@@ -125,7 +125,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 await ldapEventHandler.handlePersonenkontextCreatedMigrationEvent(event);
@@ -145,7 +145,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 organisationRepositoryMock.findEmailDomainForOrganisation.mockResolvedValueOnce('schule-sh.de');
@@ -166,7 +166,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 await ldapEventHandler.handlePersonenkontextCreatedMigrationEvent(event);
@@ -184,7 +184,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 await ldapEventHandler.handlePersonenkontextCreatedMigrationEvent(event);
@@ -202,7 +202,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 ldapClientServiceMock.isLehrerExisting.mockResolvedValueOnce({
@@ -230,7 +230,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 organisationRepositoryMock.findEmailDomainForOrganisation.mockResolvedValueOnce(undefined);
@@ -256,7 +256,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 ldapClientServiceMock.isLehrerExisting.mockResolvedValueOnce({
@@ -284,7 +284,7 @@ describe('LDAP Event Handler', () => {
                     person,
                     rolle,
                     orga,
-                    'test@schule-spsh.de',
+                    'test@schule-erwin.de',
                 );
 
                 ldapClientServiceMock.isLehrerExisting.mockResolvedValueOnce({

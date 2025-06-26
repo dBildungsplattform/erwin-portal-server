@@ -18,8 +18,8 @@ _Thunder_ can be easily configured to apply OAuth authentication to the entire c
 | Token Prefix  | `Bearer`                                                                 |
 | Access Token  | leave blank, will be auto generated                                      |
 | Grant Type    | `Password Credentials`                                                   |
-| Token URL     | `http://127.0.0.1:8080/realms/SPSH/protocol/openid-connect/token`        |
-| Client ID     | `spsh`                                                                   |
+| Token URL     | `http://127.0.0.1:8080/realms/ERWIN/protocol/openid-connect/token`        |
+| Client ID     | `erwin`                                                                   |
 | Client Secret | `YDp6fYkbUcj4ZkyAOnbAHGQ9O72htc5M` (valid for the default configuration) |
 | Username      | `test` (Or another user)                                                 |
 | Password      | `test`                                                                   |
@@ -39,9 +39,9 @@ With a bit of work you can configure Insomnia to behave similiar to Thunder, ins
 1. Create a request that gets an access token from keycloak:
 
     - Name it something like `Get Access Token`
-    - POST Request to `http://127.0.0.1:8080/realms/SPSH/protocol/openid-connect/token`
+    - POST Request to `http://127.0.0.1:8080/realms/ERWIN/protocol/openid-connect/token`
     - Set Body to `Form`, JSON WILL NOT WORK!
-        - client_id = `spsh`
+        - client_id = `erwin`
         - username = `test`
         - password = `test`
         - grant_type = `password`

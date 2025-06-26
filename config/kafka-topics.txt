@@ -1,2 +1,2 @@
-spsh-user-topic
-spsh-user-dlq-topic
+erwin-user-topic
+erwin-user-dlq-topic

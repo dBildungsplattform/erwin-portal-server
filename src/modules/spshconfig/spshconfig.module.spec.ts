@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigTestModule, DatabaseTestModule, MapperTestModule } from '../../../test/utils/index.js';
-import { SpshConfigModule } from './spshconfig.module.js';
+import { SpshConfigModule } from './erwinconfig.module.js';
 
 describe('SpshConfigModule', () => {
     let module: TestingModule;

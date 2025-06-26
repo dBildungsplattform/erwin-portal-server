@@ -18,7 +18,7 @@
                 "IMPORT_DURCHFUEHREN",
                 "PERSONEN_ANLEGEN",
                 "BULK_VERWALTEN",
-                "SCHULPORTAL_VERWALTEN",
+                "PORTAL_VERWALTEN",
                 "HINWEISE_BEARBEITEN"
             ],
             "serviceProviderIds": [5, 8, 9, 10, 11]

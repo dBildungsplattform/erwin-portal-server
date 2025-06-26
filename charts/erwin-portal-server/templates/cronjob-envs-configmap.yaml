@@ -7,6 +7,6 @@ metadata:
     {{- include "common.labels" . | nindent 4 }}
 data:
   KC_TOKEN_URL: "http://{{ $.Values.keycloakHostname }}{{ $.Values.cronjobs.keycloakTokenUrl }}"
-  KC_PUBLIC_TOKEN_URL: "https://{{ $.Values.keycloakExternalHostname | replace "spsh-xxx" .Release.Namespace  }}{{ $.Values.cronjobs.keycloakTokenUrl }}"
+  KC_PUBLIC_TOKEN_URL: "https://{{ $.Values.keycloakExternalHostname | replace "erwin-xxx" .Release.Namespace  }}{{ $.Values.cronjobs.keycloakTokenUrl }}"
   JWKS_FILE_PATH: "{{ $.Values.cronjobs.jwksFilePath }}"
   KC_CLIENT_ID: "{{ $.Values.cronjobs.keycloakClientId }}"

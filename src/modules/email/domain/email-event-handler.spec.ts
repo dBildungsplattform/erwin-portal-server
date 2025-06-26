@@ -896,7 +896,7 @@ describe('EmailEventHandler', () => {
     });
 
     describe('handlePersonenkontextCreatedMigrationEvent', () => {
-        const inputEmailAdress: string = 'test@schule-spsh.de';
+        const inputEmailAdress: string = 'test@schule-erwin.de';
         let personenkontext: Personenkontext<true>;
         let person: Person<true>;
         let rolle: Rolle<true>;
@@ -972,7 +972,7 @@ describe('EmailEventHandler', () => {
                         person,
                         rolle,
                         orga,
-                        'test@schule-spsh.de',
+                        'test@schule-erwin.de',
                     );
 
                 await emailEventHandler.handlePersonenkontextCreatedMigrationEvent(itsLearningTypeEvent);

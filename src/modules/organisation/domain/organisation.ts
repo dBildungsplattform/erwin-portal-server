@@ -118,7 +118,7 @@ export class Organisation<WasPersisted extends boolean> {
         if (!(await nameRequiredForKlasse.isSatisfiedBy(this))) {
             return new NameRequiredForKlasseError();
         }
-        //Refactor this to use KlassenNameAnSchuleEindeutig when ticket SPSH-738 is merged
+        //Refactor this to use KlassenNameAnSchuleEindeutig when ticket ERWIN-738 is merged
         if (!(await this.validateClassNameIsUniqueOnSchool(organisationRepository))) {
             return new KlassenNameAnSchuleEindeutigError(this.id ?? undefined);
         }

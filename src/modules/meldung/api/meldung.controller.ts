@@ -43,7 +43,7 @@ export class MeldungController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error while getting all meldungen.' })
     public async getAllMeldungen(@Permissions() permissions: PersonPermissions): Promise<MeldungResponse[]> {
         const requiredSytsmrechte: RollenSystemRecht[] = [
-            RollenSystemRecht.SCHULPORTAL_VERWALTEN,
+            RollenSystemRecht.PORTAL_VERWALTEN,
             RollenSystemRecht.HINWEISE_BEARBEITEN,
         ];
         const hasRequiredSystemrechte: boolean =
@@ -99,7 +99,7 @@ export class MeldungController {
         @Permissions() permissions: PersonPermissions,
     ): Promise<MeldungResponse> {
         const requiredSystemrechte: RollenSystemRecht[] = [
-            RollenSystemRecht.SCHULPORTAL_VERWALTEN,
+            RollenSystemRecht.PORTAL_VERWALTEN,
             RollenSystemRecht.HINWEISE_BEARBEITEN,
         ];
         const hasRequiredSystemrechte: boolean =

@@ -31,7 +31,7 @@ export class Migration20240515131039 extends Migration {
     this.addSql('alter table "schulstrukturknoten" add constraint "schulstrukturknoten_organizational_parent_id_unique" unique ("organizational_parent_id");');
     this.addSql('create index "schulstrukturknoten_node_type_index" on "schulstrukturknoten" ("node_type");');
 
-    this.addSql('create table "service_provider" ("id" uuid not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, "name" varchar(255) not null, "target" text check ("target" in (\'URL\', \'SCHULPORTAL_ADMINISTRATION\')) not null, "url" varchar(255) null, "provided_on_schulstrukturknoten" uuid not null, "kategorie" text check ("kategorie" in (\'EMAIL\', \'UNTERRICHT\', \'VERWALTUNG\', \'HINWEISE\', \'ANGEBOTE\')) not null, "logo" bytea null, "logo_mime_type" varchar(255) null, constraint "service_provider_pkey" primary key ("id"));');
+    this.addSql('create table "service_provider" ("id" uuid not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, "name" varchar(255) not null, "target" text check ("target" in (\'URL\', \'PORTAL_ADMINISTRATION\')) not null, "url" varchar(255) null, "provided_on_schulstrukturknoten" uuid not null, "kategorie" text check ("kategorie" in (\'EMAIL\', \'UNTERRICHT\', \'VERWALTUNG\', \'HINWEISE\', \'ANGEBOTE\')) not null, "logo" bytea null, "logo_mime_type" varchar(255) null, constraint "service_provider_pkey" primary key ("id"));');
 
     this.addSql('create table "rolle_service_provider" ("rolle_id" uuid not null, "service_provider_id" uuid not null, constraint "rolle_service_provider_pkey" primary key ("rolle_id", "service_provider_id"));');
 

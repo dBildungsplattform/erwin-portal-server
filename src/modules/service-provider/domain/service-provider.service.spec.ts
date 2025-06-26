@@ -280,7 +280,7 @@ describe('ServiceProviderService', () => {
             jest.restoreAllMocks();
         });
 
-        it('should update ServiceProvider for VIDIS Angebote if ServiceProvider in VIDIS Angebot response already exists in SPSH.', async () => {
+        it('should update ServiceProvider for VIDIS Angebote if ServiceProvider in VIDIS Angebot response already exists in ERWIN.', async () => {
             vidisService.getActivatedAngeboteByRegion.mockResolvedValue(mockVidisAngebote);
             organisationServiceProviderRepo.deleteAll.mockResolvedValue(true);
             serviceProviderRepo.findByVidisAngebotId.mockResolvedValue(
@@ -304,7 +304,7 @@ describe('ServiceProviderService', () => {
             );
         });
 
-        it('should update ServiceProvider for VIDIS Angebote if ServiceProvider in VIDIS Angebot response does not exist in SPSH yet.', async () => {
+        it('should update ServiceProvider for VIDIS Angebote if ServiceProvider in VIDIS Angebot response does not exist in ERWIN yet.', async () => {
             vidisService.getActivatedAngeboteByRegion.mockResolvedValue(mockVidisAngebote);
             organisationServiceProviderRepo.deleteAll.mockResolvedValue(true);
             serviceProviderRepo.findByVidisAngebotId.mockResolvedValue(null);
@@ -326,7 +326,7 @@ describe('ServiceProviderService', () => {
             );
         });
 
-        it('should delete ServiceProvider for VIDIS Angebote in SPSH if ServiceProvider is not in VIDIS Angebot response.', async () => {
+        it('should delete ServiceProvider for VIDIS Angebote in ERWIN if ServiceProvider is not in VIDIS Angebot response.', async () => {
             vidisService.getActivatedAngeboteByRegion.mockResolvedValue(mockVidisAngebote);
             organisationServiceProviderRepo.deleteAll.mockResolvedValue(true);
             serviceProviderRepo.findByVidisAngebotId.mockResolvedValue(null);

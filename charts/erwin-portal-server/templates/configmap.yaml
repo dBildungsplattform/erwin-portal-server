@@ -12,13 +12,13 @@ data:
   DEPLOY_STAGE: {{ .Values.environment | quote }}
   DB_NAME: {{ .Values.database.name | quote }}
   KC_BASE_URL: "http://{{ .Values.keycloakHostname }}"
-  KC_EXTERNAL_BASE_URL: 'https://{{ .Values.keycloakExternalHostname | replace "spsh-xxx" .Release.Namespace }}'
+  KC_EXTERNAL_BASE_URL: 'https://{{ .Values.keycloakExternalHostname | replace "erwin-xxx" .Release.Namespace }}'
   FRONTEND_OIDC_CALLBACK_URL: "https://{{ .Values.backendHostname }}/api/auth/login"
   FRONTEND_DEFAULT_LOGIN_REDIRECT: "https://{{ .Values.backendHostname }}/"
   FRONTEND_LOGOUT_REDIRECT: "https://{{ .Values.backendHostname }}/"
   BACKEND_HOSTNAME: "{{ .Values.backendHostname }}"
   ERROR_PAGE_REDIRECT: "https://{{ .Values.backendHostname }}/login-error"
-  LDAP_URL: '{{ .Values.ldap.url | replace "spsh-xxx" .Release.Namespace }}'
+  LDAP_URL: '{{ .Values.ldap.url | replace "erwin-xxx" .Release.Namespace }}'
   LDAP_OEFFENTLICHE_SCHULEN_DOMAIN: "{{ .Values.ldap.oeffentlicheSchulenDomain }}"
   LDAP_ERSATZSCHULEN_DOMAIN: "{{ .Values.ldap.ersatzschulenDomain }}"
   RETRY_WRAPPER_DEFAULT_RETRIES: "{{ .Values.ldap.retryWrapperDefaultRetries }}"

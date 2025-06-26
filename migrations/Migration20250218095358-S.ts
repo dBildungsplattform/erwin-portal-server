@@ -16,7 +16,7 @@ export class Migration20250218095358 extends Migration {
             'alter table "personenkontext" add constraint "personenkontext_organisation_id_foreign" foreign key ("organisation_id") references "organisation" ("id") on update cascade;',
         );
 
-        this.addSql('alter type "rollen_system_recht_enum" add value if not exists \'SCHULPORTAL_VERWALTEN\';');
+        this.addSql('alter type "rollen_system_recht_enum" add value if not exists \'PORTAL_VERWALTEN\';');
 
         this.addSql('alter type "rollen_system_recht_enum" add value if not exists \'HINWEISE_BEARBEITEN\';');
     }

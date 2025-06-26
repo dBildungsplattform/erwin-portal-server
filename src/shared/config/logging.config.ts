@@ -43,7 +43,7 @@ export class LoggingConfig {
     @IsEnum(ALLOWED_LOG_LEVEL)
     public readonly HEALTH_MODULE_LOG_LEVEL?: string;
 
-    //SPSH Modules
+    //ERWIN Modules
     @IsOptional()
     @IsEnum(ALLOWED_LOG_LEVEL)
     public readonly BACKEND_FOR_FRONTEND_MODULE_LOG_LEVEL?: string;

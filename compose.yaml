@@ -22,7 +22,7 @@ services:
       - PI_ADMIN_PASSWORD=admin
       - PI_REALM=defrealm
       - PI_BASE_URL=http://privacy-idea:8080
-      - STATUS_REDIRECT_URL=https://status.dev.spsh.dbildungsplattform.de/
+      - STATUS_REDIRECT_URL=https://status.dev.erwin.dbildungsplattform.de/
     entrypoint: '/opt/keycloak/bin/kc.sh start-dev'
     command:
       # Internal DB but still persisted in container
@@ -35,13 +35,13 @@ services:
       - "--hostname-backchannel-dynamic=true"
       # We have no way of checking for the health probe so we might just as well turn it off
       - '--health-enabled=false'
-      # Import SPSH-Realm
+      # Import ERWIN-Realm
       - '--import-realm'
     ports:
       - 8080:8080
       - 8443:8443
     volumes:
-      - ./config/dev-realm-spsh.json:/opt/keycloak/data/import/realm.json
+      - ./config/dev-realm-erwin.json:/opt/keycloak/data/import/realm.json
 
   keycloak-db-microservice:
     image: ghcr.io/dbildungsplattform/erwin-portal-server
@@ -75,7 +75,7 @@ services:
     profiles:
       - backend
     image: ghcr.io/dbildungsplattform/erwin-portal-server
-    container_name: spsh-backend
+    container_name: erwin-backend
     # build:
     #   context: .
     depends_on:
@@ -322,8 +322,8 @@ services:
     profiles:
       - third-party
     environment:
-      - KC_CLIENT_ID=spsh-service
-      - KC_TOKEN_URL=http://keycloak:8080/realms/SPSH/protocol/openid-connect/token
+      - KC_CLIENT_ID=erwin-service
+      - KC_TOKEN_URL=http://keycloak:8080/realms/ERWIN/protocol/openid-connect/token
       - BACKEND_ENDPOINT_URL=http://host.docker.internal:9090/api/cron/kopers-lock
       - HTTP_METHOD=PUT
       - JWKS_FILE_PATH=/keys/jwks.json
@@ -334,8 +334,8 @@ services:
       - keycloak
 
   frontend:
-    container_name: spsh-frontend
-    image: ghcr.io/dbildungsplattform/schulportal-client:latest
+    container_name: erwin-frontend
+    image: ghcr.io/dbildungsplattform/portal-client:latest
     profiles:
       - frontend
 

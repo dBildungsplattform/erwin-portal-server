@@ -2,7 +2,7 @@ import { BaseEvent } from './base-event.js';
 import { PersonID } from '../types/index.js';
 
 /**
- * Used for triggering syncing information about a person from SPSH to LDAP explicitly
+ * Used for triggering syncing information about a person from ERWIN to LDAP explicitly
  * and avoid communication and syncing to other systems like publishing an instance of
  * PersonExternalSystemsSyncEvent would do.
  */

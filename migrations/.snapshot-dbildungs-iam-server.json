@@ -244,7 +244,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -254,7 +254,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -501,7 +501,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -511,7 +511,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -780,7 +780,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -790,7 +790,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -1051,7 +1051,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -1061,7 +1061,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -1314,7 +1314,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -1324,7 +1324,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -1606,7 +1606,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -1616,7 +1616,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -2013,7 +2013,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -2023,7 +2023,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -2297,7 +2297,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -2307,7 +2307,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -2877,7 +2877,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -2887,7 +2887,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -3212,7 +3212,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -3222,7 +3222,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -3485,7 +3485,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -3495,7 +3495,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -3798,7 +3798,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -3808,7 +3808,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -4257,7 +4257,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -4267,7 +4267,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -4637,7 +4637,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -4647,7 +4647,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -4996,7 +4996,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -5006,7 +5006,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -5271,7 +5271,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -5281,7 +5281,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -5339,7 +5339,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ],
           "mappedType": "enum"
@@ -5559,7 +5559,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -5569,7 +5569,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -5912,7 +5912,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -5922,7 +5922,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -5998,7 +5998,7 @@
           "enumItems": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ],
           "mappedType": "enum"
         },
@@ -6297,7 +6297,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -6307,7 +6307,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -6569,7 +6569,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -6579,7 +6579,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -6841,7 +6841,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -6851,7 +6851,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -7159,7 +7159,7 @@
             "IMPORT_DURCHFUEHREN",
             "PERSONEN_LESEN",
             "BULK_VERWALTEN",
-            "SCHULPORTAL_VERWALTEN",
+            "PORTAL_VERWALTEN",
             "HINWEISE_BEARBEITEN"
           ]
         },
@@ -7169,7 +7169,7 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "PORTAL_ADMINISTRATION"
           ]
         },
         "service_provider_kategorie_enum": {
@@ -7369,7 +7369,7 @@
         "IMPORT_DURCHFUEHREN",
         "PERSONEN_LESEN",
         "BULK_VERWALTEN",
-        "SCHULPORTAL_VERWALTEN",
+        "PORTAL_VERWALTEN",
         "HINWEISE_BEARBEITEN"
       ]
     },
@@ -7379,7 +7379,7 @@
       "items": [
         "URL",
         "EMAIL",
-        "SCHULPORTAL_ADMINISTRATION"
+        "PORTAL_ADMINISTRATION"
       ]
     },
     "service_provider_kategorie_enum": {

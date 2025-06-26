@@ -14,7 +14,7 @@ export class Migration20240612044813 extends Migration {
     this.addSql('create type "rollen_art_enum" as enum (\'LERN\', \'LEHR\', \'EXTERN\', \'ORGADMIN\', \'LEIT\', \'SYSADMIN\');');
     this.addSql('create type "rollen_merkmal_enum" as enum (\'BEFRISTUNG_PFLICHT\', \'KOPERS_PFLICHT\');');
     this.addSql('create type "rollen_system_recht_enum" as enum (\'ROLLEN_VERWALTEN\', \'PERSONEN_SOFORT_LOESCHEN\', \'PERSONEN_VERWALTEN\', \'SCHULEN_VERWALTEN\', \'KLASSEN_VERWALTEN\', \'SCHULTRAEGER_VERWALTEN\', \'MIGRATION_DURCHFUEHREN\');');
-    this.addSql('create type "service_provider_target_enum" as enum (\'URL\', \'SCHULPORTAL_ADMINISTRATION\');');
+    this.addSql('create type "service_provider_target_enum" as enum (\'URL\', \'PORTAL_ADMINISTRATION\');');
     this.addSql('create type "service_provider_kategorie_enum" as enum (\'EMAIL\', \'UNTERRICHT\', \'VERWALTUNG\', \'HINWEISE\', \'ANGEBOTE\');');
     this.addSql('drop table if exists "fake" cascade;');
 
@@ -104,7 +104,7 @@ export class Migration20240612044813 extends Migration {
 
     this.addSql('alter table "service_provider" alter column "target" type text using ("target"::text);');
     this.addSql('alter table "service_provider" alter column "kategorie" type text using ("kategorie"::text);');
-    this.addSql('alter table "service_provider" add constraint "service_provider_target_check" check("target" in (\'URL\', \'SCHULPORTAL_ADMINISTRATION\'));');
+    this.addSql('alter table "service_provider" add constraint "service_provider_target_check" check("target" in (\'URL\', \'PORTAL_ADMINISTRATION\'));');
     this.addSql('alter table "service_provider" add constraint "service_provider_kategorie_check" check("kategorie" in (\'EMAIL\', \'UNTERRICHT\', \'VERWALTUNG\', \'HINWEISE\', \'ANGEBOTE\'));');
 
     this.addSql('drop type "db_seed_status_enum";');

@@ -7,7 +7,7 @@ Its purpose is, to show what needs to be implemented in the future, what has bee
 a way of dynamically raising the level of authentication for a user have been made in the dbiam-server project.
 
 ## Current state
-Currently, only the config of the keycloak project was adjusted, therefore a new flow "stepup" is available and already assigned to the spsh-client.
+Currently, only the config of the keycloak project was adjusted, therefore a new flow "stepup" is available and already assigned to the erwin-client.
 Two ACR values were introduced, silver=10, gold=20.
 
 In this project, only one thing was adjusted, the [OpenIdConnectStrategy](./../src/modules/authentication/passport/oidc.strategy.ts) now sends ACR-value to client (passport).

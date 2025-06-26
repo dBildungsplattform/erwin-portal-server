@@ -12,4 +12,4 @@ If you have access to this page, you can probably get access to a development cl
 
 ## Install helm charts to cluster
 ...
-backendHostname full host name where you want to reach the deployed instance e.g. https://helm.dev.spsh.dbildungsplattform.de/
+backendHostname full host name where you want to reach the deployed instance e.g. https://helm.dev.erwin.dbildungsplattform.de/

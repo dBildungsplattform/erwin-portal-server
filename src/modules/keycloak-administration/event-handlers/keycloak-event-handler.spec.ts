@@ -74,7 +74,7 @@ describe('KeycloakEventHandler', () => {
                 person,
                 rolle,
                 orga,
-                'test@schule-spsh.de',
+                'test@schule-erwin.de',
             );
 
             await sut.handlePersonenkontextCreatedMigrationEvent(event);
@@ -95,7 +95,7 @@ describe('KeycloakEventHandler', () => {
                 person,
                 rolle,
                 orga,
-                'test@schule-spsh.de',
+                'test@schule-erwin.de',
             );
 
             keycloakUserServiceMock.updateOXUserAttributes.mockResolvedValueOnce({
@@ -124,7 +124,7 @@ describe('KeycloakEventHandler', () => {
                 person,
                 rolle,
                 orga,
-                'test@schule-spsh.de',
+                'test@schule-erwin.de',
             );
 
             keycloakUserServiceMock.updateOXUserAttributes.mockResolvedValueOnce({

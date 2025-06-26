@@ -16,12 +16,12 @@
         "USE_SSL": true
     },
     "KEYCLOAK": {
-        "ADMIN_REALM_NAME": "SPSH",
-        "REALM_NAME": "SPSH",
-        "ADMIN_CLIENT_ID": "spsh-admin",
-        "CLIENT_ID": "spsh",
-        "TEST_CLIENT_ID": "spsh-test",
-        "SERVICE_CLIENT_ID": "spsh-service"
+        "ADMIN_REALM_NAME": "ERWIN",
+        "REALM_NAME": "ERWIN",
+        "ADMIN_CLIENT_ID": "erwin-admin",
+        "CLIENT_ID": "erwin",
+        "TEST_CLIENT_ID": "erwin-test",
+        "SERVICE_CLIENT_ID": "erwin-service"
     },
     "REDIS": {
         "HOST": "erwin-portal-redis-master.erwin.svc.cluster.local",
@@ -32,7 +32,7 @@
     },
 
     "LDAP": {
-        "URL": "ldap://spsh-xxx.svc.cluster.local",
+        "URL": "ldap://erwin-xxx.svc.cluster.local",
         "BIND_DN": "cn=admin,dc=schule-sh,dc=de",
         "ADMIN_PASSWORD": "password",
         "BASE_DN": "dc=schule-sh,dc=de"
@@ -92,8 +92,8 @@
     "KAFKA": {
         "BROKER": "localhost:9092",
         "TOPIC_PREFIX": "dev.",
-        "USER_TOPIC": "spsh-user-topic",
-        "USER_DLQ_TOPIC": "spsh-user-dlq-topic",
+        "USER_TOPIC": "erwin-user-topic",
+        "USER_DLQ_TOPIC": "erwin-user-dlq-topic",
         "GROUP_ID": "nestjs-kafka",
         "SESSION_TIMEOUT": 30000,
         "HEARTBEAT_INTERVAL": 10000,

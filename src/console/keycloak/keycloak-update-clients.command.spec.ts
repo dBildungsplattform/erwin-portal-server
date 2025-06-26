@@ -42,7 +42,7 @@ describe('KeycloakUpdateClientsCommand', () => {
             await expect(keycloakUpdateClients.run(['tests'])).resolves.not.toThrow();
 
             expect(clientServiceMock.updateClient).toHaveBeenCalledWith('f45add8b-ab22-4742-afb4-cefa9bc12331', {
-                clientId: 'spsh',
+                clientId: 'erwin',
                 description: 'Integration test',
             });
         });

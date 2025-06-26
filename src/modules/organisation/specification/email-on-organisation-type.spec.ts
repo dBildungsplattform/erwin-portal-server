@@ -11,7 +11,7 @@ describe('EmailAdressOnOrganisationTyp specification', () => {
             const schule: Organisation<false> = DoFactory.createOrganisation(false, {
                 typ: OrganisationsTyp.KLASSE,
                 name: 'test',
-                emailAdress: 'testmail@spsh.de',
+                emailAdress: 'testmail@erwin.de',
             });
 
             await expect(specification.isSatisfiedBy(schule)).resolves.toBe(false);
@@ -23,7 +23,7 @@ describe('EmailAdressOnOrganisationTyp specification', () => {
             const organisation: Organisation<false> = DoFactory.createOrganisation(false, {
                 typ: OrganisationsTyp.SONSTIGE,
                 name: 'test',
-                emailAdress: 'testmail@spsh.de',
+                emailAdress: 'testmail@erwin.de',
             });
 
             await expect(specification.isSatisfiedBy(organisation)).resolves.toBe(true);

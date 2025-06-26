@@ -28,4 +28,4 @@ Script: `cron_trigger.sh`
 
 **Authentication**
 
-The jobs use a JWKS from the secrets vault to authenticate against the `spsh-service` Keycloak client. The associated technical user has `CRON_DURCHFUEHREN` permissions, which will be checked against in the cron endpoints.
+The jobs use a JWKS from the secrets vault to authenticate against the `erwin-service` Keycloak client. The associated technical user has `CRON_DURCHFUEHREN` permissions, which will be checked against in the cron endpoints.

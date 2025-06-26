@@ -34,7 +34,7 @@ Einen gültigen Cookie erhält man über die Entwickler-Tools des Browsers, wenn
 Lokal muss man hierzu das **gesamte** Backend (inkl. Keycloak, Redis und DB) und Frontend laufen haben.
 Informationen zum Starten dieser Komponenten in den jeweiligen GitHub Projekten nachlesen:
 
-- [Backend](https://github.com/dBildungsplattform/schulportal-client)
+- [Backend](https://github.com/dBildungsplattform/portal-client)
 - [Frontend](https://github.com/dBildungsplattform/erwin-portal-server)
 
 Starten des gesamten Backends samt Keycloak, Datenbank und Redis ist auch möglich über

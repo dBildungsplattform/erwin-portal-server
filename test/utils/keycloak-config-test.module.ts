@@ -23,7 +23,7 @@ export class KeycloakConfigTestModule implements OnModuleDestroy {
                             this.keycloak = await new GenericContainer('quay.io/keycloak/keycloak:23.0.4')
                                 .withCopyFilesToContainer([
                                     {
-                                        source: './config/dev-realm-spsh.json',
+                                        source: './config/dev-realm-erwin.json',
                                         target: '/opt/keycloak/data/import/realm.json',
                                     },
                                 ])

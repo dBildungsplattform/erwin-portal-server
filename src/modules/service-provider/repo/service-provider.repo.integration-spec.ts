@@ -264,7 +264,7 @@ describe('ServiceProviderRepo', () => {
             const serviceProviderEntityMock: ServiceProviderEntity = {
                 id: faker.string.uuid(),
                 name: faker.company.name(),
-                target: ServiceProviderTarget.SCHULPORTAL_ADMINISTRATION,
+                target: ServiceProviderTarget.PORTAL_ADMINISTRATION,
                 providedOnSchulstrukturknoten: faker.string.uuid(),
                 kategorie: ServiceProviderKategorie.VERWALTUNG,
             } as ServiceProviderEntity;

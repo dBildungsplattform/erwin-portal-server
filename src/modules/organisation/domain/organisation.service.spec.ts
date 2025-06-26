@@ -246,7 +246,7 @@ describe('OrganisationService', () => {
         it('should return a domain error if type is klasse and email is set', async () => {
             const organisation: Organisation<false> = DoFactory.createOrganisation(false, {
                 typ: OrganisationsTyp.KLASSE,
-                emailAdress: 'klassenmail123@spsh.de',
+                emailAdress: 'klassenmail123@erwin.de',
                 name: 'Klasse123',
             });
             organisationRepositoryMock.save.mockResolvedValue(organisation as unknown as Organisation<true>);
@@ -625,7 +625,7 @@ describe('OrganisationService', () => {
         it('should return a domain error if type is klasse and email is set', async () => {
             const organisation: Organisation<true> = DoFactory.createOrganisation(true, {
                 typ: OrganisationsTyp.KLASSE,
-                emailAdress: 'klassenmail123@spsh.de',
+                emailAdress: 'klassenmail123@erwin.de',
                 name: 'Klasse123',
             });
             organisationRepositoryMock.findById.mockResolvedValue(organisation as unknown as Organisation<true>);

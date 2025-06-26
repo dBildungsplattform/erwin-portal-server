@@ -914,7 +914,7 @@ describe('OxEventHandler', () => {
                     personId: personId,
                     keycloakUsername: referrer,
                     oxUserId: oxUserId,
-                    oxUserName: referrer, //this is the new OxUserName, it's changed on renaming in SPSH
+                    oxUserName: referrer, //this is the new OxUserName, it's changed on renaming in ERWIN
                     oxContextId: contextId,
                     oxContextName: contextName,
                     primaryEmail: email,
@@ -993,7 +993,7 @@ describe('OxEventHandler', () => {
                     personId: personId,
                     keycloakUsername: referrer,
                     oxUserId: oxUserId,
-                    oxUserName: referrer, //this is the new OxUserName, it's changed on renaming in SPSH
+                    oxUserName: referrer, //this is the new OxUserName, it's changed on renaming in ERWIN
                     oxContextId: contextId,
                     oxContextName: contextName,
                     primaryEmail: email,

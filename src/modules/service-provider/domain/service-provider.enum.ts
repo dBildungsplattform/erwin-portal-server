@@ -12,7 +12,7 @@ export enum ServiceProviderKategorie {
 export enum ServiceProviderTarget {
     URL = 'URL',
     EMAIL = 'EMAIL',
-    SCHULPORTAL_ADMINISTRATION = 'SCHULPORTAL_ADMINISTRATION',
+    PORTAL_ADMINISTRATION = 'PORTAL_ADMINISTRATION',
 }
 
 export enum ServiceProviderSystem {

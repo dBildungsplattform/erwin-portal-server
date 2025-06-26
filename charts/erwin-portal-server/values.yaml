@@ -5,7 +5,7 @@ namespaceOverride: ''
 backendHostname: ''
 keycloakHostname: 'http://erwin-portal-keycloak'
 keycloak2ndHostname: ""
-keycloakExternalHostname: 'spsh-xxx-keycloak.dev.spsh.dbildungsplattform.de'
+keycloakExternalHostname: 'erwin-xxx-keycloak.dev.erwin.dbildungsplattform.de'
 backend2ndHostname: ""
 
 containerSecurityContext:
@@ -30,7 +30,7 @@ database:
   username: 'erwin_portal_server'
 
 ldap:
-  url: ldap://erwin-portal-ldap.spsh-xxx.svc.cluster.local
+  url: ldap://erwin-portal-ldap.erwin-xxx.svc.cluster.local
   oeffentlicheSchulenDomain: schule-sh.de
   ersatzschulenDomain: ersatzschule-sh.de
   base_dn: dc=schule-sh,dc=de
@@ -44,7 +44,7 @@ itslearning:
   rootErsatz: ersatz
 
 privacyidea:
-  url: https://privacyidea.dev.spsh.dbildungsplattform.de
+  url: https://privacyidea.dev.erwin.dbildungsplattform.de
   renameWaitingTime: 5
   realm: ucs_users
   userResolver: ucs_users
@@ -189,7 +189,7 @@ backend:
     maxOldSpaceSize: 3584
 
 # kafka:
-#   url: "erwin-portal-kafka.spsh.svc.cluster.local:9092"
+#   url: "erwin-portal-kafka.erwin.svc.cluster.local:9092"
 #   enabled: false
 #   initEnabled: true
 #   initImage:
@@ -208,7 +208,7 @@ podDisruptionBudget:
   minAvailable: "60%"
 
 status:
-  url: 'https://status.dev.spsh.dbildungsplattform.de/'
+  url: 'https://status.dev.erwin.dbildungsplattform.de/'
 
 cronjobs:
   enabled: true
@@ -217,8 +217,8 @@ cronjobs:
     repository: docker.io/schulcloud/cron-tools
     pullPolicy: IfNotPresent
   port: 5656
-  keycloakTokenUrl: '/realms/SPSH/protocol/openid-connect/token'
-  keycloakClientId: spsh-service
+  keycloakTokenUrl: '/realms/ERWIN/protocol/openid-connect/token'
+  keycloakClientId: erwin-service
   jwksFilePath: /keys/jwks.json
   backendHostname: '{{ $.Values.frontendHostname }}'
   scriptDir: scripts

@@ -66,7 +66,7 @@ export type ImportResult = {
 };
 
 export class ImportWorkflow {
-    public readonly TEXT_FILENAME_NAME: string = '_spsh_csv_import_ergebnis.txt';
+    public readonly TEXT_FILENAME_NAME: string = '_erwin_csv_import_ergebnis.txt';
 
     public readonly CSV_FILE_VALID_HEADERS: string[] = ['nachname', 'vorname', 'klasse'];
 
