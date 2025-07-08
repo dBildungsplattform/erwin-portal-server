@@ -70,7 +70,7 @@
         },
         {
             "id": 5,
-            "name": "Schulportal-Administration",
+            "name": "ErWInPortal-Administration",
             "target": "SCHULPORTAL_ADMINISTRATION",
             "kategorie": "VERWALTUNG",
             "logoMimeType": "image/png",
