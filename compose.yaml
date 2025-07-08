@@ -12,7 +12,7 @@ services:
       - POSTGRES_DB=erwin-portal-server
 
   keycloak:
-    image: ghcr.io/dbildungsplattform/dbildungs-iam-keycloak:latest
+    image: ghcr.io/dbildungsplattform/erwin-portal-keycloak:latest
     container_name: keycloak
     hostname: keycloak
     environment:
