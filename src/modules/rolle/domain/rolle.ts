@@ -25,7 +25,7 @@ export class Rolle<WasPersisted extends boolean> {
         public istTechnisch: boolean,
         public serviceProviderData: ServiceProvider<true>[],
         public lmsRolle?: string,
-    ) { }
+    ) {}
 
     public static createNew(
         organisationRepo: OrganisationRepository,
@@ -59,7 +59,7 @@ export class Rolle<WasPersisted extends boolean> {
             serviceProviderIds,
             istTechnisch,
             serviceProviderData,
-            lmsRolle
+            lmsRolle,
         );
     }
 
