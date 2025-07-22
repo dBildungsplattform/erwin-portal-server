@@ -35,18 +35,18 @@ export enum RollenSystemRecht {
 }
 
 export enum SchulcloudRollenArt {
-    user = 'user',
-    student = 'student',
-    teacher = 'teacher',
-    admin = 'admin',
-    superhero = 'superhero',
+    USER = 'user',
+    STUDENT = 'student',
+    TEACHER = 'teacher',
+    ADMIN = 'admin',
+    SUPERHERO = 'superhero',
 }
 
 export enum MoodleRollenArt {
-    Authenticated = 'Authenticated',
-    User = 'User',
-    Student = 'Student',
-    Teacher = 'Teacher',
-    Manager = 'Manager',
-    SiteAdministrator = 'Site administrator',
+    AUTHENTICATED = 'Authenticated',
+    USER = 'User',
+    STUDENT = 'Student',
+    TEACHER = 'Teacher',
+    MANAGER = 'Manager',
+    SITE_ADMINISTRATOR = 'Site administrator',
 }
