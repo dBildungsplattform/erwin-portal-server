@@ -19,7 +19,8 @@
                 "PERSONEN_ANLEGEN",
                 "BULK_VERWALTEN",
                 "SCHULPORTAL_VERWALTEN",
-                "HINWEISE_BEARBEITEN"
+                "HINWEISE_BEARBEITEN",
+                "SERVICEPROVIDER_VERWALTEN"
             ],
             "serviceProviderIds": [5, 8, 9, 10, 11]
         },
