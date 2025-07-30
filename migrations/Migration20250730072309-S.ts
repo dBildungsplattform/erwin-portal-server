@@ -13,9 +13,7 @@ export class Migration20250730072309 extends Migration {
 
         this.addSql('alter type "rollen_art_enum" add value if not exists \'PORTALADMIN\';');
 
-        this.addSql(
-            'alter type "rollen_system_recht_enum" add value if not exists \'PERSONEN_SERVICEPROVIDERN_ZUWEISEN\';',
-        );
+        this.addSql('alter type "rollen_system_recht_enum" add value if not exists \'LMS_VERWALTEN\';');
 
         this.addSql('alter type "service_provider_kategorie_enum" add value if not exists \'LMS\';');
 
