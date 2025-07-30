@@ -208,7 +208,7 @@
         {
             "id": 103,
             "administeredBySchulstrukturknoten": 0,
-            "name": "Migration",
+            "name": "Portal Admin",
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [
