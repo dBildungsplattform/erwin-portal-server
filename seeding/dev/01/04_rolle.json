@@ -220,7 +220,7 @@
                 "PERSONEN_SERVICEPROVIDERN_ZUWEISEN"
             ],
             "serviceProviderIds": [],
-            "istTechnisch": true
+            "istTechnisch": false
         },
         {
             "id": 200,

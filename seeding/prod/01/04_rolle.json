@@ -218,7 +218,7 @@
                 "PERSONEN_SERVICEPROVIDERN_ZUWEISEN"
             ],
             "serviceProviderIds": [],
-            "istTechnisch": true
+            "istTechnisch": false
         }
     ]
 }
