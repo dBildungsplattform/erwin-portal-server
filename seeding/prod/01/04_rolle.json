@@ -215,7 +215,7 @@
                 "PERSONEN_VERWALTEN",
                 "PERSONEN_SOFORT_LOESCHEN",
                 "ROLLEN_VERWALTEN",
-                "PERSONEN_SERVICEPROVIDERN_ZUWEISEN"
+                "LMS_VERWALTEN"
             ],
             "serviceProviderIds": [],
             "istTechnisch": false
