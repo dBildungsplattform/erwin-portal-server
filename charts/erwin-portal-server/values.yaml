@@ -139,7 +139,7 @@ backend:
       path: '/health'
   dbseeding:
     enabled: true
-    command: [ "node", "dist/src/console/main.js", "db", "setup", "dev" ]
+    command: [ "sh", "-c", "npm run setup" ]
   dbmigration:
     enabled: true
     command: [ "node", "dist/src/console/main.js", "db", "migration-apply" ]
