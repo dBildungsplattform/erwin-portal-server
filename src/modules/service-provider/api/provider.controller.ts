@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, StreamableFile, UseFilters, ForbiddenException } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, StreamableFile, UseFilters } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
@@ -19,14 +19,13 @@ import { StreamableFileFactory } from '../../../shared/util/streamable-file.fact
 import { AuthenticationExceptionFilter } from '../../authentication/api/authentication-exception-filter.js';
 import { Permissions } from '../../authentication/api/permissions.decorator.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
+import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { ServiceProvider } from '../domain/service-provider.js';
 import { ServiceProviderService } from '../domain/service-provider.service.js';
 import { ServiceProviderRepo } from '../repo/service-provider.repo.js';
 import { AngebotByIdParams } from './angebot-by.id.params.js';
-import { CreateNewServiceProviderParams } from './create-new-service-provider.params.js';
 import { ServiceProviderBodyParams } from './service-provider.body.params.js';
 import { ServiceProviderResponse } from './service-provider.response.js';
-import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 
 @UseFilters(SchulConnexValidationErrorFilter, new AuthenticationExceptionFilter())
 @ApiTags('provider')
@@ -128,34 +127,21 @@ export class ProviderController {
     @ApiForbiddenResponse({ description: 'Insufficient permissions to get service-providers.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while getting all service-providers.' })
     public async createNewServiceProviders(
-        @Param() params: CreateNewServiceProviderParams,
         @Body() spBodyParams: ServiceProviderBodyParams,
         @Permissions() permissions: PersonPermissions,
     ): Promise<ServiceProviderResponse> {
+        console.info('Creating new service provider with body params:', spBodyParams);
+
         const spVerwaltenPermission: boolean = await permissions.hasSystemrechteAtRootOrganisation([
             RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
         ]);
         if (!spVerwaltenPermission) {
             throw new ForbiddenException('You do not have the required permissions to create new service providers.');
         }
-        const newServiceProvider: ServiceProvider<false> = ServiceProvider.createNew(
-            params.name,
-            params.target,
-            params.url,
-            params.kategorie,
-            params.providedOnSchulstrukturknoten,
-            params.logo,
-            params.logoMimeType,
-            params.keycloakGroup,
-            params.keycloakRole,
-            params.externalSystem,
-            spBodyParams.requires2fa,
-            params.vidisAngebotId,
-        );
+        const newServiceProvider: ServiceProvider<true> =
+            await this.serviceProviderService.createServiceProvider(spBodyParams);
 
-        const persistedServiceProvider: ServiceProvider<true> = await this.serviceProviderRepo.save(newServiceProvider);
-
-        const response: ServiceProviderResponse = new ServiceProviderResponse(persistedServiceProvider);
+        const response: ServiceProviderResponse = new ServiceProviderResponse(newServiceProvider);
 
         return response;
     }

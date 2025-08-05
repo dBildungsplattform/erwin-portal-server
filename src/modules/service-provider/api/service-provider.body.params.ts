@@ -18,7 +18,7 @@ export class ServiceProviderBodyParams {
         required: true,
         enum: ServiceProviderTarget,
     })
-    public readonly target!: string;
+    public readonly target!: ServiceProviderTarget;
 
     @ApiProperty({
         description: 'The URL of the service provider.',
@@ -32,7 +32,7 @@ export class ServiceProviderBodyParams {
         required: true,
         enum: ServiceProviderKategorie,
     })
-    public readonly kategorie!: string;
+    public readonly kategorie!: ServiceProviderKategorie;
 
     @ApiProperty({
         description: 'The provided on schulstrukturknoten.',
@@ -44,9 +44,9 @@ export class ServiceProviderBodyParams {
     @ApiProperty({
         description: 'The logo of the service provider.',
         required: false,
-        type: Buffer,
+        type: String, // Changed from Buffer to String for Swagger compatibility
     })
-    public readonly logo?: Buffer;
+    public readonly logo?: string;
 
     @ApiProperty({
         description: 'The MIME type of the logo.',
@@ -74,7 +74,7 @@ export class ServiceProviderBodyParams {
         required: true,
         enum: ServiceProviderSystem,
     })
-    public readonly externalSystem!: string;
+    public readonly externalSystem!: ServiceProviderSystem;
 
     @ApiProperty({
         description: 'Indicates if the service provider requires 2FA.',
