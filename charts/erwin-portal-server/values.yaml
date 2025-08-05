@@ -139,7 +139,7 @@ backend:
       path: '/health'
   dbseeding:
     enabled: true
-    command: ["node", "-e", "require('child_process').execSync('node dist/src/console/main.js db migration-apply && node dist/src/console/main.js keycloak update-clients dev && node dist/src/console/main.js db seed dev', {stdio: 'inherit'})"]
+    command: [ "node", "dist/src/console/main.js", "db", "setup", "dev" ]
   dbmigration:
     enabled: true
     command: [ "node", "dist/src/console/main.js", "db", "migration-apply" ]
