@@ -117,7 +117,7 @@ export class ProviderController {
         return logoFile;
     }
 
-    @Post('createNew')
+    @Post('createProvider')
     @ApiOperation({ description: 'Add new service-providers.' })
     @ApiOkResponse({
         description: 'The service-providers were successfully added.',
