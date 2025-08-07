@@ -1,92 +1,89 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
     ServiceProviderKategorie,
     ServiceProviderSystem,
     ServiceProviderTarget,
 } from '../domain/service-provider.enum.js';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class ServiceProviderBodyParams {
+    @IsString()
     @ApiProperty({
         description: 'The name of the service provider.',
         required: true,
-        type: String,
     })
     public readonly name!: string;
 
+    @IsEnum(ServiceProviderTarget)
     @ApiProperty({
         description: 'The target of the service provider.',
         required: true,
         enum: ServiceProviderTarget,
+        enumName: 'ServiceProviderTarget',
     })
     public readonly target!: ServiceProviderTarget;
 
+    @IsString()
     @ApiProperty({
         description: 'The URL of the service provider.',
         required: true,
-        type: String,
     })
     public readonly url!: string;
 
+    @IsEnum(ServiceProviderKategorie)
     @ApiProperty({
         description: 'The category of the service provider.',
         required: true,
         enum: ServiceProviderKategorie,
+        enumName: 'ServiceProviderKategorie',
     })
     public readonly kategorie!: ServiceProviderKategorie;
 
+    @IsString()
     @ApiProperty({
         description: 'The provided on schulstrukturknoten.',
         required: true,
-        type: String,
     })
     public readonly providedOnSchulstrukturknoten!: string;
 
-    @ApiProperty({
-        description: 'The logo of the service provider.',
-        required: false,
-        type: String, // Changed from Buffer to String for Swagger compatibility
-    })
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional()
     public readonly logo?: string;
 
-    @ApiProperty({
-        description: 'The MIME type of the logo.',
-        required: false,
-        type: String,
-    })
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional()
     public readonly logoMimeType?: string;
 
-    @ApiProperty({
-        description: 'The Keycloak group associated with the service provider.',
-        required: false,
-        type: String,
-    })
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional()
     public readonly keycloakGroup?: string;
 
-    @ApiProperty({
-        description: 'The Keycloak role associated with the service provider.',
-        required: false,
-        type: String,
-    })
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional()
     public readonly keycloakRole?: string;
 
+    @IsEnum(ServiceProviderSystem)
     @ApiProperty({
         description: 'The external system of the service provider.',
         required: true,
         enum: ServiceProviderSystem,
+        enumName: 'ServiceProviderSystem',
     })
     public readonly externalSystem!: ServiceProviderSystem;
 
+    @IsBoolean()
     @ApiProperty({
         description: 'Indicates if the service provider requires 2FA.',
         required: true,
-        type: Boolean,
     })
     public readonly requires2fa!: boolean;
 
-    @ApiProperty({
-        description: 'The VIDIS Angebot ID of the service provider.',
-        required: false,
-        type: String,
-    })
+    @IsString()
+    @IsOptional()
+    @ApiPropertyOptional()
     public readonly vidisAngebotId?: string;
 }
