@@ -15,7 +15,6 @@ export enum RollenArt {
 export enum RollenMerkmal {
     BEFRISTUNG_PFLICHT = 'BEFRISTUNG_PFLICHT',
     KOPERS_PFLICHT = 'KOPERS_PFLICHT',
-    MAPPING = 'MAPPING',
 }
 
 export enum RollenSystemRecht {
@@ -35,21 +34,4 @@ export enum RollenSystemRecht {
     SCHULPORTAL_VERWALTEN = 'SCHULPORTAL_VERWALTEN',
     HINWEISE_BEARBEITEN = 'HINWEISE_BEARBEITEN',
     LMS_VERWALTEN = 'LMS_VERWALTEN',
-}
-
-export enum SchulcloudRollenArt {
-    USER = 'user',
-    STUDENT = 'student',
-    TEACHER = 'teacher',
-    ADMIN = 'admin',
-    SUPERHERO = 'superhero',
-}
-
-export enum MoodleRollenArt {
-    AUTHENTICATED = 'Authenticated',
-    USER = 'User',
-    STUDENT = 'Student',
-    TEACHER = 'Teacher',
-    MANAGER = 'Manager',
-    SITE_ADMINISTRATOR = 'Site administrator',
 }
