@@ -172,7 +172,7 @@ describe('RollenMappingRepo', () => {
             it('should not throw', async () => {
                 const savedMapping: RollenMapping<true> = await getSavedRollenMapping();
 
-                expect(() => sut.delete(savedMapping.id)).not.toThrow();
+                await expect(sut.delete(savedMapping.id)).resolves.not.toThrow();
             });
         });
     });
