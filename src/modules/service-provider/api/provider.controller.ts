@@ -127,7 +127,7 @@ export class ProviderController {
     @ApiUnauthorizedResponse({ description: 'Not authorized to create new service provider.' })
     @ApiForbiddenResponse({ description: 'Insufficient permissions to create a new service-provider.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating a new service-provider.' })
-    public async createNewServiceProviders(
+    public async createNewServiceProvider(
         @Body() serviceProviderBodyParams: ServiceProviderBodyParams,
         @Permissions() permissions: PersonPermissions,
     ): Promise<ServiceProviderResponse> {
