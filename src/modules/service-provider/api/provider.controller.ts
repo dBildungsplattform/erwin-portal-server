@@ -2,6 +2,7 @@ import { Body, Controller, ForbiddenException, Get, Param, Post, StreamableFile,
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
+    ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
@@ -117,30 +118,25 @@ export class ProviderController {
         return logoFile;
     }
 
-    @Post('createProvider')
-    @ApiOperation({ description: 'Add new service-providers.' })
-    @ApiOkResponse({
-        description: 'The service-providers were successfully added.',
+    @Post('create')
+    @ApiOperation({ description: 'Create a new service-provider.' })
+    @ApiCreatedResponse({
+        description: 'The service-provider was added successfully.',
         type: ServiceProviderResponse,
     })
-    @ApiUnauthorizedResponse({ description: 'Not authorized to get available service providers.' })
-    @ApiForbiddenResponse({ description: 'Insufficient permissions to get service-providers.' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while getting all service-providers.' })
+    @ApiUnauthorizedResponse({ description: 'Not authorized to create new service provider.' })
+    @ApiForbiddenResponse({ description: 'Insufficient permissions to create a new service-provider.' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while creating a new service-provider.' })
     public async createNewServiceProviders(
-        @Body() spBodyParams: ServiceProviderBodyParams,
+        @Body() serviceProviderBodyParams: ServiceProviderBodyParams,
         @Permissions() permissions: PersonPermissions,
     ): Promise<ServiceProviderResponse> {
-        console.info('Creating new service provider with body params:', spBodyParams);
-
-        const spVerwaltenPermission: boolean = await permissions.hasSystemrechteAtRootOrganisation([
-            RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
-        ]);
-        if (!spVerwaltenPermission) {
-            throw new ForbiddenException('You do not have the required permissions to create new service providers.');
+        if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.SERVICEPROVIDER_VERWALTEN]))) {
+            throw new ForbiddenException('You do not have the required permissions to create new service provider.');
         }
-        const newServiceProvider: ServiceProvider<true> =
-            await this.serviceProviderService.createServiceProvider(spBodyParams);
 
+        const newServiceProvider: ServiceProvider<true> =
+            await this.serviceProviderService.createServiceProvider(serviceProviderBodyParams);
         const response: ServiceProviderResponse = new ServiceProviderResponse(newServiceProvider);
 
         return response;
