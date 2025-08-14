@@ -177,7 +177,7 @@ describe('Provider Controller Test', () => {
 
                 const spBodyParams: ServiceProviderBodyParams = {} as ServiceProviderBodyParams;
 
-                await expect(async () =>
+                await expect(
                     providerController.createNewServiceProvider(spBodyParams, personPermissions),
                 ).rejects.toThrow(ForbiddenException);
                 expect(serviceProviderServiceMock.createServiceProvider).not.toHaveBeenCalled();
