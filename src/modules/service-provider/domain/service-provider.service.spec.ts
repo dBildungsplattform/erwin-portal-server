@@ -16,6 +16,7 @@ import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.j
 import { faker } from '@faker-js/faker';
 import { ConfigTestModule } from '../../../../test/utils/config-test.module.js';
 import { VidisAngebot } from '../../vidis/domain/vidis-angebot.js';
+import { ServiceProviderBodyParams } from '../api/service-provider.body.params.js';
 
 const mockVidisAngebote: VidisAngebot[] = [
     {
@@ -349,6 +350,27 @@ describe('ServiceProviderService', () => {
                 mockAllSchoolActivationsInVidisAngebote.length,
             );
             expect(serviceProviderRepo.deleteById).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('createServiceProvider', () => {
+        describe('When creating a new ServiceProvider', () => {
+            it('should save it in the ServiceProviderRepo', async () => {
+                const sp: ServiceProvider<false> = DoFactory.createServiceProvider(false);
+                const spBodyParams: ServiceProviderBodyParams = {
+                    name: sp.name,
+                    target: sp.target,
+                    url: sp.url ?? '',
+                    kategorie: sp.kategorie,
+                    providedOnSchulstrukturknoten: sp.providedOnSchulstrukturknoten,
+                    externalSystem: sp.externalSystem,
+                    requires2fa: sp.requires2fa,
+                };
+                const createdSp: ServiceProvider<true> = await service.createServiceProvider(spBodyParams);
+
+                expect(createdSp.id).toBeDefined();
+                expect(serviceProviderRepo.save).toHaveBeenCalled();
+            });
         });
     });
 });

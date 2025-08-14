@@ -1,7 +1,8 @@
-import { Controller, Get, Param, StreamableFile, UseFilters } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, StreamableFile, UseFilters } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
+    ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
@@ -19,10 +20,12 @@ import { StreamableFileFactory } from '../../../shared/util/streamable-file.fact
 import { AuthenticationExceptionFilter } from '../../authentication/api/authentication-exception-filter.js';
 import { Permissions } from '../../authentication/api/permissions.decorator.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
+import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { ServiceProvider } from '../domain/service-provider.js';
 import { ServiceProviderService } from '../domain/service-provider.service.js';
 import { ServiceProviderRepo } from '../repo/service-provider.repo.js';
 import { AngebotByIdParams } from './angebot-by.id.params.js';
+import { ServiceProviderBodyParams } from './service-provider.body.params.js';
 import { ServiceProviderResponse } from './service-provider.response.js';
 
 @UseFilters(SchulConnexValidationErrorFilter, new AuthenticationExceptionFilter())
@@ -113,5 +116,29 @@ export class ProviderController {
         });
 
         return logoFile;
+    }
+
+    @Post('create')
+    @ApiOperation({ description: 'Create a new service-provider.' })
+    @ApiCreatedResponse({
+        description: 'The service-provider was added successfully.',
+        type: ServiceProviderResponse,
+    })
+    @ApiUnauthorizedResponse({ description: 'Not authorized to create new service provider.' })
+    @ApiForbiddenResponse({ description: 'Insufficient permissions to create a new service-provider.' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while creating a new service-provider.' })
+    public async createNewServiceProvider(
+        @Body() serviceProviderBodyParams: ServiceProviderBodyParams,
+        @Permissions() permissions: PersonPermissions,
+    ): Promise<ServiceProviderResponse> {
+        if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.SERVICEPROVIDER_VERWALTEN]))) {
+            throw new ForbiddenException('You do not have the required permissions to create new service provider.');
+        }
+
+        const newServiceProvider: ServiceProvider<true> =
+            await this.serviceProviderService.createServiceProvider(serviceProviderBodyParams);
+        const response: ServiceProviderResponse = new ServiceProviderResponse(newServiceProvider);
+
+        return response;
     }
 }
