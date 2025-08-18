@@ -11,8 +11,6 @@ export class Migration20250814121100 extends Migration {
             'alter table "organisation" alter column "lernmanagementsystem" type uuid using ("lernmanagementsystem"::text::uuid);',
         );
 
-        this.addSql('alter type "rollen_merkmal_enum" add value if not exists \'MAPPING\';');
-
         this.addSql('alter type "rollen_system_recht_enum" add value if not exists \'SERVICEPROVIDER_VERWALTEN\';');
     }
 
