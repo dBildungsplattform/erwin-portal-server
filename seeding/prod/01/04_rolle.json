@@ -17,7 +17,8 @@
                 "PERSON_SYNCHRONISIEREN",
                 "IMPORT_DURCHFUEHREN",
                 "PERSONEN_ANLEGEN",
-                "BULK_VERWALTEN"
+                "BULK_VERWALTEN",
+                "SERVICEPROVIDER_VERWALTEN"
             ],
             "serviceProviderIds": [5, 8, 9, 10, 11]
         },
