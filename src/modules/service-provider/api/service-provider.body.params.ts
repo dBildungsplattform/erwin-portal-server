@@ -41,7 +41,7 @@ export class ServiceProviderBodyParams {
 
     @IsString()
     @ApiProperty({
-        description: 'The provided on schulstrukturknoten.',
+        description: 'The reference to the Schulstrukturknoten.',
         required: true,
     })
     public readonly providedOnSchulstrukturknoten!: string;

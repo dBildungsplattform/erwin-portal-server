@@ -14,7 +14,6 @@ import { ConfigService } from '@nestjs/config';
 import { ServerConfig } from '../../../shared/config/server.config.js';
 import { VidisConfig } from '../../../shared/config/vidis.config.js';
 import { VidisAngebot } from '../../vidis/domain/vidis-angebot.js';
-import { ServiceProviderBodyParams } from '../api/service-provider.body.params.js';
 
 @Injectable()
 export class ServiceProviderService {
@@ -157,26 +156,5 @@ export class ServiceProviderService {
         if (first3Bytes.equals(MEDIA_SIGNATURES.JPG)) return 'image/jpeg';
 
         return 'image/svg+xml';
-    }
-
-    public async createServiceProvider(spBodyParams: ServiceProviderBodyParams): Promise<ServiceProvider<true>> {
-        const serviceProvider: ServiceProvider<false> = ServiceProvider.createNew(
-            spBodyParams.name,
-            spBodyParams.target,
-            spBodyParams.url,
-            spBodyParams.kategorie,
-            spBodyParams.providedOnSchulstrukturknoten,
-            spBodyParams.logo ? Buffer.from(spBodyParams.logo, 'base64') : undefined,
-            spBodyParams.logoMimeType,
-            spBodyParams.keycloakGroup,
-            spBodyParams.keycloakRole,
-            spBodyParams.externalSystem,
-            spBodyParams.requires2fa,
-            spBodyParams.vidisAngebotId,
-        );
-
-        const persistedServiceProvider: ServiceProvider<true> = await this.serviceProviderRepo.save(serviceProvider);
-
-        return persistedServiceProvider;
     }
 }

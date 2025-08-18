@@ -118,7 +118,7 @@ export class ProviderController {
         return logoFile;
     }
 
-    @Post('create')
+    @Post()
     @ApiOperation({ description: 'Create a new service-provider.' })
     @ApiCreatedResponse({
         description: 'The service-provider was added successfully.',
@@ -128,16 +128,29 @@ export class ProviderController {
     @ApiForbiddenResponse({ description: 'Insufficient permissions to create a new service-provider.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating a new service-provider.' })
     public async createNewServiceProvider(
-        @Body() serviceProviderBodyParams: ServiceProviderBodyParams,
+        @Body() spBodyParams: ServiceProviderBodyParams,
         @Permissions() permissions: PersonPermissions,
     ): Promise<ServiceProviderResponse> {
         if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.SERVICEPROVIDER_VERWALTEN]))) {
             throw new ForbiddenException('You do not have the required permissions to create new service provider.');
         }
 
-        const newServiceProvider: ServiceProvider<true> =
-            await this.serviceProviderService.createServiceProvider(serviceProviderBodyParams);
-        const response: ServiceProviderResponse = new ServiceProviderResponse(newServiceProvider);
+        const newServiceProvider: ServiceProvider<false> = ServiceProvider.createNew(
+            spBodyParams.name,
+            spBodyParams.target,
+            spBodyParams.url,
+            spBodyParams.kategorie,
+            spBodyParams.providedOnSchulstrukturknoten,
+            spBodyParams.logo ? Buffer.from(spBodyParams.logo, 'base64') : undefined,
+            spBodyParams.logoMimeType,
+            spBodyParams.keycloakGroup,
+            spBodyParams.keycloakRole,
+            spBodyParams.externalSystem,
+            spBodyParams.requires2fa,
+            spBodyParams.vidisAngebotId,
+        );
+        const savedServiceProvider: ServiceProvider<true> = await this.serviceProviderRepo.save(newServiceProvider);
+        const response: ServiceProviderResponse = new ServiceProviderResponse(savedServiceProvider);
 
         return response;
     }

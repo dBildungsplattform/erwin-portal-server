@@ -137,7 +137,7 @@ describe('Provider Controller Test', () => {
             it('should return all service provider', async () => {
                 const spId: string = faker.string.uuid();
                 const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId });
-                serviceProviderServiceMock.createServiceProvider.mockResolvedValueOnce(sp);
+                serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
 
                 const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
                 personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
@@ -159,7 +159,7 @@ describe('Provider Controller Test', () => {
 
                 expect(spResponse).toBeDefined();
                 expect(spResponse).toBeInstanceOf(ServiceProviderResponse);
-                expect(serviceProviderServiceMock.createServiceProvider).toHaveBeenCalledWith(spBodyParams);
+                expect(serviceProviderRepoMock.save).toHaveBeenCalledWith(expect.objectContaining(spBodyParams));
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);
@@ -168,10 +168,6 @@ describe('Provider Controller Test', () => {
 
         describe('when user does not have the RollenSystemRecht SERVICEPROVIDER_VERWALTEN', () => {
             it('should throw ForbiddenException', async () => {
-                const spId: string = faker.string.uuid();
-                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId });
-                serviceProviderServiceMock.createServiceProvider.mockResolvedValueOnce(sp);
-
                 const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
                 personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(false);
 
@@ -180,7 +176,7 @@ describe('Provider Controller Test', () => {
                 await expect(
                     providerController.createNewServiceProvider(spBodyParams, personPermissions),
                 ).rejects.toThrow(ForbiddenException);
-                expect(serviceProviderServiceMock.createServiceProvider).not.toHaveBeenCalled();
+                expect(serviceProviderRepoMock.save).not.toHaveBeenCalled();
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);

@@ -218,7 +218,8 @@
                 "PERSONEN_VERWALTEN",
                 "PERSONEN_SOFORT_LOESCHEN",
                 "ROLLEN_VERWALTEN",
-                "LMS_VERWALTEN"
+                "LMS_VERWALTEN",
+                "SERVICEPROVIDER_VERWALTEN"
             ],
             "serviceProviderIds": [],
             "istTechnisch": false
