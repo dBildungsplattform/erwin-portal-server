@@ -191,7 +191,8 @@
                 "KLASSEN_VERWALTEN",
                 "SCHULTRAEGER_VERWALTEN",
                 "MIGRATION_DURCHFUEHREN",
-                "PERSON_SYNCHRONISIEREN"
+                "PERSON_SYNCHRONISIEREN",
+                "SERVICEPROVIDER_VERWALTEN"
             ],
             "serviceProviderIds": [],
             "istTechnisch": true

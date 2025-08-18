@@ -189,6 +189,7 @@
                 "SCHULTRAEGER_VERWALTEN",
                 "MIGRATION_DURCHFUEHREN",
                 "PERSON_SYNCHRONISIEREN",
+                "SERVICEPROVIDER_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
             "serviceProviderIds": [],
