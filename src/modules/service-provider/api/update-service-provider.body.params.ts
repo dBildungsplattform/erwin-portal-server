@@ -10,14 +10,14 @@ export class UpdateServiceProviderBodyParams {
     @IsString()
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The name of the service provider.',
+        description: 'The name of the service-provider.',
     })
     public readonly name?: string;
 
     @IsEnum(ServiceProviderTarget)
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The target of the service provider.',
+        description: 'The target of the service-provider.',
         enum: ServiceProviderTarget,
         enumName: 'ServiceProviderTarget',
     })
@@ -26,14 +26,14 @@ export class UpdateServiceProviderBodyParams {
     @IsString()
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The URL of the service provider.',
+        description: 'The URL of the service-provider.',
     })
     public readonly url?: string;
 
     @IsEnum(ServiceProviderKategorie)
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The category of the service provider.',
+        description: 'The category of the service-provider.',
         enum: ServiceProviderKategorie,
         enumName: 'ServiceProviderKategorie',
     })
@@ -77,7 +77,7 @@ export class UpdateServiceProviderBodyParams {
     @IsEnum(ServiceProviderSystem)
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The external system of the service provider.',
+        description: 'The external system of the service-provider.',
         enum: ServiceProviderSystem,
         enumName: 'ServiceProviderSystem',
     })
@@ -86,14 +86,14 @@ export class UpdateServiceProviderBodyParams {
     @IsBoolean()
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'Indicates if the service provider requires 2FA.',
+        description: 'Indicates if the service-provider requires 2FA.',
     })
     public readonly requires2fa?: boolean;
 
     @IsString()
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The id of the vidi angebot of this service-provider',
+        description: 'The id of the vidis angebot of this service-provider',
     })
     public readonly vidisAngebotId?: string;
 }

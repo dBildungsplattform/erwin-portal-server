@@ -76,7 +76,7 @@ export class CreateServiceProviderBodyParams {
 
     @IsEnum(ServiceProviderSystem)
     @ApiProperty({
-        description: 'The external system of the service provider.',
+        description: 'The external system of the service-provider.',
         required: true,
         enum: ServiceProviderSystem,
         enumName: 'ServiceProviderSystem',
@@ -85,7 +85,7 @@ export class CreateServiceProviderBodyParams {
 
     @IsBoolean()
     @ApiProperty({
-        description: 'Indicates if the service provider requires 2FA.',
+        description: 'Indicates if the service-provider requires 2FA.',
         required: true,
     })
     public readonly requires2fa!: boolean;
@@ -93,7 +93,7 @@ export class CreateServiceProviderBodyParams {
     @IsString()
     @IsOptional()
     @ApiPropertyOptional({
-        description: 'The id of the vidi angebot of this service-provider',
+        description: 'The id of the vidis angebot of this service-provider',
     })
     public readonly vidisAngebotId?: string;
 }
