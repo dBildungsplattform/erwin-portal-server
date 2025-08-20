@@ -175,6 +175,7 @@ export class ProviderController {
         type: ServiceProviderResponse,
     })
     @ApiUnauthorizedResponse({ description: 'Not authorized to update the service provider.' })
+    @ApiNotFoundResponse({ description: 'The service-provider with the given id was not found' })
     @ApiForbiddenResponse({ description: 'Insufficient permissions to update the service-provider.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the service-provider.' })
     public async updateServiceProvider(
