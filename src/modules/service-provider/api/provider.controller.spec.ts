@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { ForbiddenException, INestApplication } from '@nestjs/common';
+import { ForbiddenException, HttpException, INestApplication } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Client } from 'openid-client';
@@ -20,6 +20,7 @@ import { ProviderController } from './provider.controller.js';
 import { ServiceProviderResponse } from './service-provider.response.js';
 import { ServiceProviderBodyParams } from './service-provider.body.params.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
+import { SchulConnexError } from '../../../shared/error/schul-connex.error.js';
 
 describe('Provider Controller Test', () => {
     let app: INestApplication;
@@ -177,6 +178,72 @@ describe('Provider Controller Test', () => {
                     providerController.createNewServiceProvider(spBodyParams, personPermissions),
                 ).rejects.toThrow(ForbiddenException);
                 expect(serviceProviderRepoMock.save).not.toHaveBeenCalled();
+                expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
+                    RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
+                ]);
+            });
+        });
+    });
+
+    describe('deleteServiceProvider', () => {
+        describe('when user has the RollenSystemRecht SERVICEPROVIDER_VERWALTEN and service provider exists', () => {
+            it('should not throw', async () => {
+                const spId: string = faker.string.uuid();
+                serviceProviderRepoMock.deleteById.mockResolvedValueOnce(true);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                await expect(
+                    providerController.deleteServiceProvider({ angebotId: spId }, personPermissions),
+                ).resolves.not.toThrow();
+
+                expect(serviceProviderRepoMock.deleteById).toHaveBeenCalledWith(spId);
+                expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
+                    RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
+                ]);
+            });
+        });
+
+        describe('when user does not have the RollenSystemRecht SERVICEPROVIDER_VERWALTEN', () => {
+            it('should throw ForbiddenException', async () => {
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(false);
+
+                await expect(() =>
+                    providerController.deleteServiceProvider({ angebotId: faker.string.uuid() }, personPermissions),
+                ).rejects.toThrow(ForbiddenException);
+
+                expect(serviceProviderRepoMock.deleteById).not.toHaveBeenCalled();
+                expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
+                    RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
+                ]);
+            });
+        });
+
+        describe('when user has the RollenSystemRecht SERVICEPROVIDER_VERWALTEN but the service provider does not exist', () => {
+            it('should throw SchulConnexError', async () => {
+                const spId: string = faker.string.uuid();
+                serviceProviderRepoMock.deleteById.mockResolvedValueOnce(false);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                await expect(() =>
+                    providerController.deleteServiceProvider({ angebotId: spId }, personPermissions),
+                ).rejects.toThrow(
+                    new HttpException(
+                        new SchulConnexError({
+                            code: 404,
+                            subcode: '01',
+                            titel: 'Angefragte Entität existiert nicht',
+                            beschreibung: 'Die angeforderte Entität existiert nicht',
+                        }),
+                        404,
+                    ),
+                );
+
+                expect(serviceProviderRepoMock.deleteById).toHaveBeenCalledWith(spId);
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);

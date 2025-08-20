@@ -1,10 +1,23 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post, StreamableFile, UseFilters } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    ForbiddenException,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    StreamableFile,
+    UseFilters,
+} from '@nestjs/common';
 import {
     ApiBadRequestResponse,
     ApiBearerAuth,
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
+    ApiNoContentResponse,
     ApiNotFoundResponse,
     ApiOAuth2,
     ApiOkResponse,
@@ -153,5 +166,34 @@ export class ProviderController {
         const response: ServiceProviderResponse = new ServiceProviderResponse(savedServiceProvider);
 
         return response;
+    }
+
+    @Delete(':angebotId')
+    @ApiOperation({ description: 'Delete an existing service-provider.' })
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'The service-provider was deleted successfully.',
+        type: ServiceProviderResponse,
+    })
+    @ApiUnauthorizedResponse({ description: 'Not authorized to delete the service provider.' })
+    @ApiForbiddenResponse({ description: 'Insufficient permissions to delete the service-provider.' })
+    @ApiNotFoundResponse({ description: 'The service-provider with the given id was not found' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the service-provider.' })
+    public async deleteServiceProvider(
+        @Param() params: AngebotByIdParams,
+        @Permissions() permissions: PersonPermissions,
+    ): Promise<void> {
+        if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.SERVICEPROVIDER_VERWALTEN]))) {
+            throw new ForbiddenException('You do not have the required permissions to delete a service provider.');
+        }
+
+        const deleted: boolean = await this.serviceProviderRepo.deleteById(params.angebotId);
+        if (!deleted) {
+            throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
+                SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(
+                    new EntityNotFoundError('ServiceProvider', params.angebotId),
+                ),
+            );
+        }
     }
 }
