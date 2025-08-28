@@ -31,7 +31,9 @@ describe('OrganisationPersistenceMapperProfile', () => {
     describe('when the mapper is initialized', () => {
         it('should map Organisation Do into Organisatio Entity', () => {
             const organisationDO: OrganisationDo<true> = DoFactory.createOrganisation(true);
-            expect(() => sut.map(organisationDO, OrganisationDo, OrganisationEntity)).not.toThrowError(MappingError);
+            expect(() => sut.map(organisationDO, OrganisationDo, OrganisationEntity)).toThrowError(
+                /Unmapped properties[\s\S]*lernmanagementsystem/,
+            );
         });
 
         it('should map organisation entity into organisation Domain object', () => {
