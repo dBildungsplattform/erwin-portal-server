@@ -43,6 +43,11 @@ import { AngebotByIdParams } from './angebot-by.id.params.js';
 import { CreateServiceProviderBodyParams } from './create-service-provider.body.params.js';
 import { ServiceProviderResponse } from './service-provider.response.js';
 import { UpdateServiceProviderBodyParams } from './update-service-provider.body.params.js';
+import { OrganisationRepository } from '../../organisation/persistence/organisation.repository.js';
+import { ServiceProviderKategorie } from '../domain/service-provider.enum.js';
+import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
+import { ProviderDomainError } from '../domain/provider-domain.error.js';
+import { Organisation } from '../../organisation/domain/organisation.js';
 
 @UseFilters(SchulConnexValidationErrorFilter, new AuthenticationExceptionFilter())
 @ApiTags('provider')
@@ -55,6 +60,7 @@ export class ProviderController {
         private readonly serviceProviderRepo: ServiceProviderRepo,
         private readonly serviceProviderService: ServiceProviderService,
         private readonly serviceProviderFactory: ServiceProviderFactory,
+        private readonly organisationRepository: OrganisationRepository,
     ) {}
 
     @Get('all')
@@ -152,6 +158,18 @@ export class ProviderController {
             throw new ForbiddenException('You do not have the required permissions to create new service provider.');
         }
 
+        if (spBodyParams.kategorie === ServiceProviderKategorie.LMS) {
+            const org: Option<Organisation<true>> = await this.organisationRepository.findById(
+                spBodyParams.providedOnSchulstrukturknoten,
+            );
+            if (org?.typ !== OrganisationsTyp.LMS) {
+                throw new ProviderDomainError(
+                    'Could not create LMS service-provider because Organization is not of type LMS',
+                    undefined,
+                );
+            }
+        }
+
         const newServiceProvider: ServiceProvider<false> = this.serviceProviderFactory.createNew(
             spBodyParams.name,
             spBodyParams.target,
@@ -201,6 +219,18 @@ export class ProviderController {
                     new EntityNotFoundError('ServiceProvider', params.angebotId),
                 ),
             );
+        }
+
+        if ((spBodyParams.kategorie || serviceProvider.kategorie) === ServiceProviderKategorie.LMS) {
+            const org: Option<Organisation<true>> = await this.organisationRepository.findById(
+                spBodyParams.providedOnSchulstrukturknoten || serviceProvider.providedOnSchulstrukturknoten,
+            );
+            if (org?.typ !== OrganisationsTyp.LMS) {
+                throw new ProviderDomainError(
+                    'Could not update LMS service-provider because Organization is not of type LMS',
+                    undefined,
+                );
+            }
         }
 
         const updatedServiceProvider: ServiceProvider<true> = this.serviceProviderFactory.construct(
