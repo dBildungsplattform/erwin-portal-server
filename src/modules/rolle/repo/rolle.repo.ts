@@ -28,6 +28,7 @@ import { ServiceProviderEntity } from '../../service-provider/repo/service-provi
 import { RolleUpdateOutdatedError } from '../domain/update-outdated.error.js';
 import { RolleNameUniqueOnSsk } from '../specification/rolle-name-unique-on-ssk.js';
 import { RolleNameNotUniqueOnSskError } from '../specification/error/rolle-name-not-unique-on-ssk.error.js';
+import { MoodleRollenArt, SchulcloudRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
 
 export function mapRolleAggregateToData(rolle: Rolle<boolean>): RequiredEntityData<RolleEntity> {
     const merkmale: EntityData<RolleMerkmalEntity>[] = rolle.merkmale.map((merkmal: RollenMerkmal) => ({
@@ -362,6 +363,10 @@ export class RolleRepo {
         await this.em.persistAndFlush(rolleEntity);
 
         return mapRolleEntityToAggregate(rolleEntity, this.rolleFactory);
+    }
+
+    public findRollenByServiceProviderId(serviceProviderId: string): string[] {
+        return serviceProviderId ? [...Object.values(SchulcloudRollenArt), ...Object.values(MoodleRollenArt)] : [];
     }
 
     private async update(rolle: Rolle<true>): Promise<Rolle<true>> {

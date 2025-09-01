@@ -475,4 +475,20 @@ export class RolleController {
 
         return new RolleWithServiceProvidersResponse(rolle, rolleServiceProviders);
     }
+
+    @Get('/rollen/:serviceProviderId')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ description: 'Get rollen by service provider id.' })
+    @ApiOkResponse({ description: 'Returns a list of rollen.', type: [String] })
+    @ApiNotFoundResponse({ description: 'The service provider does not exist.' })
+    @ApiUnauthorizedResponse({ description: 'Not authorized to retrieve rollen for service provider.' })
+    public getRollenByServiceProviderId(@Param('serviceProviderId') serviceProviderId: string): string[] {
+        const rollen: string[] = this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
+        if (!rollen) {
+            throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
+                SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(new EntityNotFoundError('No rollen found')),
+            );
+        }
+        return rollen;
+    }
 }
