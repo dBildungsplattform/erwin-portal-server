@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -46,7 +47,6 @@ import { UpdateServiceProviderBodyParams } from './update-service-provider.body.
 import { OrganisationRepository } from '../../organisation/persistence/organisation.repository.js';
 import { ServiceProviderKategorie } from '../domain/service-provider.enum.js';
 import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
-import { ProviderDomainError } from '../domain/provider-domain.error.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
 
 @UseFilters(SchulConnexValidationErrorFilter, new AuthenticationExceptionFilter())
@@ -147,6 +147,7 @@ export class ProviderController {
         description: 'The service-provider was added successfully.',
         type: ServiceProviderResponse,
     })
+    @ApiBadRequestResponse({ description: 'Could not create provider due to a error in the request' })
     @ApiUnauthorizedResponse({ description: 'Not authorized to create new service provider.' })
     @ApiForbiddenResponse({ description: 'Insufficient permissions to create a new service-provider.' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating a new service-provider.' })
@@ -163,9 +164,8 @@ export class ProviderController {
                 spBodyParams.providedOnSchulstrukturknoten,
             );
             if (org?.typ !== OrganisationsTyp.LMS) {
-                throw new ProviderDomainError(
+                throw new BadRequestException(
                     'Could not create LMS service-provider because Organization is not of type LMS',
-                    undefined,
                 );
             }
         }
@@ -196,6 +196,7 @@ export class ProviderController {
         description: 'The service-provider was updated successfully.',
         type: ServiceProviderResponse,
     })
+    @ApiBadRequestResponse({ description: 'Could not update provider due to a error in the request' })
     @ApiUnauthorizedResponse({ description: 'Not authorized to update the service provider.' })
     @ApiNotFoundResponse({ description: 'The service-provider with the given id was not found' })
     @ApiForbiddenResponse({ description: 'Insufficient permissions to update the service-provider.' })
@@ -226,9 +227,8 @@ export class ProviderController {
                 spBodyParams.providedOnSchulstrukturknoten || serviceProvider.providedOnSchulstrukturknoten,
             );
             if (org?.typ !== OrganisationsTyp.LMS) {
-                throw new ProviderDomainError(
+                throw new BadRequestException(
                     'Could not update LMS service-provider because Organization is not of type LMS',
-                    undefined,
                 );
             }
         }

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { ForbiddenException, HttpException, INestApplication } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, INestApplication } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Client } from 'openid-client';
@@ -27,7 +27,6 @@ import { OrganisationRepository } from '../../organisation/persistence/organisat
 import { ServiceProviderKategorie } from '../domain/service-provider.enum.js';
 import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
-import { ProviderDomainError } from '../domain/provider-domain.error.js';
 
 describe('Provider Controller Test', () => {
     let app: INestApplication;
@@ -240,7 +239,7 @@ describe('Provider Controller Test', () => {
         });
 
         describe('when service-provider is of kategorie LMS but organization is not', () => {
-            it('should throw ProviderDomainError', async () => {
+            it('should throw BadRequestException', async () => {
                 const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
                 personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
 
@@ -256,7 +255,7 @@ describe('Provider Controller Test', () => {
 
                 await expect(
                     providerController.createNewServiceProvider(spBodyParams, personPermissions),
-                ).rejects.toThrow(ProviderDomainError);
+                ).rejects.toThrow(BadRequestException);
                 expect(serviceProviderFactoryMock.createNew).not.toHaveBeenCalled();
                 expect(serviceProviderRepoMock.save).not.toHaveBeenCalled();
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
@@ -386,7 +385,7 @@ describe('Provider Controller Test', () => {
         });
 
         describe('when service-provider is of kategorie LMS but organization is not', () => {
-            it('should throw ProviderDomainError', async () => {
+            it('should throw BadRequestException', async () => {
                 const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
                 personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
 
@@ -411,7 +410,7 @@ describe('Provider Controller Test', () => {
                         spBodyParams,
                         personPermissions,
                     ),
-                ).rejects.toThrow(ProviderDomainError);
+                ).rejects.toThrow(BadRequestException);
                 expect(serviceProviderRepoMock.save).not.toHaveBeenCalled();
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
