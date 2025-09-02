@@ -478,12 +478,14 @@ export class RolleController {
 
     @Get('/rollen/:serviceProviderId')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ description: 'Get rollen by service provider id.' })
-    @ApiOkResponse({ description: 'Returns a list of rollen.', type: [String] })
+    @ApiOperation({ description: 'Get rollen objects by service provider id.' })
+    @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [Rolle] })
     @ApiNotFoundResponse({ description: 'The service provider does not exist.' })
     @ApiUnauthorizedResponse({ description: 'Not authorized to retrieve rollen for service provider.' })
-    public getRollenByServiceProviderId(@Param('serviceProviderId') serviceProviderId: string): string[] {
-        const rollen: string[] = this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
+    public async getRollenByServiceProviderId(
+        @Param('serviceProviderId') serviceProviderId: string,
+    ): Promise<Rolle<boolean>[]> {
+        const rollen: Rolle<boolean>[] = await this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
         if (!rollen) {
             throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(new EntityNotFoundError('No rollen found')),

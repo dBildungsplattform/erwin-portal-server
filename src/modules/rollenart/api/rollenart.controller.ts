@@ -8,15 +8,15 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { RollenartService } from '../domain/rollenart.service.js';
 import { Controller, Get } from '@nestjs/common';
+import { RollenartRepo } from '../repo/rollenart.repo.js';
 
 @ApiTags('Rollenart')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
 @Controller({ path: 'rollenart' })
 export class RollenartController {
-    public constructor(private readonly rollenartService: RollenartService) {}
+    public constructor(private readonly rollenartRepo: RollenartRepo) {}
 
     @Get()
     @ApiOkResponse({ description: 'The list of LMS roles was successfully returned', type: [String] })
@@ -25,6 +25,6 @@ export class RollenartController {
     @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve all LMS roles' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving LMS roles' })
     public getAllLmsRollenarten(): string[] {
-        return this.rollenartService.getAllLmsRollenarten();
+        return this.rollenartRepo.getAllRollenarten();
     }
 }

@@ -28,7 +28,6 @@ import { ServiceProviderEntity } from '../../service-provider/repo/service-provi
 import { RolleUpdateOutdatedError } from '../domain/update-outdated.error.js';
 import { RolleNameUniqueOnSsk } from '../specification/rolle-name-unique-on-ssk.js';
 import { RolleNameNotUniqueOnSskError } from '../specification/error/rolle-name-not-unique-on-ssk.error.js';
-import { MoodleRollenArt, SchulcloudRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
 
 export function mapRolleAggregateToData(rolle: Rolle<boolean>): RequiredEntityData<RolleEntity> {
     const merkmale: EntityData<RolleMerkmalEntity>[] = rolle.merkmale.map((merkmal: RollenMerkmal) => ({
@@ -365,8 +364,15 @@ export class RolleRepo {
         return mapRolleEntityToAggregate(rolleEntity, this.rolleFactory);
     }
 
-    public findRollenByServiceProviderId(serviceProviderId: string): string[] {
-        return serviceProviderId ? [...Object.values(SchulcloudRollenArt), ...Object.values(MoodleRollenArt)] : [];
+    public async findRollenByServiceProviderId(serviceProviderId: string): Promise<Rolle<boolean>[]> {
+        const rollenEntities: RolleEntity[] = await this.em.find(
+            RolleEntity,
+            {
+                serviceProvider: { serviceProvider: { id: serviceProviderId } },
+            },
+            { populate: ['merkmale', 'systemrechte', 'serviceProvider.serviceProvider'] as const },
+        );
+        return rollenEntities.map((entity: RolleEntity) => mapRolleEntityToAggregate(entity, this.rolleFactory));
     }
 
     private async update(rolle: Rolle<true>): Promise<Rolle<true>> {
