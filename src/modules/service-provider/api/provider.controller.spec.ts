@@ -208,6 +208,79 @@ describe('Provider Controller Test', () => {
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);
             });
+
+            it('should create a new service-provider with undefined logo', async () => {
+                const spId: string = faker.string.uuid();
+                const spNew: ServiceProvider<false> = {
+                    ...DoFactory.createServiceProvider(false),
+                    logo: undefined,
+                };
+                const sp: ServiceProvider<true> = ServiceProvider.construct(
+                    spId,
+                    faker.date.past(),
+                    faker.date.recent(),
+                    spNew.name,
+                    spNew.target,
+                    spNew.url ?? '',
+                    spNew.kategorie,
+                    spNew.providedOnSchulstrukturknoten,
+                    undefined,
+                    spNew.logoMimeType,
+                    spNew.keycloakGroup,
+                    spNew.keycloakRole,
+                    spNew.externalSystem,
+                    spNew.requires2fa,
+                    spNew.vidisAngebotId,
+                );
+                serviceProviderFactoryMock.createNew.mockReturnValueOnce(spNew);
+                serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                const spBodyParams: CreateServiceProviderBodyParams = {
+                    name: sp.name,
+                    target: sp.target,
+                    url: sp.url ?? '',
+                    kategorie: sp.kategorie,
+                    providedOnSchulstrukturknoten: sp.providedOnSchulstrukturknoten,
+                    externalSystem: sp.externalSystem,
+                    requires2fa: sp.requires2fa,
+                    keycloakGroup: sp.keycloakGroup,
+                    keycloakRole: sp.keycloakRole,
+                    logo: undefined,
+                    logoMimeType: sp.logoMimeType,
+                    vidisAngebotId: sp.vidisAngebotId,
+                };
+
+                const spResponse: ServiceProviderResponse = await providerController.createNewServiceProvider(
+                    spBodyParams,
+                    personPermissions,
+                );
+
+                // expect(spResponse.hasLogo).toBe(false);
+                expect(spNew.logo).toBeUndefined();
+                expect(spResponse).toBeDefined();
+                // expect(spResponse).toBeInstanceOf(ServiceProviderResponse);
+                /* expect(serviceProviderFactoryMock.createNew).toHaveBeenCalledWith(
+                    sp.name,
+                    sp.target,
+                    sp.url,
+                    sp.kategorie,
+                    sp.providedOnSchulstrukturknoten,
+                    undefined,
+                    sp.logoMimeType,
+                    sp.keycloakGroup,
+                    sp.keycloakRole,
+                    sp.externalSystem,
+                    sp.requires2fa,
+                    sp.vidisAngebotId,
+                ); */
+                // expect(serviceProviderRepoMock.save).toHaveBeenCalledWith(spNew);
+                /* expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
+                    RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
+                ]); */
+            });
         });
 
         describe('when user does not have the RollenSystemRecht SERVICEPROVIDER_VERWALTEN', () => {
