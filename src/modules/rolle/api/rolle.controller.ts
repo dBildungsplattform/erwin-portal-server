@@ -484,13 +484,13 @@ export class RolleController {
     @ApiUnauthorizedResponse({ description: 'Not authorized to retrieve rollen for service provider.' })
     public async getRollenByServiceProviderId(
         @Param('serviceProviderId') serviceProviderId: string,
-    ): Promise<Rolle<boolean>[]> {
+    ): Promise<string[]> {
         const rollen: Rolle<boolean>[] = await this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
         if (!rollen) {
             throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(new EntityNotFoundError('No rollen found')),
             );
         }
-        return rollen;
+        return rollen.map((r) => r.id) as string[];
     }
 }
