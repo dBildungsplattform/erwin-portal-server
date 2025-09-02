@@ -216,23 +216,7 @@ describe('Provider Controller Test', () => {
                     logo: undefined,
                 };
                 const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId, logo: undefined });
-                /* const sp: ServiceProvider<true> = ServiceProvider.construct(
-                    spId,
-                    faker.date.past(),
-                    faker.date.recent(),
-                    spNew.name,
-                    spNew.target,
-                    spNew.url ?? '',
-                    spNew.kategorie,
-                    spNew.providedOnSchulstrukturknoten,
-                    undefined,
-                    spNew.logoMimeType,
-                    spNew.keycloakGroup,
-                    spNew.keycloakRole,
-                    spNew.externalSystem,
-                    spNew.requires2fa,
-                    spNew.vidisAngebotId,
-                ); */
+
                 serviceProviderFactoryMock.createNew.mockReturnValueOnce(spNew);
                 serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
 
@@ -259,10 +243,8 @@ describe('Provider Controller Test', () => {
                     personPermissions,
                 );
 
-                // expect(spResponse.hasLogo).toBe(false);
                 expect(spNew.logo).toBeUndefined();
                 expect(spResponse).toBeDefined();
-                // expect(spResponse).toBeInstanceOf(ServiceProviderResponse);
                 expect(serviceProviderFactoryMock.createNew).toHaveBeenCalledWith(
                     sp.name,
                     sp.target,
@@ -277,10 +259,6 @@ describe('Provider Controller Test', () => {
                     sp.requires2fa,
                     sp.vidisAngebotId,
                 );
-                // expect(serviceProviderRepoMock.save).toHaveBeenCalledWith(spNew);
-                /* expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
-                    RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
-                ]); */
             });
         });
 
@@ -360,6 +338,44 @@ describe('Provider Controller Test', () => {
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);
+            });
+
+            it('should use fallback values from serviceProvider if body params are missing', async () => {
+                const spId: string = faker.string.uuid();
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId });
+                serviceProviderFactoryMock.construct.mockReturnValueOnce(sp);
+                serviceProviderRepoMock.findById.mockResolvedValueOnce(sp);
+                serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                const spBodyParams: UpdateServiceProviderBodyParams = {};
+
+                const spResponse: ServiceProviderResponse = await providerController.updateServiceProvider(
+                    { angebotId: spId },
+                    spBodyParams,
+                    personPermissions,
+                );
+
+                expect(spResponse).toBeDefined();
+                expect(serviceProviderFactoryMock.construct).toHaveBeenCalledWith(
+                    sp.id,
+                    sp.createdAt,
+                    sp.updatedAt,
+                    sp.name,
+                    sp.target,
+                    sp.url,
+                    sp.kategorie,
+                    sp.providedOnSchulstrukturknoten,
+                    sp.logo,
+                    sp.logoMimeType,
+                    sp.keycloakGroup,
+                    sp.keycloakRole,
+                    sp.externalSystem,
+                    sp.requires2fa,
+                    sp.vidisAngebotId,
+                );
             });
         });
 
