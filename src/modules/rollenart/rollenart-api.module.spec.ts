@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { RollenartApiModule } from './rollenart-api.module.js';
+import { RollenartController } from './api/rollenart.controller.js';
+import { LoggerModule } from '../../core/logging/logger.module.js';
 import { ConfigTestModule } from '../../../test/utils/config-test.module.js';
-import { RollenartRepo } from './repo/rollenart.repo.js';
-import { RollenartModule } from './rollenart.module.js';
 
-describe('RollenartModule', () => {
+describe('RollenartApiModule', () => {
     let module: TestingModule;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
-            imports: [RollenartModule, ConfigTestModule],
+            imports: [ConfigTestModule, RollenartApiModule, LoggerModule],
         }).compile();
     });
 
@@ -21,8 +22,8 @@ describe('RollenartModule', () => {
     });
 
     describe('when module is initialized', () => {
-        it('should resolve RollenartRepo', () => {
-            expect(module.get(RollenartRepo)).toBeInstanceOf(RollenartRepo);
+        it('should resolve RollenartController', () => {
+            expect(module.get(RollenartController)).toBeInstanceOf(RollenartController);
         });
     });
 });

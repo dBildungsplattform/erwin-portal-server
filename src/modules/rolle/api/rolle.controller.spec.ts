@@ -25,6 +25,8 @@ import { NameForRolleWithTrailingSpaceError } from '../domain/name-with-trailing
 import { Organisation } from '../../organisation/domain/organisation.js';
 import { RolleServiceProviderBodyParams } from './rolle-service-provider.body.params.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
+import { RolleNameIdResponse } from './rolle-name-id.response.js';
+import { EntityNotFoundError } from '../../../shared/error/entity-not-found.error.js';
 
 describe('Rolle API with mocked ServiceProviderRepo', () => {
     let rolleRepoMock: DeepMocked<RolleRepo>;
@@ -128,6 +130,38 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
                 await expect(rolleController.createRolle(createRolleParams, permissionsMock)).rejects.toThrow(
                     NameForRolleWithTrailingSpaceError,
                 );
+            });
+        });
+    });
+
+    describe('/GET rollen objects by service provider id', () => {
+        describe('getRollenByServiceProviderId', () => {
+            it('should return an array of RolleNameIdResponse when rollen exist', async () => {
+                const serviceProviderId: string = faker.string.uuid();
+                const rolleMock: DeepMocked<Rolle<true>> = createMock<Rolle<true>>({
+                    id: faker.string.uuid(),
+                    name: faker.person.fullName(),
+                });
+                rolleRepoMock.findRollenByServiceProviderId.mockResolvedValueOnce([rolleMock]);
+
+                const result: RolleNameIdResponse[] =
+                    await rolleController.getRollenByServiceProviderId(serviceProviderId);
+
+                expect(Array.isArray(result)).toBe(true);
+                expect(result.length).toBe(1);
+                expect(result[0]).toBeInstanceOf(RolleNameIdResponse);
+                expect(result[0]?.id).toBe(rolleMock.id);
+                expect(result[0]?.name).toBe(rolleMock.name);
+                expect(rolleRepoMock.findRollenByServiceProviderId).toHaveBeenCalledWith(serviceProviderId);
+            });
+
+            it('should throw an error if no rollen are found', async () => {
+                const serviceProviderId: string = faker.string.uuid();
+                const error: EntityNotFoundError = new EntityNotFoundError('No rollen found');
+                rolleRepoMock.findRollenByServiceProviderId.mockRejectedValueOnce(error);
+
+                await expect(rolleController.getRollenByServiceProviderId(serviceProviderId)).rejects.toThrow(error);
+                expect(rolleRepoMock.findRollenByServiceProviderId).toHaveBeenCalledWith(serviceProviderId);
             });
         });
     });

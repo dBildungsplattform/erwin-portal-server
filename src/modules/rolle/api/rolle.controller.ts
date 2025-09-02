@@ -63,6 +63,7 @@ import { Organisation } from '../../organisation/domain/organisation.js';
 import { RolleServiceProviderBodyParams } from './rolle-service-provider.body.params.js';
 import { StepUpGuard } from '../../authentication/api/steup-up.guard.js';
 import { ClassLogger } from '../../../core/logging/class-logger.js';
+import { RolleNameIdResponse } from './rolle-name-id.response.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter(), new RolleExceptionFilter(), new AuthenticationExceptionFilter())
 @ApiTags('rolle')
@@ -479,18 +480,18 @@ export class RolleController {
     @Get('/rollen/:serviceProviderId')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ description: 'Get rollen objects by service provider id.' })
-    @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [Rolle] })
+    @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [RolleNameIdResponse] })
     @ApiNotFoundResponse({ description: 'The service provider does not exist.' })
     @ApiUnauthorizedResponse({ description: 'Not authorized to retrieve rollen for service provider.' })
     public async getRollenByServiceProviderId(
         @Param('serviceProviderId') serviceProviderId: string,
-    ): Promise<string[]> {
+    ): Promise<RolleNameIdResponse[]> {
         const rollen: Rolle<boolean>[] = await this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
-        if (!rollen) {
+        if (!rollen || rollen.length === 0) {
             throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(new EntityNotFoundError('No rollen found')),
             );
         }
-        return rollen.map((r) => r.id) as string[];
+        return rollen.map((rolle: Rolle<boolean>) => new RolleNameIdResponse(rolle));
     }
 }
