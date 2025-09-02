@@ -215,7 +215,8 @@ describe('Provider Controller Test', () => {
                     ...DoFactory.createServiceProvider(false),
                     logo: undefined,
                 };
-                const sp: ServiceProvider<true> = ServiceProvider.construct(
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId, logo: undefined });
+                /* const sp: ServiceProvider<true> = ServiceProvider.construct(
                     spId,
                     faker.date.past(),
                     faker.date.recent(),
@@ -231,7 +232,7 @@ describe('Provider Controller Test', () => {
                     spNew.externalSystem,
                     spNew.requires2fa,
                     spNew.vidisAngebotId,
-                );
+                ); */
                 serviceProviderFactoryMock.createNew.mockReturnValueOnce(spNew);
                 serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
 
@@ -262,7 +263,7 @@ describe('Provider Controller Test', () => {
                 expect(spNew.logo).toBeUndefined();
                 expect(spResponse).toBeDefined();
                 // expect(spResponse).toBeInstanceOf(ServiceProviderResponse);
-                /* expect(serviceProviderFactoryMock.createNew).toHaveBeenCalledWith(
+                expect(serviceProviderFactoryMock.createNew).toHaveBeenCalledWith(
                     sp.name,
                     sp.target,
                     sp.url,
@@ -275,7 +276,7 @@ describe('Provider Controller Test', () => {
                     sp.externalSystem,
                     sp.requires2fa,
                     sp.vidisAngebotId,
-                ); */
+                );
                 // expect(serviceProviderRepoMock.save).toHaveBeenCalledWith(spNew);
                 /* expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
