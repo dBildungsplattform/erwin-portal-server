@@ -477,7 +477,7 @@ export class RolleController {
         return new RolleWithServiceProvidersResponse(rolle, rolleServiceProviders);
     }
 
-    @Get('/rollen/:serviceProviderId')
+    @Get('/by-provider/:serviceProviderId')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ description: 'Get rollen objects by service provider id.' })
     @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [RolleNameIdResponse] })

@@ -1,11 +1,11 @@
 import { RollenartController } from './rollenart.controller.js';
 import { RollenartRepo } from '../repo/rollenart.repo.js';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
+import { createMock, DeepMocked } from '@golevelup/ts-jest';
 
 describe('RollenartController', () => {
     let controller: RollenartController;
-    let rollenartRepo: RollenartRepo;
+    let rollenartRepo: DeepMocked<RollenartRepo>;
     let module: TestingModule;
 
     beforeAll(async () => {
@@ -34,7 +34,7 @@ describe('RollenartController', () => {
     describe('getAllLmsRollenarten', () => {
         it('should return all rollenarten from the repository', () => {
             const rollenarten: string[] = ['Admin', 'User', 'Manager'];
-            (rollenartRepo.getAllRollenarten as jest.Mock).mockReturnValueOnce(rollenarten);
+            rollenartRepo.getAllRollenarten.mockReturnValueOnce(rollenarten);
 
             const result: string[] = controller.getAllLmsRollenarten();
 
@@ -43,7 +43,7 @@ describe('RollenartController', () => {
         });
 
         it('should return an empty array if no rollenarten are found', () => {
-            (rollenartRepo.getAllRollenarten as jest.Mock).mockReturnValueOnce([]);
+            rollenartRepo.getAllRollenarten.mockReturnValueOnce([]);
 
             const result: string[] = controller.getAllLmsRollenarten();
 
