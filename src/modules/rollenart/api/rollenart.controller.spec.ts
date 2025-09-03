@@ -1,22 +1,40 @@
 import { RollenartController } from './rollenart.controller.js';
 import { RollenartRepo } from '../repo/rollenart.repo.js';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('RollenartController', () => {
     let controller: RollenartController;
-    let rollenartRepo: jest.Mocked<RollenartRepo>;
+    let rollenartRepo: RollenartRepo;
+    let module: TestingModule;
+
+    beforeAll(async () => {
+        module = await Test.createTestingModule({
+            providers: [
+                {
+                    provide: RollenartRepo,
+                    useValue: createMock<RollenartRepo>(),
+                },
+                RollenartController,
+            ],
+        }).compile();
+
+        controller = module.get(RollenartController);
+        rollenartRepo = module.get(RollenartRepo);
+    });
 
     beforeEach(() => {
-        rollenartRepo = {
-            getAllRollenarten: jest.fn(),
-        } as unknown as jest.Mocked<RollenartRepo>;
+        jest.clearAllMocks();
+    });
 
-        controller = new RollenartController(rollenartRepo);
+    afterAll(async () => {
+        await module.close();
     });
 
     describe('getAllLmsRollenarten', () => {
         it('should return all rollenarten from the repository', () => {
             const rollenarten: string[] = ['Admin', 'User', 'Manager'];
-            rollenartRepo.getAllRollenarten.mockReturnValue(rollenarten);
+            (rollenartRepo.getAllRollenarten as jest.Mock).mockReturnValueOnce(rollenarten);
 
             const result: string[] = controller.getAllLmsRollenarten();
 
@@ -25,7 +43,7 @@ describe('RollenartController', () => {
         });
 
         it('should return an empty array if no rollenarten are found', () => {
-            rollenartRepo.getAllRollenarten.mockReturnValue([]);
+            (rollenartRepo.getAllRollenarten as jest.Mock).mockReturnValueOnce([]);
 
             const result: string[] = controller.getAllLmsRollenarten();
 

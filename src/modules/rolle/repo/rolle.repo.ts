@@ -372,6 +372,7 @@ export class RolleRepo {
             },
             { populate: ['merkmale', 'systemrechte', 'serviceProvider.serviceProvider'] as const },
         );
+
         return rollenEntities.map((entity: RolleEntity) => mapRolleEntityToAggregate(entity, this.rolleFactory));
     }
 
