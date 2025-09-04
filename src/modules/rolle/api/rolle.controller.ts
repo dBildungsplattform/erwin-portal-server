@@ -492,6 +492,7 @@ export class RolleController {
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(new EntityNotFoundError('No rollen found')),
             );
         }
+
         return rollen.map((rolle: Rolle<boolean>) => new RolleNameIdResponse(rolle));
     }
 }

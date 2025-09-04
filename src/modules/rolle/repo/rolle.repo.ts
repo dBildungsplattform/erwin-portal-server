@@ -258,6 +258,18 @@ export class RolleRepo {
         return [rollen.map((rolle: RolleEntity) => mapRolleEntityToAggregate(rolle, this.rolleFactory)), total];
     }
 
+    public async findRollenByServiceProviderId(serviceProviderId: string): Promise<Rolle<boolean>[]> {
+        const rollenEntities: RolleEntity[] = await this.em.find(
+            RolleEntity,
+            {
+                serviceProvider: { serviceProvider: { id: serviceProviderId } },
+            },
+            { populate: ['merkmale', 'systemrechte', 'serviceProvider.serviceProvider'] as const },
+        );
+
+        return rollenEntities.map((entity: RolleEntity) => mapRolleEntityToAggregate(entity, this.rolleFactory));
+    }
+
     public async exists(id: RolleID): Promise<boolean> {
         const rolle: Option<Loaded<RolleEntity, never, 'id', never>> = await this.em.findOne(
             RolleEntity,
@@ -362,18 +374,6 @@ export class RolleRepo {
         await this.em.persistAndFlush(rolleEntity);
 
         return mapRolleEntityToAggregate(rolleEntity, this.rolleFactory);
-    }
-
-    public async findRollenByServiceProviderId(serviceProviderId: string): Promise<Rolle<boolean>[]> {
-        const rollenEntities: RolleEntity[] = await this.em.find(
-            RolleEntity,
-            {
-                serviceProvider: { serviceProvider: { id: serviceProviderId } },
-            },
-            { populate: ['merkmale', 'systemrechte', 'serviceProvider.serviceProvider'] as const },
-        );
-
-        return rollenEntities.map((entity: RolleEntity) => mapRolleEntityToAggregate(entity, this.rolleFactory));
     }
 
     private async update(rolle: Rolle<true>): Promise<Rolle<true>> {
