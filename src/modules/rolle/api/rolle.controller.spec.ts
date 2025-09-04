@@ -138,14 +138,19 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
         const serviceProviderId: string = faker.string.uuid();
         describe('getRollenByServiceProviderId', () => {
             it('should return an array of RolleNameIdResponse when rollen exist', async () => {
+                const permissionsMock: DeepMocked<PersonPermissions> = createMock<PersonPermissions>();
+                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
                 const rolleMock: DeepMocked<Rolle<true>> = createMock<Rolle<true>>({
                     id: faker.string.uuid(),
                     name: faker.person.fullName(),
                 });
                 rolleRepoMock.findRollenByServiceProviderId.mockResolvedValueOnce([rolleMock]);
 
-                const result: RolleNameIdResponse[] =
-                    await rolleController.getRollenByServiceProviderId(serviceProviderId);
+                const result: RolleNameIdResponse[] = await rolleController.getRollenByServiceProviderId(
+                    serviceProviderId,
+                    permissionsMock,
+                );
 
                 expect(Array.isArray(result)).toBe(true);
                 expect(result.length).toBe(1);
@@ -156,12 +161,25 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
             });
 
             it('should throw an error if no rollen are found', async () => {
+                const permissionsMock: DeepMocked<PersonPermissions> = createMock<PersonPermissions>();
+                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
                 rolleRepoMock.findRollenByServiceProviderId.mockResolvedValueOnce([]);
 
-                await expect(rolleController.getRollenByServiceProviderId(serviceProviderId)).rejects.toThrow(
-                    HttpException,
-                );
+                await expect(
+                    rolleController.getRollenByServiceProviderId(serviceProviderId, permissionsMock),
+                ).rejects.toThrow(HttpException);
+
                 expect(rolleRepoMock.findRollenByServiceProviderId).toHaveBeenCalledWith(serviceProviderId);
+            });
+
+            it('should throw an error that the right permissions are required', async () => {
+                const permissionsMock: DeepMocked<PersonPermissions> = createMock<PersonPermissions>();
+                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(false);
+
+                await expect(
+                    rolleController.getRollenByServiceProviderId(serviceProviderId, permissionsMock),
+                ).rejects.toThrow(HttpException);
             });
         });
     });
