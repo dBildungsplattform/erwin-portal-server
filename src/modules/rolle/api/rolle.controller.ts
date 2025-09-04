@@ -490,7 +490,7 @@ export class RolleController {
         @Permissions() permissions: PersonPermissions,
     ): Promise<RolleNameIdResponse[]> {
         if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
-            throw new ForbiddenException('You do not have the required permissions to delete a service provider.');
+            throw new ForbiddenException('You do not have the required permissions to modify roles.');
         }
 
         const rollen: Rolle<boolean>[] = await this.rolleRepo.findRollenByServiceProviderId(serviceProviderId);
