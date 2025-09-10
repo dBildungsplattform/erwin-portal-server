@@ -204,7 +204,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [15, 16],
             "istTechnisch": true
         },
         {
@@ -250,7 +250,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [15, 16],
             "istTechnisch": false
         },
         {
