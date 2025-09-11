@@ -175,7 +175,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": ["CRON_DURCHFUEHREN", "PERSONEN_VERWALTEN", "PERSONEN_SOFORT_LOESCHEN"],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [],
             "istTechnisch": true
         },
         {
@@ -236,7 +236,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [15],
             "istTechnisch": false
         },
         {
@@ -250,7 +250,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [16],
             "istTechnisch": false
         },
         {
@@ -260,7 +260,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [15],
             "istTechnisch": false
         },
         {
@@ -270,7 +270,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [16],
             "istTechnisch": false
         },
         {
