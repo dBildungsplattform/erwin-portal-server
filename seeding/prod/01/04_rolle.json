@@ -258,7 +258,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": false
         },
         {
