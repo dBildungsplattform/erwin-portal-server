@@ -234,7 +234,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [13],
             "istTechnisch": false
         },
         {
@@ -248,7 +248,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [14],
             "istTechnisch": false
         },
         {
@@ -258,7 +258,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [13],
             "istTechnisch": false
         },
         {
@@ -268,7 +268,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [14],
             "istTechnisch": false
         }
     ]
