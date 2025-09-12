@@ -20,7 +20,7 @@
                 "BULK_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [5, 8, 9, 10, 11, 15, 16]
+            "serviceProviderIds": [5, 8, 9, 10, 11, 13, 14]
         },
         {
             "id": 1,
@@ -173,7 +173,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": ["CRON_DURCHFUEHREN", "PERSONEN_VERWALTEN", "PERSONEN_SOFORT_LOESCHEN"],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": true
         },
         {
@@ -192,7 +192,7 @@
                 "PERSON_SYNCHRONISIEREN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": true
         },
         {
@@ -220,7 +220,7 @@
                 "LMS_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": false
         },
         {
@@ -234,7 +234,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": false
         },
         {
@@ -248,7 +248,7 @@
                 "SERVICEPROVIDER_VERWALTEN",
                 "ROLLEN_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": false
         },
         {
@@ -268,7 +268,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": false
         }
     ]
