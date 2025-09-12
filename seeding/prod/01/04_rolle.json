@@ -173,7 +173,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": ["CRON_DURCHFUEHREN", "PERSONEN_VERWALTEN", "PERSONEN_SOFORT_LOESCHEN"],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [],
             "istTechnisch": true
         },
         {
@@ -192,7 +192,7 @@
                 "PERSON_SYNCHRONISIEREN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [13, 14],
+            "serviceProviderIds": [],
             "istTechnisch": true
         },
         {
