@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - "**"
+    pull_request:
+      branches:
+        - "**"
   schedule:
     - cron: '0 6 * * 1'
   delete:
@@ -75,7 +78,7 @@ jobs:
 
   tests_and_sonarcloud:
     name: "Tests and Sonarcloud"
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@7
     with:
       node_version: '22'
