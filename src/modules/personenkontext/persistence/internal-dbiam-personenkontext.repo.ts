@@ -100,4 +100,8 @@ export class DBiamPersonenkontextRepoInternal {
         const deletedPersons: number = await this.em.nativeDelete(PersonenkontextEntity, { id });
         return deletedPersons > 0;
     }
+
+    public async clear(): Promise<void> {
+        await this.em.nativeDelete(PersonenkontextEntity, {});
+    }
 }

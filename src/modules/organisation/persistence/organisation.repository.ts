@@ -683,4 +683,8 @@ export class OrganisationRepository {
 
         return RootDirectChildrenType.OEFFENTLICH;
     }
+
+    public async clear(): Promise<void> {
+        await this.em.nativeDelete(OrganisationEntity, {});
+    }
 }

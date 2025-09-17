@@ -906,4 +906,12 @@ export class PersonRepository {
         const admins: PersonEntity[] = await this.em.find(PersonEntity, filters);
         return admins.map((admin: PersonEntity) => admin.vorname + ' ' + admin.familienname);
     }
+
+    public async clearPersons(): Promise<void> {
+        await this.em.nativeDelete(PersonEntity, {});
+    }
+
+    public async clearTechnicalUsers(): Promise<void> {
+        await this.em.nativeDelete(PersonEntity, { istTechnisch: true });
+    }
 }

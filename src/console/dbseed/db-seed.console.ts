@@ -108,6 +108,20 @@ export class DbSeedConsole extends CommandRunner {
             );
             const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
             try {
+                // clear DB before inserting new data
+                if (entityFileName === 'organisations.json') {
+                    await this.dbSeedService.clearOrganisations();
+                } else if (entityFileName === 'rollen.json') {
+                    await this.dbSeedService.clearRollen();
+                } else if (entityFileName === 'persons.json') {
+                    await this.dbSeedService.clearPersons();
+                } else if (entityFileName === 'service-providers.json') {
+                    await this.dbSeedService.clearServiceProviders();
+                } else if (entityFileName === 'personenkontexte.json') {
+                    await this.dbSeedService.clearPersonenkontexte();
+                } else if (entityFileName === 'technical-users.json') {
+                    await this.dbSeedService.clearTechnicalUsers();
+                }
                 await this.processEntityFile(entityFileName, directory, subDir);
                 persistedDbSeed.setDone();
                 await this.dbSeedRepo.update(persistedDbSeed);

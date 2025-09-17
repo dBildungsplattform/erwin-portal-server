@@ -201,4 +201,8 @@ export class ServiceProviderRepo {
         const deletedPersons: number = await this.em.nativeDelete(ServiceProviderEntity, { name: name });
         return deletedPersons > 0;
     }
+
+    public async clear(): Promise<void> {
+        await this.em.nativeDelete(ServiceProviderEntity, {});
+    }
 }

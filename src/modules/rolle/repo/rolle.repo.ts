@@ -392,4 +392,8 @@ export class RolleRepo {
 
         return mapRolleEntityToAggregate(rolleEntity, this.rolleFactory);
     }
+
+    public async clear(): Promise<void> {
+        await this.em.nativeDelete(RolleEntity, {});
+    }
 }
