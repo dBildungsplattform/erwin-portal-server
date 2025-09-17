@@ -108,7 +108,7 @@ export class DbSeedConsole extends CommandRunner {
             );
             const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
             try {
-                // clear DB before inserting new data
+                // clear DB before inserting/seeding data from file
                 if (entityFileName === 'organisations.json') {
                     await this.dbSeedService.clearOrganisations();
                 } else if (entityFileName === 'rollen.json') {
