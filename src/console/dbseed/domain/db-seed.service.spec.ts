@@ -1,5 +1,7 @@
+import { faker } from '@faker-js/faker';
+import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DbSeedService } from './db-seed.service.js';
+import fs from 'fs';
 import {
     ConfigTestModule,
     DatabaseTestModule,
@@ -7,32 +9,30 @@ import {
     LoggingTestModule,
     MapperTestModule,
 } from '../../../../test/utils/index.js';
-import fs from 'fs';
-import { DataProviderFile } from '../file/data-provider-file.js';
-import { PersonFactory } from '../../../modules/person/domain/person.factory.js';
-import { PersonRepository } from '../../../modules/person/persistence/person.repository.js';
-import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { EntityNotFoundError } from '../../../shared/error/index.js';
-import { faker } from '@faker-js/faker';
-import { RolleRepo } from '../../../modules/rolle/repo/rolle.repo.js';
-import { Rolle } from '../../../modules/rolle/domain/rolle.js';
-import { RolleFactory } from '../../../modules/rolle/domain/rolle.factory.js';
-import { ServiceProviderRepo } from '../../../modules/service-provider/repo/service-provider.repo.js';
-import { ServiceProviderFactory } from '../../../modules/service-provider/domain/service-provider.factory.js';
-import { KeycloakUserService, User } from '../../../modules/keycloak-administration/index.js';
-import { Person } from '../../../modules/person/domain/person.js';
-import { DBiamPersonenkontextService } from '../../../modules/personenkontext/domain/dbiam-personenkontext.service.js';
-import { DbSeedReferenceRepo } from '../repo/db-seed-reference.repo.js';
-import { ServiceProvider } from '../../../modules/service-provider/domain/service-provider.js';
-import { GleicheRolleAnKlasseWieSchuleError } from '../../../modules/personenkontext/specification/error/gleiche-rolle-an-klasse-wie-schule.error.js';
-import { PersonenkontextFactory } from '../../../modules/personenkontext/domain/personenkontext.factory.js';
-import { OrganisationRepository } from '../../../modules/organisation/persistence/organisation.repository.js';
 import { KeycloakGroupRoleService } from '../../../modules/keycloak-administration/domain/keycloak-group-role.service.js';
+import { KeycloakUserService, User } from '../../../modules/keycloak-administration/index.js';
 import { Organisation } from '../../../modules/organisation/domain/organisation.js';
+import { OrganisationRepository } from '../../../modules/organisation/persistence/organisation.repository.js';
 import { NameForOrganisationWithTrailingSpaceError } from '../../../modules/organisation/specification/error/name-with-trailing-space.error.js';
+import { PersonFactory } from '../../../modules/person/domain/person.factory.js';
+import { Person } from '../../../modules/person/domain/person.js';
+import { PersonRepository } from '../../../modules/person/persistence/person.repository.js';
+import { DBiamPersonenkontextService } from '../../../modules/personenkontext/domain/dbiam-personenkontext.service.js';
+import { PersonenkontextFactory } from '../../../modules/personenkontext/domain/personenkontext.factory.js';
+import { DBiamPersonenkontextRepoInternal } from '../../../modules/personenkontext/persistence/internal-dbiam-personenkontext.repo.js';
+import { GleicheRolleAnKlasseWieSchuleError } from '../../../modules/personenkontext/specification/error/gleiche-rolle-an-klasse-wie-schule.error.js';
 import { NameForRolleWithTrailingSpaceError } from '../../../modules/rolle/domain/name-with-trailing-space.error.js';
 import { RollenMerkmal } from '../../../modules/rolle/domain/rolle.enums.js';
-import { DBiamPersonenkontextRepoInternal } from '../../../modules/personenkontext/persistence/internal-dbiam-personenkontext.repo.js';
+import { RolleFactory } from '../../../modules/rolle/domain/rolle.factory.js';
+import { Rolle } from '../../../modules/rolle/domain/rolle.js';
+import { RolleRepo } from '../../../modules/rolle/repo/rolle.repo.js';
+import { ServiceProviderFactory } from '../../../modules/service-provider/domain/service-provider.factory.js';
+import { ServiceProvider } from '../../../modules/service-provider/domain/service-provider.js';
+import { ServiceProviderRepo } from '../../../modules/service-provider/repo/service-provider.repo.js';
+import { EntityNotFoundError } from '../../../shared/error/index.js';
+import { DataProviderFile } from '../file/data-provider-file.js';
+import { DbSeedReferenceRepo } from '../repo/db-seed-reference.repo.js';
+import { DbSeedService } from './db-seed.service.js';
 
 describe('DbSeedService', () => {
     let module: TestingModule;
@@ -43,6 +43,7 @@ describe('DbSeedService', () => {
     let serviceProviderRepoMock: DeepMocked<ServiceProviderRepo>;
     let personenkontextServiceMock: DeepMocked<DBiamPersonenkontextService>;
     let dbSeedReferenceRepoMock: DeepMocked<DbSeedReferenceRepo>;
+    let dBiamPersonenkontextRepoInternalMock: DeepMocked<DBiamPersonenkontextRepoInternal>;
     let kcUserService: DeepMocked<KeycloakUserService>;
     let personFactory: DeepMocked<PersonFactory>;
 
@@ -108,6 +109,7 @@ describe('DbSeedService', () => {
         serviceProviderRepoMock = module.get(ServiceProviderRepo);
         personenkontextServiceMock = module.get(DBiamPersonenkontextService);
         dbSeedReferenceRepoMock = module.get(DbSeedReferenceRepo);
+        dBiamPersonenkontextRepoInternalMock = module.get(DBiamPersonenkontextRepoInternal);
         kcUserService = module.get(KeycloakUserService);
         personFactory = module.get(PersonFactory);
     });
@@ -710,6 +712,60 @@ describe('DbSeedService', () => {
                     '01',
                 );
                 expect(entityFileNames).toHaveLength(7);
+            });
+        });
+    });
+
+    describe('clearOrganisations', () => {
+        describe('when seeding organisations', () => {
+            it('should clear organisations from the database', async () => {
+                await dbSeedService.clearOrganisations();
+                expect(organisationRepositoryMock.clear).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('clearRollen', () => {
+        describe('when seeding rollen', () => {
+            it('should clear rollen from the database', async () => {
+                await dbSeedService.clearRollen();
+                expect(rolleRepoMock.clear).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('clearPersons', () => {
+        describe('when seeding persons', () => {
+            it('should clear persons from the database', async () => {
+                await dbSeedService.clearPersons();
+                expect(personRepoMock.clearPersons).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('clearTechnicalUsers', () => {
+        describe('when seeding persons', () => {
+            it('should clear persons from the database', async () => {
+                await dbSeedService.clearTechnicalUsers();
+                expect(personRepoMock.clearTechnicalUsers).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('clearServiceProviders', () => {
+        describe('when seeding serviceProviders', () => {
+            it('should clear serviceProviders from the database', async () => {
+                await dbSeedService.clearServiceProviders();
+                expect(serviceProviderRepoMock.clear).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('clearPersonenkontexte', () => {
+        describe('when seeding personenkontexte', () => {
+            it('should clear personenkontexte from the database', async () => {
+                await dbSeedService.clearPersonenkontexte();
+                expect(dBiamPersonenkontextRepoInternalMock.clear).toHaveBeenCalled();
             });
         });
     });
