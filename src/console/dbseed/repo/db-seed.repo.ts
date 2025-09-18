@@ -45,6 +45,10 @@ export class DbSeedRepo {
         return mapEntityToAggregate(dbSeedEntity);
     }
 
+    public async clear(): Promise<void> {
+        await this.em.nativeDelete(DbSeedEntity, {});
+    }
+
     public forkEntityManager(): void {
         this.em = this.em.fork();
     }
