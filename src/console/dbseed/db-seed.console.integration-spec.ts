@@ -52,6 +52,14 @@ describe('DbSeedConsoleIntegration', () => {
         orm = module.get(MikroORM);
         dbSeedService = module.get(DbSeedService);
 
+        // Spy on clear functions so Jest can track calls
+        jest.spyOn(dbSeedService, 'clearOrganisations');
+        jest.spyOn(dbSeedService, 'clearRollen');
+        jest.spyOn(dbSeedService, 'clearServiceProviders');
+        jest.spyOn(dbSeedService, 'clearPersons');
+        jest.spyOn(dbSeedService, 'clearPersonenkontexte');
+        jest.spyOn(dbSeedService, 'clearTechnicalUsers');
+
         await DatabaseTestModule.setupDatabase(module.get(MikroORM));
     }, 10000000);
 
@@ -110,6 +118,19 @@ describe('DbSeedConsoleIntegration', () => {
                 await expect(sut.run(params)).rejects.toThrow(
                     new Error(`Unsupported EntityName / EntityType: NonExistingEntityType`),
                 );
+            });
+        });
+        describe('when start seeding file', () => {
+            it('should clear DB before inserting/seeding data from file', async () => {
+                // test to cover DbSeedConsole from line 112 to 124
+                const params: string[] = ['seeding-integration-test/all'];
+                await expect(sut.run(params)).resolves.not.toThrow();
+                expect(dbSeedService.clearOrganisations).toHaveBeenCalled();
+                expect(dbSeedService.clearRollen).toHaveBeenCalled();
+                expect(dbSeedService.clearServiceProviders).toHaveBeenCalled();
+                expect(dbSeedService.clearPersons).toHaveBeenCalled();
+                expect(dbSeedService.clearPersonenkontexte).toHaveBeenCalled();
+                expect(dbSeedService.clearTechnicalUsers).toHaveBeenCalled();
             });
         });
     });

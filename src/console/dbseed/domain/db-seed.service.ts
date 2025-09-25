@@ -123,6 +123,30 @@ export class DbSeedService {
         return savedOrga;
     }
 
+    public async clearOrganisations(): Promise<void> {
+        await this.organisationRepository.clear();
+    }
+
+    public async clearRollen(): Promise<void> {
+        await this.rolleRepo.clear();
+    }
+
+    public async clearServiceProviders(): Promise<void> {
+        await this.serviceProviderRepo.clear();
+    }
+
+    public async clearPersons(): Promise<void> {
+        await this.personRepository.clearPersons();
+    }
+
+    public async clearPersonenkontexte(): Promise<void> {
+        await this.dBiamPersonenkontextRepoInternal.clear();
+    }
+
+    public async clearTechnicalUsers(): Promise<void> {
+        await this.personRepository.clearTechnicalUsers();
+    }
+
     public async seedOrganisation(fileContentAsStr: string): Promise<void> {
         const organisationFile: EntityFile<OrganisationFile> = JSON.parse(
             fileContentAsStr,
