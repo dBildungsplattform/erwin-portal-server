@@ -101,6 +101,20 @@ export class DbSeedConsole extends CommandRunner {
                 );
             }
         } else {
+            // clear DB before inserting/seeding data from file
+            if (entityFileName === '01_organisation.json') {
+                await this.dbSeedService.clearOrganisations();
+            } else if (entityFileName === '02_person.json') {
+                await this.dbSeedService.clearPersons();
+            } else if (entityFileName === '03_service-provider.json') {
+                await this.dbSeedService.clearServiceProviders();
+            } else if (entityFileName === '04_rolle.json') {
+                await this.dbSeedService.clearRollen();
+            } else if (entityFileName === '05_personenkontext.json') {
+                await this.dbSeedService.clearPersonenkontexte();
+            } else if (entityFileName === '06_technical-user.json') {
+                await this.dbSeedService.clearTechnicalUsers();
+            }
             const dbSeed: DbSeed<false> = DbSeed.createNew(
                 contentHash,
                 DbSeedStatus.STARTED,
@@ -108,20 +122,6 @@ export class DbSeedConsole extends CommandRunner {
             );
             const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
             try {
-                // clear DB before inserting/seeding data from file
-                if (entityFileName === 'organisations.json') {
-                    await this.dbSeedService.clearOrganisations();
-                } else if (entityFileName === 'rollen.json') {
-                    await this.dbSeedService.clearRollen();
-                } else if (entityFileName === 'persons.json') {
-                    await this.dbSeedService.clearPersons();
-                } else if (entityFileName === 'service-providers.json') {
-                    await this.dbSeedService.clearServiceProviders();
-                } else if (entityFileName === 'personenkontexte.json') {
-                    await this.dbSeedService.clearPersonenkontexte();
-                } else if (entityFileName === 'technical-users.json') {
-                    await this.dbSeedService.clearTechnicalUsers();
-                }
                 await this.processEntityFile(entityFileName, directory, subDir);
                 persistedDbSeed.setDone();
                 await this.dbSeedRepo.update(persistedDbSeed);

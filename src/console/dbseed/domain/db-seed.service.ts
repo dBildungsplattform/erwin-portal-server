@@ -125,22 +125,18 @@ export class DbSeedService {
 
     public async clearOrganisations(): Promise<void> {
         await this.organisationRepository.clear();
-        await this.dbSeedReferenceRepo.clear();
     }
 
     public async clearRollen(): Promise<void> {
         await this.rolleRepo.clear();
-        await this.dbSeedReferenceRepo.clear();
     }
 
     public async clearServiceProviders(): Promise<void> {
         await this.serviceProviderRepo.clear();
-        await this.dbSeedReferenceRepo.clear();
     }
 
     public async clearPersons(): Promise<void> {
         await this.personRepository.clearPersons();
-        await this.dbSeedReferenceRepo.clear();
     }
 
     public async clearPersonenkontexte(): Promise<void> {
