@@ -44,6 +44,7 @@ import { VidisModule } from '../modules/vidis/vidis.module.js';
 import { MeldungModule } from '../modules/meldung/meldung.module.js';
 import { MapperModule } from '../modules/person/mapper/mapper.module.js';
 import { RollenartApiModule } from '../modules/rollenart/rollenart-api.module.js';
+import { RollenMappingApiModule } from '../modules/rollenmapping/rollenmapping-api.module.js';
 
 @Module({
     imports: [
@@ -94,6 +95,7 @@ import { RollenartApiModule } from '../modules/rollenart/rollenart-api.module.js
         RollenartApiModule,
         ServiceProviderApiModule,
         PersonenKontextApiModule,
+        RollenMappingApiModule,
         ErrorModule,
         KeycloakConfigModule,
         ItsLearningModule,
