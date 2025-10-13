@@ -27,10 +27,11 @@ import { Permissions } from '../../authentication/api/permissions.decorator.js';
 import { ClassLogger } from '../../../core/logging/class-logger.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
-import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
+// import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
+import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
 
-@UseFilters()
+@UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenmapping')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
@@ -93,23 +94,25 @@ export class RollenmappingController {
     }
 
     @Post()
-    @ApiOkResponse({ description: 'The rollenmapping was successfully created', type: RollenMapping<true> })
+    @ApiOkResponse({ description: 'The rollenmapping was successfully created', type: RollenMapping })
     @ApiUnauthorizedResponse({ description: 'Unauthorized to create the rollenmapping' })
     @ApiBadRequestResponse({ description: 'Invalid input, rollenmapping not created' })
     @ApiForbiddenResponse({ description: 'Insufficient rights to create the rollenmapping' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating the rollenmapping' })
     public async createNewRollenmapping(
-        @Param() rollenMappingCreateBodyParams: RollenmappingCreateBodyParams,
+        @Param('rolleId') rolleId: string,
+        @Param('serviceProviderId') serviceProviderId: string,
+        @Param('mapToLmsRolle') mapToLmsRolle: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
             throw new ForbiddenException('Insufficient rights to create rollenmapping object');
         }
 
-        const newRollenmapping: RollenMapping<false> = this.rollenMappingFactory.createNew(
-            rollenMappingCreateBodyParams.rolleId,
-            rollenMappingCreateBodyParams.serviceProviderId,
-            rollenMappingCreateBodyParams.mapToLmsRolle,
+        const newRollenmapping: RollenMapping<false> = RollenMapping.createNew(
+            rolleId,
+            serviceProviderId,
+            mapToLmsRolle,
         );
         const savedRollenMapping: RollenMapping<true> = await this.rollenMappingRepo.create(newRollenmapping);
 
