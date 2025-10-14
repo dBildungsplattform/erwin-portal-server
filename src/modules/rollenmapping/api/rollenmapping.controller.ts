@@ -10,7 +10,6 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
-    Body,
     Controller,
     Delete,
     ForbiddenException,
@@ -19,6 +18,7 @@ import {
     Param,
     Post,
     Put,
+    Query,
     UseFilters,
 } from '@nestjs/common';
 import { RollenMapping } from '../domain/rollenmapping.js';
@@ -27,9 +27,9 @@ import { Permissions } from '../../authentication/api/permissions.decorator.js';
 import { ClassLogger } from '../../../core/logging/class-logger.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
-// import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
 import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
+import { RollenmappingCreateUpdateBodyParams } from './rollenmapping-create-update-body.params.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenmapping')
@@ -100,9 +100,7 @@ export class RollenmappingController {
     @ApiForbiddenResponse({ description: 'Insufficient rights to create the rollenmapping' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating the rollenmapping' })
     public async createNewRollenmapping(
-        @Param('rolleId') rolleId: string,
-        @Param('serviceProviderId') serviceProviderId: string,
-        @Param('mapToLmsRolle') mapToLmsRolle: string,
+        @Query() rollenmappingCreateBodyParams: RollenmappingCreateUpdateBodyParams,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
@@ -110,9 +108,9 @@ export class RollenmappingController {
         }
 
         const newRollenmapping: RollenMapping<false> = RollenMapping.createNew(
-            rolleId,
-            serviceProviderId,
-            mapToLmsRolle,
+            rollenmappingCreateBodyParams.rolleId,
+            rollenmappingCreateBodyParams.serviceProviderId,
+            rollenmappingCreateBodyParams.mapToLmsRolle,
         );
         const savedRollenMapping: RollenMapping<true> = await this.rollenMappingRepo.create(newRollenmapping);
 
@@ -127,25 +125,26 @@ export class RollenmappingController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the rollenmapping' })
     public async updateExistingRollenmapping(
         @Param('id') id: string,
-        @Body() rollenMappingUpdate: RollenMapping<true>,
+        @Query() rollenMappingUpdateBodyParams: RollenmappingCreateUpdateBodyParams,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
             throw new ForbiddenException('Insufficient rights to create rollenmapping object');
         }
 
-        if (!(await this.rollenMappingRepo.findById(id))) {
+        const originalRollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
+        if (!originalRollenMapping) {
             this.logger.error(`No rollenmapping found with id ${id}`);
             throw new NotFoundException(`No rollenmapping found with id ${id}`);
         }
 
         const updateRollenMapping: RollenMapping<true> = this.rollenMappingFactory.update(
-            rollenMappingUpdate.id,
-            rollenMappingUpdate.createdAt,
+            originalRollenMapping.id,
+            originalRollenMapping.createdAt,
             new Date(),
-            rollenMappingUpdate.rolleId,
-            rollenMappingUpdate.serviceProviderId,
-            rollenMappingUpdate.mapToLmsRolle,
+            rollenMappingUpdateBodyParams.rolleId,
+            rollenMappingUpdateBodyParams.serviceProviderId,
+            rollenMappingUpdateBodyParams.mapToLmsRolle,
         );
         const savedRollenMapping: RollenMapping<true> = await this.rollenMappingRepo.save(updateRollenMapping);
 

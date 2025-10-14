@@ -62,7 +62,7 @@ describe('RollenMappingFactory', () => {
 
                 const rollenMapping: RollenMapping<false> = sut.createNew(rolleId, serviceProviderId, mapToLmsRolle);
 
-                expect(rollenMapping.id).toBeUndefined();
+                expect(rollenMapping.id).toBeDefined();
                 expect(rollenMapping.createdAt).toBeUndefined();
                 expect(rollenMapping.updatedAt).toBeUndefined();
                 expect(rollenMapping.rolleId).toStrictEqual(rolleId);

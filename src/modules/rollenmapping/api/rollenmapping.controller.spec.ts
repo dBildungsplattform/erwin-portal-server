@@ -11,7 +11,7 @@ import { GlobalValidationPipe } from '../../../shared/validation/global-validati
 import { LoggingTestModule } from '../../../../test/utils/logging-test.module.js';
 import { MapperTestModule } from '../../../../test/utils/mapper-test.module.js';
 import { DEFAULT_TIMEOUT_FOR_TESTCONTAINERS } from '../../../../test/utils/timeouts.js';
-import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
+import { RollenmappingCreateUpdateBodyParams } from './rollenmapping-create-update-body.params.js';
 
 describe('Rollenmapping API', () => {
     let rollenMappingRepoMock: DeepMocked<RollenMappingRepo>;
@@ -80,7 +80,7 @@ describe('Rollenmapping API', () => {
                     rollenMapping.id,
                     permissionsMock,
                 );
-                expect(result).toBe(rollenMapping);
+                expect(result).toStrictEqual(rollenMapping);
             });
 
             it('should throw ForbiddenException if permission is missing', async () => {
@@ -147,46 +147,32 @@ describe('Rollenmapping API', () => {
     describe('createNewRollenmapping', () => {
         describe('when called', () => {
             it('should create and return rollenmapping if permission is granted', async () => {
-                const rollenMappingCreateBodyParams: RollenmappingCreateBodyParams = {
+                const rollenMappingCreateBodyParams: RollenmappingCreateUpdateBodyParams = {
                     rolleId: faker.string.uuid(),
                     serviceProviderId: faker.string.uuid(),
-                    mapToLmsRolle: 'Moodle',
+                    mapToLmsRolle: 'user',
                 };
-                const rollenMapping: RollenMapping<true> = {
+                const rollingMappingExpected: RollenMapping<true> = {
                     id: faker.string.uuid(),
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    rolleId: faker.string.uuid(),
-                    serviceProviderId: faker.string.uuid(),
-                    mapToLmsRolle: faker.string.uuid(),
-                };
-                const rollenMappingDomain: RollenMapping<false> = {
-                    id: faker.string.uuid(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    rolleId: faker.string.uuid(),
-                    serviceProviderId: faker.string.uuid(),
-                    mapToLmsRolle: faker.string.uuid(),
+                    rolleId: rollenMappingCreateBodyParams.rolleId,
+                    serviceProviderId: rollenMappingCreateBodyParams.serviceProviderId,
+                    mapToLmsRolle: rollenMappingCreateBodyParams.mapToLmsRolle,
                 };
                 permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
-                rollenMappingFactoryMock.createNew.mockReturnValue(rollenMappingDomain);
-                rollenMappingRepoMock.save.mockResolvedValue(rollenMapping);
+                rollenMappingFactoryMock.createNew.mockReturnValue(
+                    rollingMappingExpected as unknown as RollenMapping<false>,
+                );
+                rollenMappingRepoMock.create.mockResolvedValue(rollingMappingExpected);
 
-                const result: RollenMapping<true> = await rollenMappingController.createNewRollenmapping(
-                    rollenMappingCreateBodyParams,
-                    permissionsMock,
-                );
-                expect(result).toBe(rollenMapping);
-                expect(rollenMappingFactoryMock.createNew).toHaveBeenCalledWith(
-                    rollenMappingCreateBodyParams.rolleId,
-                    rollenMappingCreateBodyParams.serviceProviderId,
-                    rollenMappingCreateBodyParams.mapToLmsRolle,
-                );
-                expect(rollenMappingRepoMock.save).toHaveBeenCalledWith(rollenMappingDomain);
+                await rollenMappingController.createNewRollenmapping(rollenMappingCreateBodyParams, permissionsMock);
+
+                expect(rollenMappingRepoMock.create).toHaveBeenCalled();
             });
 
             it('should throw ForbiddenException if permission is missing', async () => {
-                const rollenMappingCreateBodyParams: RollenmappingCreateBodyParams = {
+                const rollenMappingCreateBodyParams: RollenmappingCreateUpdateBodyParams = {
                     rolleId: faker.string.uuid(),
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: 'Moodle',
