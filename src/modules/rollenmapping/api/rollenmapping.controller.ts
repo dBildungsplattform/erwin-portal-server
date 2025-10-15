@@ -29,7 +29,7 @@ import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
 import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
-import { RollenmappingCreateUpdateBodyParams } from './rollenmapping-create-update-body.params.js';
+import { RollenmappingCreateBodyParams as RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenmapping')
@@ -100,7 +100,7 @@ export class RollenmappingController {
     @ApiForbiddenResponse({ description: 'Insufficient rights to create the rollenmapping' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while creating the rollenmapping' })
     public async createNewRollenmapping(
-        @Query() rollenmappingCreateBodyParams: RollenmappingCreateUpdateBodyParams,
+        @Query() rollenmappingCreateBodyParams: RollenmappingCreateBodyParams,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
@@ -125,7 +125,7 @@ export class RollenmappingController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the rollenmapping' })
     public async updateExistingRollenmapping(
         @Param('id') id: string,
-        @Query() rollenMappingUpdateBodyParams: RollenmappingCreateUpdateBodyParams,
+        @Query('mapToLmsRolle') mapToLmsRolle: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
@@ -142,9 +142,9 @@ export class RollenmappingController {
             originalRollenMapping.id,
             originalRollenMapping.createdAt,
             new Date(),
-            rollenMappingUpdateBodyParams.rolleId,
-            rollenMappingUpdateBodyParams.serviceProviderId,
-            rollenMappingUpdateBodyParams.mapToLmsRolle,
+            originalRollenMapping.rolleId,
+            originalRollenMapping.serviceProviderId,
+            mapToLmsRolle,
         );
         const savedRollenMapping: RollenMapping<true> = await this.rollenMappingRepo.save(updateRollenMapping);
 
