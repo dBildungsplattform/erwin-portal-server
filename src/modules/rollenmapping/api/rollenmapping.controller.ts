@@ -98,16 +98,12 @@ export class RollenmappingController {
             const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
                 rollenmapping.serviceProviderId,
             );
+            const hasPermission: boolean = await personPermission.hasSystemrechtAtOrganisation(
+                serviceProvider!.providedOnSchulstrukturknoten,
+                RollenSystemRecht.ROLLEN_VERWALTEN,
+            );
 
-            if (
-                !(await personPermission.hasSystemrechtAtOrganisation(
-                    serviceProvider!.providedOnSchulstrukturknoten,
-                    RollenSystemRecht.ROLLEN_VERWALTEN,
-                ))
-            ) {
-                return false;
-            }
-            return true;
+            return hasPermission;
         });
 
         if (!rollenmappingArray || rollenmappingArray.length === 0) {
