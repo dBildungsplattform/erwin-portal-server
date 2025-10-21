@@ -29,7 +29,7 @@ import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
 import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
-import { RollenmappingCreateBodyParams as RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
+import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
 import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
 
