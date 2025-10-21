@@ -85,6 +85,16 @@ export class RollenMappingRepo {
         return mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory);
     }
 
+    public async findByServiceProviderId(serviceProviderId: string): Promise<RollenMapping<true>[]> {
+        const rollenMappingEntities: RollenMappingEntity[] = await this.em.find(RollenMappingEntity, {
+            serviceProviderId,
+        });
+
+        return rollenMappingEntities.map((rollenMappingEntity: RollenMappingEntity) =>
+            mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory),
+        );
+    }
+
     private async update(rollenMapping: RollenMapping<true>): Promise<RollenMapping<true>> {
         const rollenMappingEntity: Loaded<RollenMappingEntity> = await this.em.findOneOrFail(
             RollenMappingEntity,

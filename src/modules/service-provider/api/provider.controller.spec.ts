@@ -33,6 +33,7 @@ import { OrganisationRepository } from '../../organisation/persistence/organisat
 import { ServiceProviderKategorie } from '../domain/service-provider.enum.js';
 import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
+import { StreamableFileFactory } from '../../../shared/util/streamable-file.factory.js';
 
 describe('Provider Controller Test', () => {
     let app: INestApplication;
@@ -40,6 +41,7 @@ describe('Provider Controller Test', () => {
     let serviceProviderRepoMock: DeepMocked<ServiceProviderRepo>;
     let organisationRepoMock: DeepMocked<OrganisationRepository>;
     let serviceProviderFactoryMock: DeepMocked<ServiceProviderFactory>;
+    let streamableFileFactoryMock: DeepMocked<StreamableFileFactory>;
     let providerController: ProviderController;
 
     beforeAll(async () => {
@@ -69,12 +71,15 @@ describe('Provider Controller Test', () => {
             .useValue(createMock<ServiceProviderFactory>())
             .overrideProvider(OrganisationRepository)
             .useValue(createMock<OrganisationRepository>())
+            .overrideProvider(StreamableFileFactory)
+            .useValue(createMock<StreamableFileFactory>())
             .compile();
 
         serviceProviderServiceMock = module.get<DeepMocked<ServiceProviderService>>(ServiceProviderService);
         serviceProviderRepoMock = module.get<DeepMocked<ServiceProviderRepo>>(ServiceProviderRepo);
         organisationRepoMock = module.get<DeepMocked<OrganisationRepository>>(OrganisationRepository);
         serviceProviderFactoryMock = module.get<DeepMocked<ServiceProviderFactory>>(ServiceProviderFactory);
+        streamableFileFactoryMock = module.get<DeepMocked<StreamableFileFactory>>(StreamableFileFactory);
         providerController = module.get(ProviderController);
         app = module.createNestApplication();
         await app.init();
@@ -651,15 +656,13 @@ describe('Provider Controller Test', () => {
                     logoMimeType,
                 };
                 serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProvider);
-                const streamableFile: unknown = { dummy: true };
-                // @ts-expect-error: Accessing private property for test purposes
-                providerController.streamableFileFactory.fromBuffer = jest.fn().mockReturnValue(streamableFile);
+                const streamableFile = new StreamableFile(logoBuffer);
+                streamableFileFactoryMock.fromBuffer.mockReturnValue(streamableFile);
 
                 const result: StreamableFile = await providerController.getServiceProviderLogo({ angebotId: spId });
 
                 expect(serviceProviderRepoMock.findById).toHaveBeenCalledWith(spId, { withLogo: true });
-                // @ts-expect-error: Accessing private property for test purposes
-                expect(providerController.streamableFileFactory.fromBuffer).toHaveBeenCalledWith(logoBuffer, {
+                expect(streamableFileFactoryMock.fromBuffer).toHaveBeenCalledWith(logoBuffer, {
                     type: logoMimeType,
                 });
                 expect(result).toBe(streamableFile);

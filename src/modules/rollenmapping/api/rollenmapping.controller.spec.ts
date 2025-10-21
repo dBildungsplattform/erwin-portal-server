@@ -12,12 +12,16 @@ import { LoggingTestModule } from '../../../../test/utils/logging-test.module.js
 import { MapperTestModule } from '../../../../test/utils/mapper-test.module.js';
 import { DEFAULT_TIMEOUT_FOR_TESTCONTAINERS } from '../../../../test/utils/timeouts.js';
 import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
+import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
+import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
+import { DoFactory } from '../../../../test/utils/do-factory.js';
 
 describe('Rollenmapping API', () => {
     let rollenMappingRepoMock: DeepMocked<RollenMappingRepo>;
     let rollenMappingController: RollenmappingController;
     let rollenMappingFactoryMock: DeepMocked<RollenMappingFactory>;
     let permissionsMock: DeepMocked<PersonPermissions>;
+    let serviceProviderRepoMock: DeepMocked<ServiceProviderRepo>;
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -39,6 +43,10 @@ describe('Rollenmapping API', () => {
                     provide: PersonPermissions,
                     useValue: createMock<PersonPermissions>(),
                 },
+                {
+                    provide: ServiceProviderRepo,
+                    useValue: createMock<ServiceProviderRepo>(),
+                },
                 RollenmappingController,
             ],
         }).compile();
@@ -47,6 +55,7 @@ describe('Rollenmapping API', () => {
         rollenMappingFactoryMock = module.get(RollenMappingFactory);
         rollenMappingController = module.get(RollenmappingController);
         permissionsMock = module.get(PersonPermissions);
+        serviceProviderRepoMock = module.get(ServiceProviderRepo);
     }, DEFAULT_TIMEOUT_FOR_TESTCONTAINERS);
 
     beforeEach(() => {
@@ -59,7 +68,15 @@ describe('Rollenmapping API', () => {
             serviceProviderId: faker.string.uuid(),
             mapToLmsRolle: faker.string.uuid(),
         } as unknown as RollenMapping<false>);
-        permissionsMock.hasSystemrechteAtRootOrganisation.mockReset();
+        serviceProviderRepoMock.findById.mockReturnValue({
+            id: faker.string.uuid(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            name: faker.company.name(),
+            kategorie: 'ANGEBOTE',
+            providedOnSchulstrukturknoten: faker.string.uuid(),
+        } as unknown as Promise<Option<ServiceProvider<true>>>);
+        permissionsMock.hasSystemrechtAtOrganisation.mockReset();
     });
 
     describe('getRollenmappingWithId', () => {
@@ -73,7 +90,7 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: faker.string.uuid(),
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue(rollenMapping);
 
                 const result: RollenMapping<true> = await rollenMappingController.getRollenmappingWithId(
@@ -85,16 +102,25 @@ describe('Rollenmapping API', () => {
 
             it('should throw ForbiddenException if permission is missing', async () => {
                 const id: string = faker.string.uuid();
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(false);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
+                // Ensure rollenMappingRepoMock returns a value so permission check is hit
+                rollenMappingRepoMock.findById.mockResolvedValue({
+                    id,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    rolleId: faker.string.uuid(),
+                    serviceProviderId: faker.string.uuid(),
+                    mapToLmsRolle: faker.string.uuid(),
+                });
 
                 await expect(rollenMappingController.getRollenmappingWithId(id, permissionsMock)).rejects.toThrow(
-                    'Insufficient rights to retrieve the rollenmapping objects',
+                    `Insufficient rights to retrieve the rollenmapping at this organization with id ${id}`,
                 );
             });
 
             it('should throw NotFoundException if rollenmapping does not exist', async () => {
                 const id: string = faker.string.uuid();
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue(undefined);
 
                 await expect(rollenMappingController.getRollenmappingWithId(id, permissionsMock)).rejects.toThrow(
@@ -117,7 +143,7 @@ describe('Rollenmapping API', () => {
                         mapToLmsRolle: faker.string.uuid(),
                     },
                 ];
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.find.mockResolvedValue(rollenMappings);
 
                 const result: RollenMapping<true>[] =
@@ -126,15 +152,15 @@ describe('Rollenmapping API', () => {
             });
 
             it('should throw ForbiddenException if permission is missing', async () => {
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(false);
-
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
+                rollenMappingRepoMock.find.mockResolvedValue([]);
                 await expect(rollenMappingController.getAllAvailableRollenmapping(permissionsMock)).rejects.toThrow(
-                    'Insufficient rights to retrieve the rollenmapping objects',
+                    'No rollenmapping objects found for the organizations within your editing rights',
                 );
             });
 
             it('should throw NotFoundException if no rollenmapping found', async () => {
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.find.mockResolvedValue([]);
 
                 await expect(rollenMappingController.getAllAvailableRollenmapping(permissionsMock)).rejects.toThrow(
@@ -160,7 +186,7 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: rollenMappingCreateBodyParams.serviceProviderId,
                     mapToLmsRolle: rollenMappingCreateBodyParams.mapToLmsRolle,
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingFactoryMock.createNew.mockReturnValue(
                     rollingMappingExpected as unknown as RollenMapping<false>,
                 );
@@ -177,11 +203,11 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: 'User',
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(false);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
 
                 await expect(
                     rollenMappingController.createNewRollenmapping(rollenMappingCreateBodyParams, permissionsMock),
-                ).rejects.toThrow('Insufficient rights to create rollenmapping object');
+                ).rejects.toThrow('Insufficient rights to create the rollenmapping objects into this organization');
             });
         });
     });
@@ -207,7 +233,7 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: rollenMappingToBeUpdated.serviceProviderId,
                     mapToLmsRolle: mapToLmsRolle,
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue(rollenMappingToBeUpdated);
                 rollenMappingFactoryMock.update.mockReturnValue(rollenMappingUpdateExpectedResult);
                 rollenMappingRepoMock.save.mockResolvedValue(rollenMappingUpdateExpectedResult);
@@ -240,7 +266,8 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: 'User',
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(false);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
+                rollenMappingRepoMock.findById.mockResolvedValue(rollenMappingUpdate);
 
                 await expect(
                     rollenMappingController.updateExistingRollenmapping(
@@ -248,7 +275,7 @@ describe('Rollenmapping API', () => {
                         rollenMappingUpdate.mapToLmsRolle,
                         permissionsMock,
                     ),
-                ).rejects.toThrow('Insufficient rights to create rollenmapping object');
+                ).rejects.toThrow('Insufficient rights to update the rollenmapping objects in this organization');
             });
 
             it('should throw NotFoundException if rollenmapping does not exist', async () => {
@@ -261,7 +288,7 @@ describe('Rollenmapping API', () => {
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: 'User',
                 };
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue(undefined);
 
                 await expect(
@@ -279,7 +306,7 @@ describe('Rollenmapping API', () => {
         describe('when called', () => {
             it('should delete rollenmapping if permission and entity exist', async () => {
                 const id: string = faker.string.uuid();
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue({
                     id,
                     createdAt: new Date(),
@@ -298,21 +325,105 @@ describe('Rollenmapping API', () => {
 
             it('should throw ForbiddenException if permission is missing', async () => {
                 const id: string = faker.string.uuid();
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(false);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
+                rollenMappingRepoMock.findById.mockResolvedValue({
+                    id,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    rolleId: faker.string.uuid(),
+                    serviceProviderId: faker.string.uuid(),
+                    mapToLmsRolle: 'User',
+                });
 
                 await expect(rollenMappingController.deleteExistingRollenmapping(id, permissionsMock)).rejects.toThrow(
-                    'Insufficient rights to create rollenmapping object',
+                    'Insufficient rights to delete the rollenmapping',
                 );
             });
 
             it('should throw NotFoundException if rollenmapping does not exist', async () => {
                 const id: string = faker.string.uuid();
-                permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValue(true);
+                permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
                 rollenMappingRepoMock.findById.mockResolvedValue(undefined);
 
                 await expect(rollenMappingController.deleteExistingRollenmapping(id, permissionsMock)).rejects.toThrow(
                     `No rollenmapping found with id ${id}`,
                 );
+            });
+        });
+        describe('getAvailableRollenmappingForServiceProvider', () => {
+            describe('When Called', () => {
+                const serviceProviderId: string = faker.string.uuid();
+
+                it('should return rollenmapping array if permission is granted and entities exist', async () => {
+                    const rollenMappings: RollenMapping<true>[] = [
+                        {
+                            id: faker.string.uuid(),
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                            rolleId: faker.string.uuid(),
+                            serviceProviderId,
+                            mapToLmsRolle: faker.string.uuid(),
+                        },
+                    ];
+                    const serviceProvider: ServiceProvider<true> = DoFactory.createServiceProvider<true>(true, {
+                        id: serviceProviderId,
+                    });
+                    serviceProviderRepoMock.findById.mockResolvedValue(Promise.resolve(serviceProvider));
+                    permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
+                    rollenMappingRepoMock.findByServiceProviderId.mockResolvedValue(rollenMappings);
+
+                    const result: RollenMapping<true>[] =
+                        await rollenMappingController.getAvailableRollenmappingForServiceProvider(
+                            serviceProviderId,
+                            permissionsMock,
+                        );
+                    expect(result).toBe(rollenMappings);
+                });
+
+                it('should throw ForbiddenException if permission is missing', async () => {
+                    const serviceProvider: ServiceProvider<true> = DoFactory.createServiceProvider<true>(true, {
+                        id: serviceProviderId,
+                    });
+                    serviceProviderRepoMock.findById.mockResolvedValue(serviceProvider);
+                    permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
+
+                    await expect(
+                        rollenMappingController.getAvailableRollenmappingForServiceProvider(
+                            serviceProviderId,
+                            permissionsMock,
+                        ),
+                    ).rejects.toThrow(
+                        'Insufficient rights to retrieve the rollenmapping objects from this organization',
+                    );
+                });
+
+                it('should throw NotFoundException if no rollenmapping found for service provider', async () => {
+                    const serviceProvider: ServiceProvider<true> = DoFactory.createServiceProvider<true>(true, {
+                        id: serviceProviderId,
+                    });
+                    serviceProviderRepoMock.findById.mockResolvedValue(serviceProvider);
+                    permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
+                    rollenMappingRepoMock.findByServiceProviderId.mockResolvedValue([]);
+
+                    await expect(
+                        rollenMappingController.getAvailableRollenmappingForServiceProvider(
+                            serviceProviderId,
+                            permissionsMock,
+                        ),
+                    ).rejects.toThrow(`No rollenmapping objects found for service provider id ${serviceProviderId}`);
+                });
+
+                it('should throw NotFoundException if serviceProvider is undefined', async () => {
+                    serviceProviderRepoMock.findById.mockResolvedValue(undefined);
+                    rollenMappingRepoMock.findByServiceProviderId.mockResolvedValue([]);
+
+                    await expect(
+                        rollenMappingController.getAvailableRollenmappingForServiceProvider(
+                            serviceProviderId,
+                            permissionsMock,
+                        ),
+                    ).rejects.toThrow(`No rollenmapping objects found for service provider id ${serviceProviderId}`);
+                });
             });
         });
     });
