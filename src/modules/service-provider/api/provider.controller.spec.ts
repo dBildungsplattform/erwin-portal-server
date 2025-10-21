@@ -656,7 +656,7 @@ describe('Provider Controller Test', () => {
                     logoMimeType,
                 };
                 serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProvider);
-                const streamableFile = new StreamableFile(logoBuffer);
+                const streamableFile: StreamableFile = new StreamableFile(logoBuffer);
                 streamableFileFactoryMock.fromBuffer.mockReturnValue(streamableFile);
 
                 const result: StreamableFile = await providerController.getServiceProviderLogo({ angebotId: spId });
