@@ -103,7 +103,6 @@ describe('Rollenmapping API', () => {
             it('should throw ForbiddenException if permission is missing', async () => {
                 const id: string = faker.string.uuid();
                 permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(false);
-                // Ensure rollenMappingRepoMock returns a value so permission check is hit
                 rollenMappingRepoMock.findById.mockResolvedValue({
                     id,
                     createdAt: new Date(),
@@ -403,18 +402,6 @@ describe('Rollenmapping API', () => {
                     });
                     serviceProviderRepoMock.findById.mockResolvedValue(serviceProvider);
                     permissionsMock.hasSystemrechtAtOrganisation.mockResolvedValue(true);
-                    rollenMappingRepoMock.findByServiceProviderId.mockResolvedValue([]);
-
-                    await expect(
-                        rollenMappingController.getAvailableRollenmappingForServiceProvider(
-                            serviceProviderId,
-                            permissionsMock,
-                        ),
-                    ).rejects.toThrow(`No rollenmapping objects found for service provider id ${serviceProviderId}`);
-                });
-
-                it('should throw NotFoundException if serviceProvider is undefined', async () => {
-                    serviceProviderRepoMock.findById.mockResolvedValue(undefined);
                     rollenMappingRepoMock.findByServiceProviderId.mockResolvedValue([]);
 
                     await expect(

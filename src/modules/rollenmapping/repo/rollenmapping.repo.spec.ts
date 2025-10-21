@@ -176,4 +176,46 @@ describe('RollenMappingRepo', () => {
             });
         });
     });
+
+    describe('findByServiceProviderId', () => {
+        describe('findByServiceProviderId', () => {
+            it('should return all RollenMappings for a given serviceProviderId', async () => {
+                const rolle: Rolle<true> = await getSavedRolle();
+                const serviceProvider: ServiceProvider<true> = await getSavedServiceProvider();
+
+                const mapping1: RollenMapping<false> = DoFactory.createRollenMapping(false, {
+                    rolleId: rolle.id,
+                    serviceProviderId: serviceProvider.id,
+                });
+                const mapping2: RollenMapping<false> = DoFactory.createRollenMapping(false, {
+                    rolleId: rolle.id,
+                    serviceProviderId: serviceProvider.id,
+                });
+                const savedMapping1: RollenMapping<true> = await sut.save(mapping1);
+                const savedMapping2: RollenMapping<true> = await sut.save(mapping2);
+
+                const otherServiceProvider: ServiceProvider<true> = await getSavedServiceProvider();
+                const mappingOther: RollenMapping<false> = DoFactory.createRollenMapping(false, {
+                    rolleId: rolle.id,
+                    serviceProviderId: otherServiceProvider.id,
+                });
+                await sut.save(mappingOther);
+
+                const foundMappings: RollenMapping<true>[] = await sut.findByServiceProviderId(serviceProvider.id);
+
+                expect(foundMappings).toHaveLength(2);
+                const foundIds: string[] = foundMappings.map((m: RollenMapping<true>) => m.id);
+                expect(foundIds).toContain(savedMapping1.id);
+                expect(foundIds).toContain(savedMapping2.id);
+            });
+
+            it('should return an empty array if no RollenMappings exist for the given serviceProviderId', async () => {
+                const nonExistentServiceProviderId: string = faker.string.uuid();
+                const foundMappings: RollenMapping<true>[] =
+                    await sut.findByServiceProviderId(nonExistentServiceProviderId);
+
+                expect(foundMappings).toEqual([]);
+            });
+        });
+    });
 });

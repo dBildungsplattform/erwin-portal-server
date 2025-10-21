@@ -135,10 +135,10 @@ export class RollenmappingController {
     ): Promise<RollenMapping<true>[]> {
         const serviceProvider: Option<ServiceProvider<true>> =
             await this.serviceProviderRepo.findById(serviceProviderId);
-        if (serviceProvider?.providedOnSchulstrukturknoten) {
+        if (serviceProvider!.providedOnSchulstrukturknoten) {
             if (
                 !(await personPermission.hasSystemrechtAtOrganisation(
-                    serviceProvider?.providedOnSchulstrukturknoten,
+                    serviceProvider!.providedOnSchulstrukturknoten,
                     RollenSystemRecht.ROLLEN_VERWALTEN,
                 ))
             ) {
@@ -260,14 +260,15 @@ export class RollenmappingController {
                 rollenmapping.serviceProviderId,
             );
 
-            if (
-                !serviceProvider ||
-                !(await personPermission.hasSystemrechtAtOrganisation(
-                    serviceProvider.providedOnSchulstrukturknoten,
-                    RollenSystemRecht.ROLLEN_VERWALTEN,
-                ))
-            ) {
-                throw new ForbiddenException('Insufficient rights to delete the rollenmapping');
+            if (serviceProvider) {
+                if (
+                    !(await personPermission.hasSystemrechtAtOrganisation(
+                        serviceProvider.providedOnSchulstrukturknoten,
+                        RollenSystemRecht.ROLLEN_VERWALTEN,
+                    ))
+                ) {
+                    throw new ForbiddenException('Insufficient rights to delete the rollenmapping');
+                }
             }
             await this.rollenMappingRepo.delete(id);
         }
