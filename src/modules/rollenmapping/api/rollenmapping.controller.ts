@@ -29,16 +29,16 @@ import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
 import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
-import { RollenmappingCreateBodyParams } from './rollenmapping-create-body.params.js';
+import { RollenMappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
 import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
-@ApiTags('rollenmapping')
+@ApiTags('rollenMapping')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
-@Controller({ path: 'rollenmapping' })
-export class RollenmappingController {
+@Controller({ path: 'rollenMapping' })
+export class RollenMappingController {
     public constructor(
         private readonly rollenMappingRepo: RollenMappingRepo,
         private readonly rollenMappingFactory: RollenMappingFactory,
@@ -47,23 +47,23 @@ export class RollenmappingController {
     ) {}
 
     @Get(':id')
-    @ApiOkResponse({ description: 'The rollenmapping was successfully returned', type: RollenMapping })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenmapping' })
-    @ApiNotFoundResponse({ description: 'No rollenmapping found' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenmapping' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenmapping' })
-    public async getRollenmappingWithId(
+    @ApiOkResponse({ description: 'The rollenMapping was successfully returned', type: RollenMapping })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenMapping' })
+    @ApiNotFoundResponse({ description: 'No rollenMapping found' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenMapping' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenMapping' })
+    public async getRollenMappingWithId(
         @Param('id') id: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
-        const rollenmapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
+        const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
 
-        if (!rollenmapping) {
-            this.logger.error(`No rollenmapping object found with id ${id}`);
-            throw new NotFoundException(`No rollenmapping object found with id ${id}`);
+        if (!rollenMapping) {
+            this.logger.error(`No rollenMapping object found with id ${id}`);
+            throw new NotFoundException(`No rollenMapping object found with id ${id}`);
         }
         const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
-            rollenmapping.serviceProviderId,
+            rollenMapping.serviceProviderId,
         );
         if (
             !(await personPermission.hasSystemrechtAtOrganisation(
@@ -71,61 +71,63 @@ export class RollenmappingController {
                 RollenSystemRecht.ROLLEN_VERWALTEN,
             ))
         ) {
-            this.logger.error(`Insufficient rights to retrieve the rollenmapping at this organization with id ${id}`);
+            this.logger.error(`Insufficient rights to retrieve the rollenMapping at this organization with id ${id}`);
             throw new ForbiddenException(
-                `Insufficient rights to retrieve the rollenmapping at this organization with id ${id}`,
+                `Insufficient rights to retrieve the rollenMapping at this organization with id ${id}`,
             );
         }
 
-        return rollenmapping;
+        return rollenMapping;
     }
 
     @Get()
     @ApiOkResponse({
-        description: 'The available rollenmapping objects were successfully returned',
+        description: 'The available rollenMapping objects were successfully returned',
         type: [RollenMapping],
     })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenmapping' })
-    @ApiNotFoundResponse({ description: 'No rollenmapping objects found' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenmapping objects' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenmapping objects' })
-    public async getAllAvailableRollenmapping(
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenMapping' })
+    @ApiNotFoundResponse({ description: 'No rollenMapping objects found' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenMapping objects' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenMapping objects' })
+    public async getAllAvailableRollenMapping(
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>[]> {
-        const rollenmappingArray: Option<RollenMapping<true>[]> = await this.rollenMappingRepo.find();
+        const rollenMappingArray: Option<RollenMapping<true>[]> = await this.rollenMappingRepo.find();
 
-        rollenmappingArray.filter(async (rollenmapping: RollenMapping<true>) => {
-            const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
-                rollenmapping.serviceProviderId,
-            );
-            const hasPermission: boolean = await personPermission.hasSystemrechtAtOrganisation(
-                serviceProvider!.providedOnSchulstrukturknoten,
-                RollenSystemRecht.ROLLEN_VERWALTEN,
-            );
+        const filteredRollenMappingArray: RollenMapping<true>[] = rollenMappingArray.filter(
+            async (rollenMapping: RollenMapping<true>) => {
+                const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
+                    rollenMapping.serviceProviderId,
+                );
+                const hasPermission: boolean = await personPermission.hasSystemrechtAtOrganisation(
+                    serviceProvider!.providedOnSchulstrukturknoten,
+                    RollenSystemRecht.ROLLEN_VERWALTEN,
+                );
 
-            return hasPermission;
-        });
+                return hasPermission;
+            },
+        );
 
-        if (!rollenmappingArray || rollenmappingArray.length === 0) {
-            this.logger.error(`No rollenmapping objects found for the organizations within your editing rights`);
+        if (!filteredRollenMappingArray || filteredRollenMappingArray.length === 0) {
+            this.logger.error(`No rollenMapping objects found for the organizations within your editing rights`);
             throw new NotFoundException(
-                `No rollenmapping objects found for the organizations within your editing rights`,
+                `No rollenMapping objects found for the organizations within your editing rights`,
             );
         }
 
-        return rollenmappingArray;
+        return filteredRollenMappingArray;
     }
 
     @Get(':serviceProviderId/available')
     @ApiOkResponse({
-        description: 'The available rollenmapping objects were successfully returned',
+        description: 'The available rollenMapping objects were successfully returned',
         type: [RollenMapping],
     })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenmapping' })
-    @ApiNotFoundResponse({ description: 'No rollenmapping objects found' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenmapping objects' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenmapping objects' })
-    public async getAvailableRollenmappingForServiceProvider(
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to retrieve the rollenMapping' })
+    @ApiNotFoundResponse({ description: 'No rollenMapping objects found' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to retrieve the rollenMapping objects' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while retrieving the rollenMapping objects' })
+    public async getAvailableRollenMappingForServiceProvider(
         @Param('serviceProviderId') serviceProviderId: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>[]> {
@@ -139,33 +141,33 @@ export class RollenmappingController {
                 ))
             ) {
                 throw new ForbiddenException(
-                    'Insufficient rights to retrieve the rollenmapping objects from this organization',
+                    'Insufficient rights to retrieve the rollenMapping objects from this organization',
                 );
             }
         }
-        const rollenmappingArray: Option<RollenMapping<true>[]> =
+        const rollenMappingArray: Option<RollenMapping<true>[]> =
             await this.rollenMappingRepo.findByServiceProviderId(serviceProviderId);
 
-        if (!rollenmappingArray || rollenmappingArray.length === 0) {
-            this.logger.error(`No rollenmapping objects found for service provider id ${serviceProviderId}`);
-            throw new NotFoundException(`No rollenmapping objects found for service provider id ${serviceProviderId}`);
+        if (!rollenMappingArray || rollenMappingArray.length === 0) {
+            this.logger.error(`No rollenMapping objects found for service provider id ${serviceProviderId}`);
+            throw new NotFoundException(`No rollenMapping objects found for service provider id ${serviceProviderId}`);
         }
 
-        return rollenmappingArray;
+        return rollenMappingArray;
     }
 
     @Post()
-    @ApiOkResponse({ description: 'The rollenmapping was successfully created', type: RollenMapping })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to create the rollenmapping' })
-    @ApiBadRequestResponse({ description: 'Invalid input, rollenmapping not created' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to create the rollenmapping' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while creating the rollenmapping' })
-    public async createNewRollenmapping(
-        @Query() rollenmappingCreateBodyParams: RollenmappingCreateBodyParams,
+    @ApiOkResponse({ description: 'The rollenMapping was successfully created', type: RollenMapping })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to create the rollenMapping' })
+    @ApiBadRequestResponse({ description: 'Invalid input, rollenMapping not created' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to create the rollenMapping' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while creating the rollenMapping' })
+    public async createNewRollenMapping(
+        @Query() rollenMappingCreateBodyParams: RollenMappingCreateBodyParams,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
-            rollenmappingCreateBodyParams.serviceProviderId,
+            rollenMappingCreateBodyParams.serviceProviderId,
         );
         if (serviceProvider!.providedOnSchulstrukturknoten) {
             if (
@@ -175,15 +177,15 @@ export class RollenmappingController {
                 ))
             ) {
                 throw new ForbiddenException(
-                    'Insufficient rights to create the rollenmapping objects into this organization',
+                    'Insufficient rights to create the rollenMapping objects into this organization',
                 );
             }
         }
 
         const newRollenmapping: RollenMapping<false> = RollenMapping.createNew(
-            rollenmappingCreateBodyParams.rolleId,
-            rollenmappingCreateBodyParams.serviceProviderId,
-            rollenmappingCreateBodyParams.mapToLmsRolle,
+            rollenMappingCreateBodyParams.rolleId,
+            rollenMappingCreateBodyParams.serviceProviderId,
+            rollenMappingCreateBodyParams.mapToLmsRolle,
         );
         const savedRollenMapping: RollenMapping<true> = await this.rollenMappingRepo.create(newRollenmapping);
 
@@ -191,20 +193,20 @@ export class RollenmappingController {
     }
 
     @Put(':id')
-    @ApiOkResponse({ description: 'The rollenmapping was successfully updated', type: RollenMapping })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to update the rollenmapping' })
-    @ApiNotFoundResponse({ description: 'No rollenmapping found to update' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to update the rollenmapping' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the rollenmapping' })
-    public async updateExistingRollenmapping(
+    @ApiOkResponse({ description: 'The rollenMapping was successfully updated', type: RollenMapping })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to update the rollenMapping' })
+    @ApiNotFoundResponse({ description: 'No rollenMapping found to update' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to update the rollenMapping' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while updating the rollenMapping' })
+    public async updateExistingRollenMapping(
         @Param('id') id: string,
         @Query('mapToLmsRolle') mapToLmsRolle: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<RollenMapping<true>> {
         const originalRollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
         if (!originalRollenMapping) {
-            this.logger.error(`No rollenmapping found with id ${id}`);
-            throw new NotFoundException(`No rollenmapping found with id ${id}`);
+            this.logger.error(`No rollenMapping found with id ${id}`);
+            throw new NotFoundException(`No rollenMapping found with id ${id}`);
         }
 
         const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
@@ -218,7 +220,7 @@ export class RollenmappingController {
                 ))
             ) {
                 throw new ForbiddenException(
-                    'Insufficient rights to update the rollenmapping objects in this organization',
+                    'Insufficient rights to update the rollenMapping objects in this organization',
                 );
             }
         }
@@ -237,23 +239,23 @@ export class RollenmappingController {
     }
 
     @Delete(':id')
-    @ApiOkResponse({ description: 'The rollenmapping was successfully deleted' })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized to delete the rollenmapping' })
-    @ApiNotFoundResponse({ description: 'No rollenmapping found to delete' })
-    @ApiForbiddenResponse({ description: 'Insufficient rights to delete the rollenmapping' })
-    @ApiInternalServerErrorResponse({ description: 'Internal server error while deleting the rollenmapping' })
-    public async deleteExistingRollenmapping(
+    @ApiOkResponse({ description: 'The rollenMapping was successfully deleted' })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to delete the rollenMapping' })
+    @ApiNotFoundResponse({ description: 'No rollenMapping found to delete' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to delete the rollenMapping' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while deleting the rollenMapping' })
+    public async deleteExistingRollenMapping(
         @Param('id') id: string,
         @Permissions() personPermission: PersonPermissions,
     ): Promise<void> {
-        const rollenmapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
+        const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findById(id);
 
-        if (!rollenmapping) {
-            this.logger.error(`No rollenmapping found with id ${id}`);
-            throw new NotFoundException(`No rollenmapping found with id ${id}`);
+        if (!rollenMapping) {
+            this.logger.error(`No rollenMapping found with id ${id}`);
+            throw new NotFoundException(`No rollenMapping found with id ${id}`);
         } else {
             const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
-                rollenmapping.serviceProviderId,
+                rollenMapping.serviceProviderId,
             );
 
             if (serviceProvider) {
@@ -263,7 +265,7 @@ export class RollenmappingController {
                         RollenSystemRecht.ROLLEN_VERWALTEN,
                     ))
                 ) {
-                    throw new ForbiddenException('Insufficient rights to delete the rollenmapping');
+                    throw new ForbiddenException('Insufficient rights to delete the rollenMapping');
                 }
             }
             await this.rollenMappingRepo.delete(id);

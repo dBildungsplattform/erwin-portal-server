@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID } from 'class-validator';
 
-export class RollenmappingCreateBodyParams {
+export class RollenMappingCreateBodyParams {
     @ApiProperty({
         description: 'The id of the service provider/LMS.',
     })

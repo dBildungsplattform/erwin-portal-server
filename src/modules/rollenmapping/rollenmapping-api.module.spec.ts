@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigTestModule, DatabaseTestModule, MapperTestModule } from '../../../test/utils/index.js';
 import { RollenMappingApiModule } from './rollenmapping-api.module.js';
-import { RollenmappingController } from './api/rollenmapping.controller.js';
+import { RollenMappingController } from './api/rollenmapping.controller.js';
 import { ServiceProviderModule } from '../service-provider/service-provider.module.js';
 
 describe('RollenMappingApiModule', () => {
@@ -29,7 +29,7 @@ describe('RollenMappingApiModule', () => {
 
     describe('when module is initialized', () => {
         it('should resolve RollenMappingController', () => {
-            expect(module.get(RollenmappingController)).toBeInstanceOf(RollenmappingController);
+            expect(module.get(RollenMappingController)).toBeInstanceOf(RollenMappingController);
         });
     });
 });
