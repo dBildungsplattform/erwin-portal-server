@@ -94,8 +94,8 @@ export class RollenMappingController {
     ): Promise<RollenMapping<true>[]> {
         const rollenMappingArray: Option<RollenMapping<true>[]> = await this.rollenMappingRepo.find();
 
-        const filteredRollenMappingArray: RollenMapping<true>[] = rollenMappingArray.filter(
-            async (rollenMapping: RollenMapping<true>) => {
+        const permissionChecks: boolean[] = await Promise.all(
+            rollenMappingArray.map(async (rollenMapping: RollenMapping<true>) => {
                 const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(
                     rollenMapping.serviceProviderId,
                 );
@@ -103,9 +103,11 @@ export class RollenMappingController {
                     serviceProvider!.providedOnSchulstrukturknoten,
                     RollenSystemRecht.ROLLEN_VERWALTEN,
                 );
-
                 return hasPermission;
-            },
+            }),
+        );
+        const filteredRollenMappingArray: RollenMapping<true>[] = rollenMappingArray.filter(
+            (_: RollenMapping<true>, index: number) => permissionChecks[index],
         );
 
         if (!filteredRollenMappingArray || filteredRollenMappingArray.length === 0) {
