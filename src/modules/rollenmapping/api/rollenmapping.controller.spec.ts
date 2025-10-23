@@ -16,7 +16,7 @@ import { ServiceProviderRepo } from '../../service-provider/repo/service-provide
 import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
 import { DoFactory } from '../../../../test/utils/do-factory.js';
 
-describe('Rollenmapping API', () => {
+describe('RollenMapping API', () => {
     let rollenMappingRepoMock: DeepMocked<RollenMappingRepo>;
     let rollenMappingController: RollenMappingController;
     let rollenMappingFactoryMock: DeepMocked<RollenMappingFactory>;
@@ -79,7 +79,7 @@ describe('Rollenmapping API', () => {
         permissionsMock.hasSystemrechtAtOrganisation.mockReset();
     });
 
-    describe('getRollenmappingWithId', () => {
+    describe('getRollenMappingWithId', () => {
         describe('when called', () => {
             it('should return rollenMapping if permission and entity exist', async () => {
                 const rollenMapping: RollenMapping<true> = {
@@ -129,7 +129,7 @@ describe('Rollenmapping API', () => {
         });
     });
 
-    describe('getAllAvailableRollenmapping', () => {
+    describe('getAllAvailableRollenMapping', () => {
         describe('when called', () => {
             it('should return array if permission and entities exist', async () => {
                 const rollenMappings: RollenMapping<true>[] = [
@@ -169,7 +169,7 @@ describe('Rollenmapping API', () => {
         });
     });
 
-    describe('createNewRollenmapping', () => {
+    describe('createNewRollenMapping', () => {
         describe('when called', () => {
             it('should create and return rollenMapping if permission is granted', async () => {
                 const rollenMappingCreateBodyParams: RollenMappingCreateBodyParams = {
@@ -211,7 +211,7 @@ describe('Rollenmapping API', () => {
         });
     });
 
-    describe('updateExistingRollenmapping', () => {
+    describe('updateExistingRollenMapping', () => {
         describe('when called', () => {
             it('should update and return rollenMapping if permission and entity exist', async () => {
                 const id: string = faker.string.uuid();
@@ -301,7 +301,7 @@ describe('Rollenmapping API', () => {
         });
     });
 
-    describe('deleteExistingRollenmapping', () => {
+    describe('deleteExistingRollenMapping', () => {
         describe('when called', () => {
             it('should delete rollenMapping if permission and entity exist', async () => {
                 const id: string = faker.string.uuid();
@@ -349,7 +349,7 @@ describe('Rollenmapping API', () => {
                 );
             });
         });
-        describe('getAvailableRollenmappingForServiceProvider', () => {
+        describe('getAvailableRollenMappingForServiceProvider', () => {
             describe('When Called', () => {
                 const serviceProviderId: string = faker.string.uuid();
 

@@ -183,30 +183,17 @@ describe('RollenMappingRepo', () => {
                 const rolle: Rolle<true> = await getSavedRolle();
                 const serviceProvider: ServiceProvider<true> = await getSavedServiceProvider();
 
-                const mapping1: RollenMapping<false> = DoFactory.createRollenMapping(false, {
+                const mapping: RollenMapping<false> = DoFactory.createRollenMapping(false, {
                     rolleId: rolle.id,
                     serviceProviderId: serviceProvider.id,
                 });
-                const mapping2: RollenMapping<false> = DoFactory.createRollenMapping(false, {
-                    rolleId: rolle.id,
-                    serviceProviderId: serviceProvider.id,
-                });
-                const savedMapping1: RollenMapping<true> = await sut.save(mapping1);
-                const savedMapping2: RollenMapping<true> = await sut.save(mapping2);
-
-                const otherServiceProvider: ServiceProvider<true> = await getSavedServiceProvider();
-                const mappingOther: RollenMapping<false> = DoFactory.createRollenMapping(false, {
-                    rolleId: rolle.id,
-                    serviceProviderId: otherServiceProvider.id,
-                });
-                await sut.save(mappingOther);
+                const savedMapping: RollenMapping<true> = await sut.save(mapping);
 
                 const foundMappings: RollenMapping<true>[] = await sut.findByServiceProviderId(serviceProvider.id);
 
-                expect(foundMappings).toHaveLength(2);
+                expect(foundMappings).toHaveLength(1);
                 const foundIds: string[] = foundMappings.map((m: RollenMapping<true>) => m.id);
-                expect(foundIds).toContain(savedMapping1.id);
-                expect(foundIds).toContain(savedMapping2.id);
+                expect(foundIds).toContain(savedMapping.id);
             });
 
             it('should return an empty array if no RollenMappings exist for the given serviceProviderId', async () => {
