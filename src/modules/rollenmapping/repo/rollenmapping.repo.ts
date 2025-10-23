@@ -75,14 +75,31 @@ export class RollenMappingRepo {
     }
 
     public async create(rollenMapping: RollenMapping<false>): Promise<RollenMapping<true>> {
-        const rollenMappingEntity: RollenMappingEntity = this.em.create(
-            RollenMappingEntity,
-            mapRollenMappingAggregateToData(rollenMapping),
+        const existsInDb: RollenMappingEntity | null = await this.em.findOne(RollenMappingEntity, {
+            rolleId: rollenMapping.rolleId,
+        });
+        if (!existsInDb) {
+            const rollenMappingEntity: RollenMappingEntity = this.em.create(
+                RollenMappingEntity,
+                mapRollenMappingAggregateToData(rollenMapping),
+            );
+
+            await this.em.persistAndFlush(rollenMappingEntity);
+
+            return mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory);
+        } else {
+            throw new Error('RollenMapping with the given rolleId already exists');
+        }
+    }
+
+    public async findByServiceProviderId(serviceProviderId: string): Promise<RollenMapping<true>[]> {
+        const rollenMappingEntities: RollenMappingEntity[] = await this.em.find(RollenMappingEntity, {
+            serviceProviderId,
+        });
+
+        return rollenMappingEntities.map((rollenMappingEntity: RollenMappingEntity) =>
+            mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory),
         );
-
-        await this.em.persistAndFlush(rollenMappingEntity);
-
-        return mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory);
     }
 
     private async update(rollenMapping: RollenMapping<true>): Promise<RollenMapping<true>> {

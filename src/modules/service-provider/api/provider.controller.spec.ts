@@ -1,6 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { BadRequestException, ForbiddenException, HttpException, INestApplication } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    HttpException,
+    INestApplication,
+    StreamableFile,
+} from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Client } from 'openid-client';
@@ -27,6 +33,7 @@ import { OrganisationRepository } from '../../organisation/persistence/organisat
 import { ServiceProviderKategorie } from '../domain/service-provider.enum.js';
 import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
+import { StreamableFileFactory } from '../../../shared/util/streamable-file.factory.js';
 
 describe('Provider Controller Test', () => {
     let app: INestApplication;
@@ -34,6 +41,7 @@ describe('Provider Controller Test', () => {
     let serviceProviderRepoMock: DeepMocked<ServiceProviderRepo>;
     let organisationRepoMock: DeepMocked<OrganisationRepository>;
     let serviceProviderFactoryMock: DeepMocked<ServiceProviderFactory>;
+    let streamableFileFactoryMock: DeepMocked<StreamableFileFactory>;
     let providerController: ProviderController;
 
     beforeAll(async () => {
@@ -63,12 +71,15 @@ describe('Provider Controller Test', () => {
             .useValue(createMock<ServiceProviderFactory>())
             .overrideProvider(OrganisationRepository)
             .useValue(createMock<OrganisationRepository>())
+            .overrideProvider(StreamableFileFactory)
+            .useValue(createMock<StreamableFileFactory>())
             .compile();
 
         serviceProviderServiceMock = module.get<DeepMocked<ServiceProviderService>>(ServiceProviderService);
         serviceProviderRepoMock = module.get<DeepMocked<ServiceProviderRepo>>(ServiceProviderRepo);
         organisationRepoMock = module.get<DeepMocked<OrganisationRepository>>(OrganisationRepository);
         serviceProviderFactoryMock = module.get<DeepMocked<ServiceProviderFactory>>(ServiceProviderFactory);
+        streamableFileFactoryMock = module.get<DeepMocked<StreamableFileFactory>>(StreamableFileFactory);
         providerController = module.get(ProviderController);
         app = module.createNestApplication();
         await app.init();
@@ -631,6 +642,129 @@ describe('Provider Controller Test', () => {
                 expect(personPermissions.hasSystemrechteAtRootOrganisation).toHaveBeenCalledWith([
                     RollenSystemRecht.SERVICEPROVIDER_VERWALTEN,
                 ]);
+            });
+        });
+
+        describe('getServiceProviderLogo', () => {
+            it('should return a StreamableFile when service provider and logo exist', async () => {
+                const spId: string = faker.string.uuid();
+                const logoBuffer: Buffer = Buffer.from('logo');
+                const logoMimeType: string = 'image/png';
+                const serviceProvider: ServiceProvider<true> = {
+                    ...DoFactory.createServiceProvider(true, { id: spId }),
+                    logo: logoBuffer,
+                    logoMimeType,
+                };
+                serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProvider);
+                const streamableFile: StreamableFile = new StreamableFile(logoBuffer);
+                streamableFileFactoryMock.fromBuffer.mockReturnValue(streamableFile);
+
+                const result: StreamableFile = await providerController.getServiceProviderLogo({ angebotId: spId });
+
+                expect(serviceProviderRepoMock.findById).toHaveBeenCalledWith(spId, { withLogo: true });
+                expect(streamableFileFactoryMock.fromBuffer).toHaveBeenCalledWith(logoBuffer, {
+                    type: logoMimeType,
+                });
+                expect(result).toBe(streamableFile);
+            });
+
+            it('should throw NotFound if service provider does not exist', async () => {
+                const spId: string = faker.string.uuid();
+                serviceProviderRepoMock.findById.mockResolvedValueOnce(null);
+
+                await expect(providerController.getServiceProviderLogo({ angebotId: spId })).rejects.toThrow(
+                    HttpException,
+                );
+                expect(serviceProviderRepoMock.findById).toHaveBeenCalledWith(spId, { withLogo: true });
+            });
+
+            it('should throw NotFound if service provider has no logo', async () => {
+                const spId: string = faker.string.uuid();
+                const serviceProvider: ServiceProvider<true> = {
+                    ...DoFactory.createServiceProvider(true, { id: spId }),
+                    logo: undefined,
+                    logoMimeType: undefined,
+                };
+                serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProvider);
+
+                await expect(providerController.getServiceProviderLogo({ angebotId: spId })).rejects.toThrow(
+                    HttpException,
+                );
+                expect(serviceProviderRepoMock.findById).toHaveBeenCalledWith(spId, { withLogo: true });
+            });
+        });
+
+        describe('createNewServiceProvider', () => {
+            it('should create LMS provider if org is of type LMS', async () => {
+                const spId: string = faker.string.uuid();
+                const orgId: string = faker.string.uuid();
+                const spNew: ServiceProvider<false> = DoFactory.createServiceProvider(false, {
+                    kategorie: ServiceProviderKategorie.LMS,
+                });
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, {
+                    id: spId,
+                    kategorie: ServiceProviderKategorie.LMS,
+                });
+                serviceProviderFactoryMock.createNew.mockReturnValueOnce(spNew);
+                serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                const org: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.LMS });
+                organisationRepoMock.findById.mockResolvedValueOnce(org);
+
+                const spBodyParams: CreateServiceProviderBodyParams = {
+                    name: sp.name,
+                    target: sp.target,
+                    url: sp.url ?? '',
+                    kategorie: ServiceProviderKategorie.LMS,
+                    providedOnSchulstrukturknoten: orgId,
+                    externalSystem: sp.externalSystem,
+                    requires2fa: sp.requires2fa,
+                    keycloakGroup: sp.keycloakGroup,
+                    keycloakRole: sp.keycloakRole,
+                    logo: sp.logo?.toString('base64'),
+                    logoMimeType: sp.logoMimeType,
+                    vidisAngebotId: sp.vidisAngebotId,
+                };
+
+                const result: ServiceProviderResponse = await providerController.createNewServiceProvider(
+                    spBodyParams,
+                    personPermissions,
+                );
+
+                expect(organisationRepoMock.findById).toHaveBeenCalledWith(orgId);
+                expect(result).toBeInstanceOf(ServiceProviderResponse);
+            });
+        });
+
+        describe('updateServiceProvider', () => {
+            it('should throw if updating LMS provider and org is not LMS', async () => {
+                const spId: string = faker.string.uuid();
+                const orgId: string = faker.string.uuid();
+                const existingProvider: ServiceProvider<true> = DoFactory.createServiceProvider(true, {
+                    id: spId,
+                    kategorie: ServiceProviderKategorie.LMS,
+                    providedOnSchulstrukturknoten: orgId,
+                });
+                serviceProviderRepoMock.findById.mockResolvedValueOnce(existingProvider);
+
+                const org: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.SCHULE });
+                organisationRepoMock.findById.mockResolvedValueOnce(org);
+
+                const personPermissions: DeepMocked<PersonPermissions> = createMock<PersonPermissions>({});
+                personPermissions.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
+
+                const spBodyParams: UpdateServiceProviderBodyParams = {
+                    kategorie: ServiceProviderKategorie.LMS,
+                    providedOnSchulstrukturknoten: orgId,
+                };
+
+                await expect(
+                    providerController.updateServiceProvider({ angebotId: spId }, spBodyParams, personPermissions),
+                ).rejects.toThrow(BadRequestException);
+                expect(organisationRepoMock.findById).toHaveBeenCalledWith(orgId);
             });
         });
     });

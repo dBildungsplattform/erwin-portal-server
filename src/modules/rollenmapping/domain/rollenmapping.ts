@@ -5,13 +5,13 @@ export class RollenMapping<WasPersisted extends boolean> {
         public id: Persisted<string, WasPersisted>,
         public createdAt: Persisted<Date, WasPersisted>,
         public updatedAt: Persisted<Date, WasPersisted>,
-        public rolleId: RolleID,
-        public serviceProviderId: ServiceProviderID,
+        public rolleId: string,
+        public serviceProviderId: string,
         public mapToLmsRolle: string,
     ) {}
 
     public static createNew(rolleId: string, serviceProviderId: string, mapToLmsRolle: string): RollenMapping<false> {
-        return new RollenMapping(undefined, undefined, undefined, rolleId, serviceProviderId, mapToLmsRolle);
+        return new RollenMapping(crypto.randomUUID(), undefined, undefined, rolleId, serviceProviderId, mapToLmsRolle);
     }
 
     public static update(
