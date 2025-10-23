@@ -136,6 +136,21 @@ describe('RollenMappingRepo', () => {
         });
     });
 
+    describe('create', () => {
+        describe('when saving a new RollenMapping with rolleId that has RollenMapping', () => {
+            it('should throw an error', async () => {
+                const serviceProvider: ServiceProvider<true> = await getSavedServiceProvider();
+                const existingMapping: RollenMapping<true> = await getSavedRollenMapping();
+                const newMapping: RollenMapping<false> = DoFactory.createRollenMapping(false, {
+                    rolleId: existingMapping.rolleId,
+                    serviceProviderId: serviceProvider.id,
+                });
+
+                await expect(sut.save(newMapping)).rejects.toThrow();
+            });
+        });
+    });
+
     describe('save', () => {
         describe('when saving a new RollenMapping', () => {
             it('should assign an id', async () => {
