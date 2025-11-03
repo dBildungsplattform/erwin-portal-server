@@ -33,7 +33,7 @@ export class PersonInfoResponseV1 extends PersonInfoResponse {
                     typ: k.organisation.typ,
                     kennung: k.organisation.kennung,
                 }),
-                rollenart: k.rolle.rollenart,
+                rolle: k.rolle.rollenart,
                 rollenname: k.rolle.name,
                 personenstatus: k.personenkontext.personenstatus,
                 jahrgangsstufe: k.personenkontext.jahrgangsstufe,
