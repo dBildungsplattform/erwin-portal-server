@@ -102,6 +102,16 @@ export class RollenMappingRepo {
         );
     }
 
+    public async findByRolleId(rolleId: string): Promise<Option<RollenMapping<true>>> {
+        const rollenMappingEntity: RollenMappingEntity | null = await this.em.findOne(RollenMappingEntity, {
+            rolleId,
+        });
+        if (!rollenMappingEntity) {
+            return null;
+        }
+        return mapRollenMappingEntityToAggregate(rollenMappingEntity, this.rollenMappingFactory);
+    }
+
     private async update(rollenMapping: RollenMapping<true>): Promise<RollenMapping<true>> {
         const rollenMappingEntity: Loaded<RollenMappingEntity> = await this.em.findOneOrFail(
             RollenMappingEntity,
