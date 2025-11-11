@@ -86,7 +86,7 @@ describe('RollenMapping API', () => {
             providedOnSchulstrukturknoten: faker.string.uuid(),
         } as unknown as Promise<Option<ServiceProvider<true>>>);
         permissionsMock.hasSystemrechtAtOrganisation.mockReset();
-        rollenMappingServiceMock.hasAccessOnServiceProvider.mockReset();
+        rollenMappingServiceMock.getRoleOnServiceProviderByClientName.mockReset();
     });
 
     describe('getRollenMappingWithId', () => {
@@ -443,7 +443,7 @@ describe('RollenMapping API', () => {
                     serviceProviderId: faker.string.uuid(),
                     mapToLmsRolle: 'Teacher',
                 };
-                rollenMappingServiceMock.hasAccessOnServiceProvider.mockResolvedValue(rolleId);
+                rollenMappingServiceMock.getRoleOnServiceProviderByClientName.mockResolvedValue(rolleId);
                 rollenMappingRepoMock.findByRolleId.mockResolvedValue(rollenMapping);
 
                 const result: RollenMappingRolleIdResponse =
@@ -456,7 +456,7 @@ describe('RollenMapping API', () => {
             });
 
             it('should throw NotFoundException if rollenMapping does not exist for rolleId', async () => {
-                rollenMappingServiceMock.hasAccessOnServiceProvider.mockResolvedValue(rolleId);
+                rollenMappingServiceMock.getRoleOnServiceProviderByClientName.mockResolvedValue(rolleId);
                 rollenMappingRepoMock.findByRolleId.mockResolvedValue(undefined);
 
                 await expect(
@@ -467,7 +467,7 @@ describe('RollenMapping API', () => {
             });
 
             it('should throw NotFoundException if rolleId is null (no access)', async () => {
-                rollenMappingServiceMock.hasAccessOnServiceProvider.mockResolvedValue(null);
+                rollenMappingServiceMock.getRoleOnServiceProviderByClientName.mockResolvedValue(null);
 
                 await expect(
                     rollenMappingController.getMappingForRolleAndServiceProvider(

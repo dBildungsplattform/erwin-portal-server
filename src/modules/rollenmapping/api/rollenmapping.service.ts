@@ -12,7 +12,7 @@ export class RollenMappingService {
         private readonly personenKontextService: PersonenkontextService,
     ) {}
 
-    public async hasAccessOnServiceProvider(clientName: string, userId: string): Promise<RolleID | null> {
+    public async getRoleOnServiceProviderByClientName(clientName: string, userId: string): Promise<RolleID | null> {
         const serviceProvider: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findByName(clientName);
 
         if (!serviceProvider) {

@@ -62,7 +62,7 @@ describe('RollenMappingService', () => {
             serviceProviderRepoMock.findByName.mockResolvedValue(sp);
             personenKontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValue(personenkontexte);
 
-            const result: RolleID | null = await rollenMappingService.hasAccessOnServiceProvider(clientName, userId);
+            const result: RolleID | null = await rollenMappingService.getRoleOnServiceProviderByClientName(clientName, userId);
             expect(result).toBe(rolleId);
             expect(serviceProviderRepoMock.findByName).toHaveBeenCalledWith(clientName);
             expect(personenKontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledWith(userId);
@@ -74,7 +74,7 @@ describe('RollenMappingService', () => {
 
             serviceProviderRepoMock.findByName.mockResolvedValue(undefined);
 
-            const result: RolleID | null = await rollenMappingService.hasAccessOnServiceProvider(clientName, userId);
+            const result: RolleID | null = await rollenMappingService.getRoleOnServiceProviderByClientName(clientName, userId);
             expect(result).toBeNull();
             expect(serviceProviderRepoMock.findByName).toHaveBeenCalledWith(clientName);
             expect(personenKontextServiceMock.findPersonenkontexteByPersonId).not.toHaveBeenCalled();
@@ -92,7 +92,7 @@ describe('RollenMappingService', () => {
             serviceProviderRepoMock.findByName.mockResolvedValue(sp);
             personenKontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValue(personenkontexte);
 
-            const result: RolleID | null = await rollenMappingService.hasAccessOnServiceProvider(clientName, userId);
+            const result: RolleID | null = await rollenMappingService.getRoleOnServiceProviderByClientName(clientName, userId);
             expect(result).toBeNull();
         });
 
@@ -106,7 +106,7 @@ describe('RollenMappingService', () => {
             serviceProviderRepoMock.findByName.mockResolvedValue(sp);
             personenKontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValue([]);
 
-            const result: RolleID | null = await rollenMappingService.hasAccessOnServiceProvider(clientName, userId);
+            const result: RolleID | null = await rollenMappingService.getRoleOnServiceProviderByClientName(clientName, userId);
             expect(result).toBeNull();
         });
     });

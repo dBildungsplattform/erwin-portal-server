@@ -290,7 +290,7 @@ export class RollenMappingController {
         @Query('RollenMappingExtractMappingRequestBody')
         rollenMappingExtractMappingRequestBody: RollenMappingExtractMappingRequestBody,
     ): Promise<RollenMappingRolleIdResponse> {
-        const rolleId: RolleID | null = await this.rollenMappingService.hasAccessOnServiceProvider(
+        const rolleId: RolleID | null = await this.rollenMappingService.getRoleOnServiceProviderByClientName(
             rollenMappingExtractMappingRequestBody.clientName,
             rollenMappingExtractMappingRequestBody.userId,
         );
