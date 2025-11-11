@@ -91,7 +91,7 @@ describe('PersonInfoController', () => {
                 mandant: person.mandant,
                 referrer: person.referrer,
                 name: {
-                    familiennamen: person.familienname,
+                    familienname: person.familienname,
                     vorname: person.vorname,
                     anrede: person.nameAnrede,
                     initialenfamilienname: person.initialenFamilienname,
@@ -160,7 +160,7 @@ describe('PersonInfoController', () => {
                 expect(result.personenkontexte.at(0)?.organisation.kennung).toEqual(orga?.kennung);
                 expect(result.personenkontexte.at(0)?.organisation.name).toEqual(orga?.name);
                 expect(result.personenkontexte.at(0)?.organisation.typ).toEqual(orga?.typ);
-                expect(result.personenkontexte.at(0)?.rollenart).toEqual(rolle.rollenart);
+                expect(result.personenkontexte.at(0)?.rolle).toEqual(rolle.rollenart);
                 expect(result.personenkontexte.at(0)?.rollenname).toEqual(rolle.name);
                 expect(result.gruppen).toEqual([]);
                 expect(result.email).toEqual({
@@ -212,7 +212,7 @@ describe('PersonInfoController', () => {
                 expect(result.personenkontexte.at(0)?.organisation.kennung).toEqual(orga?.kennung);
                 expect(result.personenkontexte.at(0)?.organisation.name).toEqual(orga?.name);
                 expect(result.personenkontexte.at(0)?.organisation.typ).toEqual(orga?.typ);
-                expect(result.personenkontexte.at(0)?.rollenart).toEqual(rolle.rollenart);
+                expect(result.personenkontexte.at(0)?.rolle).toEqual(rolle.rollenart);
                 expect(result.personenkontexte.at(0)?.rollenname).toEqual(rolle.name);
                 expect(result.gruppen).toEqual([]);
                 expect(result.email).toEqual({
@@ -288,7 +288,7 @@ describe('PersonInfoController', () => {
                 mandant: person.mandant,
                 referrer: person.referrer,
                 name: {
-                    familiennamen: person.familienname,
+                    familienname: person.familienname,
                     vorname: person.vorname,
                     anrede: person.nameAnrede,
                     initialenfamilienname: person.initialenFamilienname,
@@ -357,7 +357,7 @@ describe('PersonInfoController', () => {
                 expect(result.personenkontexte.at(0)?.organisation.kennung).toEqual(orga?.kennung);
                 expect(result.personenkontexte.at(0)?.organisation.name).toEqual(orga?.name);
                 expect(result.personenkontexte.at(0)?.organisation.typ).toEqual(orga?.typ);
-                expect(result.personenkontexte.at(0)?.rollenart).toEqual(rolle.rollenart);
+                expect(result.personenkontexte.at(0)?.rolle).toEqual(rolle.rollenart);
                 expect(result.personenkontexte.at(0)?.rollenname).toEqual(rolle.name);
                 expect(result.gruppen).toEqual([]);
                 expect(result.email).toEqual({
@@ -409,7 +409,7 @@ describe('PersonInfoController', () => {
                 expect(result.personenkontexte.at(0)?.organisation.kennung).toEqual(orga?.kennung);
                 expect(result.personenkontexte.at(0)?.organisation.name).toEqual(orga?.name);
                 expect(result.personenkontexte.at(0)?.organisation.typ).toEqual(orga?.typ);
-                expect(result.personenkontexte.at(0)?.rollenart).toEqual(rolle.rollenart);
+                expect(result.personenkontexte.at(0)?.rolle).toEqual(rolle.rollenart);
                 expect(result.personenkontexte.at(0)?.rollenname).toEqual(rolle.name);
                 expect(result.gruppen).toEqual([]);
                 expect(result.email).toEqual({

@@ -22,7 +22,7 @@ export class PersonenInfoKontextResponse {
     public organisation!: PersonenInfoKontextOrganisationResponse;
 
     @ApiProperty({ nullable: true })
-    public rollenart?: RollenArt;
+    public rolle?: RollenArt;
 
     @ApiProperty({ nullable: true })
     public rollenname?: string;
@@ -52,7 +52,7 @@ export class PersonenInfoKontextResponse {
         this.sichtfreigabe = props.sichtfreigabe;
         this.loeschung = props.loeschung;
         this.revision = props.revision;
-        this.rollenart = props.rollenart;
+        this.rolle = props.rolle;
         this.rollenname = props.rollenname;
     }
 }
