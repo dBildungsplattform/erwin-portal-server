@@ -120,6 +120,27 @@ describe('RollenMappingRepo', () => {
         });
     });
 
+    describe('findByRolleId', () => {
+        describe('when RollenMapping with the given rolleId exists', () => {
+            it('should return the RollenMapping', async () => {
+                const savedMapping: RollenMapping<true> = await getSavedRollenMapping();
+                const foundMapping: Option<RollenMapping<true>> = await sut.findByRolleId(savedMapping.rolleId);
+
+                expect(foundMapping).toBeDefined();
+                if (!foundMapping) throw Error();
+                expect(foundMapping.id).toBe(savedMapping.id);
+            });
+            describe('when no RollenMapping exists for the given rolleId', () => {
+                it('should throw an error if no RollenMapping exists for the given rolleId', async () => {
+                    const nonExistentRolleId: string = faker.string.uuid();
+                    await expect(sut.findByRolleId(nonExistentRolleId)).rejects.toThrow(
+                        'No rollenMapping found for the given rolleId',
+                    );
+                });
+            });
+        });
+    });
+
     describe('find', () => {
         describe('when finding RollenMappings', () => {
             it('should return all RollenMappings', async () => {
