@@ -32,7 +32,7 @@ import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulcon
 import { RollenMappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
 import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
-import { RollenMappingRolleIdResponse } from './rollenmapping-rolle-id-response.js';
+import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-response.js';
 import { RollenMappingExtractMappingRequestBody } from './rollenmapping-extract-mapping-request.body.js';
 import { RollenMappingService } from './rollenmapping.service.js';
 import { RolleID } from '../../../shared/types/index.js';
@@ -280,7 +280,7 @@ export class RollenMappingController {
     }
 
     @Post('extract-mapping/keycloak')
-    @ApiOkResponse({ description: 'Mapping successfully extracted', type: RollenMappingRolleIdResponse })
+    @ApiOkResponse({ description: 'Mapping successfully extracted', type: RollenMappingRolleUserIdResponse })
     @ApiBadRequestResponse({ description: 'Invalid input, mapping not extracted' })
     @ApiUnauthorizedResponse({ description: 'Unauthorized to extract mapping' })
     @ApiForbiddenResponse({ description: 'Insufficient rights to extract mapping' })
@@ -289,25 +289,25 @@ export class RollenMappingController {
     public async getMappingForRolleAndServiceProvider(
         @Query('RollenMappingExtractMappingRequestBody')
         rollenMappingExtractMappingRequestBody: RollenMappingExtractMappingRequestBody,
-    ): Promise<RollenMappingRolleIdResponse> {
+    ): Promise<RollenMappingRolleUserIdResponse> {
         const rolleId: RolleID | null = await this.rollenMappingService.getRoleOnServiceProviderByClientName(
             rollenMappingExtractMappingRequestBody.clientName,
             rollenMappingExtractMappingRequestBody.userId,
         );
-if (!rolleId) {
-    throw new NotFoundException("User doesn't have access to the requested service provider");
-}   
+        if (!rolleId) {
+            throw new NotFoundException("User doesn't have access to the requested service provider");
+        }
 
-const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findByRolleId(rolleId);
+        const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findByRolleId(rolleId);
 
-if (!rollenMapping) {
-    this.logger.error(`No rollenMapping object found with rolleId ${rolleId}`);
-    throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
-}
+        if (!rollenMapping) {
+            this.logger.error(`No rollenMapping object found with rolleId ${rolleId}`);
+            throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
+        }
 
-return new RollenMappingRolleIdResponse(
-    rollenMappingExtractMappingRequestBody.userId,
-    rollenMapping.mapToLmsRolle,
-);
+        return new RollenMappingRolleUserIdResponse(
+            rollenMappingExtractMappingRequestBody.userId,
+            rollenMapping.mapToLmsRolle,
+        );
     }
 }

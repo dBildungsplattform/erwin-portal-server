@@ -1,4 +1,4 @@
-export class RollenMappingRolleIdResponse {
+export class RollenMappingRolleUserIdResponse {
     public userId: string;
 
     public mapToLmsRolle: string;

@@ -17,7 +17,7 @@ import { ServiceProvider } from '../../service-provider/domain/service-provider.
 import { DoFactory } from '../../../../test/utils/do-factory.js';
 import { RollenMappingService } from './rollenmapping.service.js';
 import { RollenMappingExtractMappingRequestBody } from './rollenmapping-extract-mapping-request.body.js';
-import { RollenMappingRolleIdResponse } from './rollenmapping-rolle-id-response.js';
+import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-response.js';
 
 describe('RollenMapping API', () => {
     let rollenMappingRepoMock: DeepMocked<RollenMappingRepo>;
@@ -446,7 +446,7 @@ describe('RollenMapping API', () => {
                 rollenMappingServiceMock.getRoleOnServiceProviderByClientName.mockResolvedValue(rolleId);
                 rollenMappingRepoMock.findByRolleId.mockResolvedValue(rollenMapping);
 
-                const result: RollenMappingRolleIdResponse =
+                const result: RollenMappingRolleUserIdResponse =
                     await rollenMappingController.getMappingForRolleAndServiceProvider(
                         rollenMappingExtractMappingRequestBody,
                     );
