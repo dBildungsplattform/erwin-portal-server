@@ -294,19 +294,20 @@ export class RollenMappingController {
             rollenMappingExtractMappingRequestBody.clientName,
             rollenMappingExtractMappingRequestBody.userId,
         );
-        if (rolleId) {
-            const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findByRolleId(rolleId);
+if (!rolleId) {
+    throw new NotFoundException("User doesn't have access to the requested service provider");
+}   
 
-            if (!rollenMapping) {
-                this.logger.error(`No rollenMapping object found with rolleId ${rolleId}`);
-                throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
-            }
-            return new RollenMappingRolleIdResponse(
-                rollenMappingExtractMappingRequestBody.userId,
-                rollenMapping.mapToLmsRolle,
-            );
-        } else {
-            throw new NotFoundException("User doesn't have access to the requested service provider");
-        }
+const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findByRolleId(rolleId);
+
+if (!rollenMapping) {
+    this.logger.error(`No rollenMapping object found with rolleId ${rolleId}`);
+    throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
+}
+
+return new RollenMappingRolleIdResponse(
+    rollenMappingExtractMappingRequestBody.userId,
+    rollenMapping.mapToLmsRolle,
+);
     }
 }
