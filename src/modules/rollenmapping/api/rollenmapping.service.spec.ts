@@ -42,7 +42,7 @@ describe('RollenMappingService', () => {
         jest.clearAllMocks();
     });
 
-    describe('hasAccessOnServiceProvider', () => {
+    describe('getRoleOnServiceProviderByClientName', () => {
         it('should return RolleID if serviceProvider and personenkontext exist and match', async () => {
             const clientName: string = faker.company.name();
             const userId: string = faker.string.uuid();
