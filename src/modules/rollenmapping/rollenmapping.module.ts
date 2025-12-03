@@ -4,9 +4,14 @@ import { RollenMappingFactory } from './domain/rollenmapping.factory.js';
 import { RollenMappingRepo } from './repo/rollenmapping.repo.js';
 import { ServiceProviderRepo } from '../service-provider/repo/service-provider.repo.js';
 import { ServiceProviderModule } from '../service-provider/service-provider.module.js';
+import { PersonenKontextModule } from '../personenkontext/personenkontext.module.js';
 
 @Module({
-    imports: [LoggerModule.register(RollenMappingModule.name), forwardRef(() => ServiceProviderModule)],
+    imports: [
+        LoggerModule.register(RollenMappingModule.name),
+        forwardRef(() => ServiceProviderModule),
+        forwardRef(() => PersonenKontextModule),
+    ],
     providers: [RollenMappingRepo, RollenMappingFactory, ServiceProviderRepo],
     exports: [RollenMappingRepo, RollenMappingFactory],
 })
