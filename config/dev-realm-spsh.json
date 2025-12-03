@@ -1194,6 +1194,112 @@
             ],
             "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "email"],
             "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
+        },
+        {
+            "id": "31f18569-1890-4f41-abcf-21a7c5235da7",
+            "clientId": "moodle",
+            "name": "moodle",
+            "enabled": true,
+            "protocol": "openid-connect",
+            "publicClient": false,
+            "secret": "moodle-client-secret",
+            "rootUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
+            "baseUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
+            "adminUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
+            "redirectUris": ["https://moodle-01.dev.svs.dbildungsplattform.de/auth/oidc/"],
+            "webOrigins": ["https://moodle-01.dev.svs.dbildungsplattform.de"],
+            "bearerOnly": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "serviceAccountsEnabled": true,
+            "authorizationServicesEnabled": false,
+            "clientAuthenticatorType": "client-secret",
+            "attributes": {
+                "post.logout.redirect.uri": "https://moodle-01.dev.svs.dbildungsplattform.de/",
+                "oauth2.device.authorization.grant.enabled": "false"
+            },
+            "defaultClientScopes": ["web-origins", "role_list", "profile", "email"],
+            "optionalClientScopes": ["address", "phone"],
+            "protocolMappers": [
+                {
+                    "name": "spsh-custom-oidc-api-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "spsh-custom-oidc-api-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "claim.name": "spsh_profile",
+                        "jsonType.label": "JSON",
+
+                        "id.token.claim": "false",
+                        "access.token.claim": "true",
+                        "userinfo.token.claim": "false",
+
+                        "multivalued": "false",
+
+                        "extractJsonPath": "$.profile",
+                        "ignoreMissingPath": "true",
+
+                        "timeoutMs": "1500",
+                        "cacheTtlSeconds": "60",
+                        "failMode": "empty-claim",
+                        "authHeaderName": "Authorization"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "77eb64b5-ebb0-4c6b-869e-41843d99957d",
+            "clientId": "svs",
+            "name": "svs",
+            "enabled": true,
+            "protocol": "openid-connect",
+            "publicClient": false,
+            "secret": "svs-client-secret",
+            "rootUrl": "https://main.dbc.dbildungscloud.dev/",
+            "baseUrl": "https://main.dbc.dbildungscloud.dev/",
+            "adminUrl": "https://main.dbc.dbildungscloud.dev/",
+            "redirectUris": [],
+            "webOrigins": ["https://main.dbc.dbildungscloud.dev"],
+            "bearerOnly": false,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "serviceAccountsEnabled": true,
+            "authorizationServicesEnabled": false,
+            "clientAuthenticatorType": "client-secret",
+            "attributes": {
+                "post.logout.redirect.uri": "https://main.dbc.dbildungscloud.dev/",
+                "oauth2.device.authorization.grant.enabled": "false"
+            },
+            "defaultClientScopes": ["web-origins", "role_list", "profile", "email"],
+            "optionalClientScopes": ["address", "phone"],
+            "protocolMappers": [
+                {
+                    "name": "spsh-custom-oidc-api-mapper",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "spsh-custom-oidc-api-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "claim.name": "spsh_profile",
+                        "jsonType.label": "JSON",
+
+                        "id.token.claim": "false",
+                        "access.token.claim": "true",
+                        "userinfo.token.claim": "false",
+
+                        "multivalued": "false",
+
+                        "extractJsonPath": "$.profile",
+                        "ignoreMissingPath": "true",
+
+                        "timeoutMs": "1500",
+                        "cacheTtlSeconds": "60",
+                        "failMode": "empty-claim",
+                        "authHeaderName": "Authorization"
+                    }
+                }
+            ]
         }
     ],
     "clientScopes": [
@@ -2517,21 +2623,22 @@
                 "loa-condition-level": "20",
                 "loa-max-age": "0"
             }
-        }, {
-            "id" : "a289ca13-92ef-4ac8-9544-bbff68c93147",
-            "alias" : "pi",
-            "config" : {
-                "pienrolltokentype" : "TOTP",
-                "pipollinbrowser" : "false",
-                "piservicerealm" : "${PI_REALM}",
-                "piservicepass" : "${PI_ADMIN_PASSWORD}",
-                "piserver" : "${PI_BASE_URL}",
-                "piserviceaccount" : "${PI_ADMIN_USER}",
-                "pidefaultmessage" : "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung voraus. Bitte geben Sie das Einmalpasswort von Ihrem 2FA-Token ein.",
-                "preftokentype" : "OTP",
-                "pirealm" : "${PI_REALM}",
-                "pidolog" : "true",
-                "pienrolltoken" : "false"
+        },
+        {
+            "id": "a289ca13-92ef-4ac8-9544-bbff68c93147",
+            "alias": "pi",
+            "config": {
+                "pienrolltokentype": "TOTP",
+                "pipollinbrowser": "false",
+                "piservicerealm": "${PI_REALM}",
+                "piservicepass": "${PI_ADMIN_PASSWORD}",
+                "piserver": "${PI_BASE_URL}",
+                "piserviceaccount": "${PI_ADMIN_USER}",
+                "pidefaultmessage": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung voraus. Bitte geben Sie das Einmalpasswort von Ihrem 2FA-Token ein.",
+                "preftokentype": "OTP",
+                "pirealm": "${PI_REALM}",
+                "pidolog": "true",
+                "pienrolltoken": "false"
             }
         },
         {
