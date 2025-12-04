@@ -1202,7 +1202,7 @@
             "enabled": true,
             "protocol": "openid-connect",
             "publicClient": false,
-            "secret": "moodle-client-secret",
+            "secret": "3DvxMZpU7gtQFuPelh9sg7ftdYFAIHeP",
             "rootUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
             "baseUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
             "adminUrl": "https://moodle-01.dev.svs.dbildungsplattform.de/",
@@ -1219,8 +1219,8 @@
                 "post.logout.redirect.uri": "https://moodle-01.dev.svs.dbildungsplattform.de/",
                 "oauth2.device.authorization.grant.enabled": "false"
             },
-            "defaultClientScopes": ["web-origins", "role_list", "profile", "email"],
-            "optionalClientScopes": ["address", "phone"],
+            "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "basic", "email"],
+            "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"],
             "protocolMappers": [
                 {
                     "name": "spsh-custom-oidc-api-mapper",
@@ -1228,7 +1228,7 @@
                     "protocolMapper": "spsh-custom-oidc-api-mapper",
                     "consentRequired": false,
                     "config": {
-                        "claim.name": "spsh_profile",
+                        "claim.name": "erwin_profile",
                         "jsonType.label": "JSON",
 
                         "id.token.claim": "false",
@@ -1237,13 +1237,12 @@
 
                         "multivalued": "false",
 
-                        "extractJsonPath": "$.profile",
+                        "extractJsonPath": "$",
                         "ignoreMissingPath": "true",
 
                         "timeoutMs": "1500",
                         "cacheTtlSeconds": "60",
-                        "failMode": "empty-claim",
-                        "authHeaderName": "Authorization"
+                        "failMode": "deny"
                     }
                 }
             ]
@@ -1255,7 +1254,7 @@
             "enabled": true,
             "protocol": "openid-connect",
             "publicClient": false,
-            "secret": "svs-client-secret",
+            "secret": "M24woetUBz8oFf7V0GgR1zGEpleiVACc",
             "rootUrl": "https://main.dbc.dbildungscloud.dev/",
             "baseUrl": "https://main.dbc.dbildungscloud.dev/",
             "adminUrl": "https://main.dbc.dbildungscloud.dev/",
@@ -1272,8 +1271,8 @@
                 "post.logout.redirect.uri": "https://main.dbc.dbildungscloud.dev/",
                 "oauth2.device.authorization.grant.enabled": "false"
             },
-            "defaultClientScopes": ["web-origins", "role_list", "profile", "email"],
-            "optionalClientScopes": ["address", "phone"],
+            "defaultClientScopes": ["web-origins", "acr", "roles", "profile", "basic", "email"],
+            "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"],
             "protocolMappers": [
                 {
                     "name": "spsh-custom-oidc-api-mapper",
@@ -1281,7 +1280,7 @@
                     "protocolMapper": "spsh-custom-oidc-api-mapper",
                     "consentRequired": false,
                     "config": {
-                        "claim.name": "spsh_profile",
+                        "claim.name": "erwin_profile",
                         "jsonType.label": "JSON",
 
                         "id.token.claim": "false",
@@ -1290,13 +1289,12 @@
 
                         "multivalued": "false",
 
-                        "extractJsonPath": "$.profile",
+                        "extractJsonPath": "$",
                         "ignoreMissingPath": "true",
 
                         "timeoutMs": "1500",
                         "cacheTtlSeconds": "60",
-                        "failMode": "empty-claim",
-                        "authHeaderName": "Authorization"
+                        "failMode": "deny"
                     }
                 }
             ]
