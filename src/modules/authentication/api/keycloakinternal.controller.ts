@@ -76,8 +76,6 @@ export class KeycloakInternalController {
         type: LdapUserDataBodyParams,
     })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
-        console.log(params);
-
         const existingPerson: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(
             params.keycloakUserId,
         );
