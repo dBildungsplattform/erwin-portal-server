@@ -23,6 +23,7 @@ import { ServiceProviderModule } from '../../service-provider/service-provider.m
 import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
 import { UserExeternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { KeycloakInternalController } from './keycloakinternal.controller.js';
+import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 
 describe('KeycloakInternalController', () => {
     let module: TestingModule;
@@ -159,15 +160,17 @@ describe('KeycloakInternalController', () => {
             personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
             personFactoryMock.createNew.mockResolvedValueOnce(DoFactory.createPerson(false));
 
-            await keycloakinternalController.onNewLdapUser({
-                userName: faker.internet.userName(),
-                email: faker.internet.email(),
-                firstName: faker.person.firstName(),
-                lastName: faker.person.lastName(),
-                keycloakUserId: faker.string.uuid(),
-                ldapId: faker.string.uuid(),
-                ldapDn: faker.internet.domainName(),
-            });
+            await keycloakinternalController.onNewLdapUser(
+                new LdapUserDataBodyParams({
+                    userName: faker.internet.userName(),
+                    email: faker.internet.email(),
+                    firstName: faker.person.firstName(),
+                    lastName: faker.person.lastName(),
+                    keycloakUserId: faker.string.uuid(),
+                    ldapId: faker.string.uuid(),
+                    ldapDn: faker.internet.domainName(),
+                }),
+            );
 
             expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
             expect(personFactoryMock.createNew).toHaveBeenCalledTimes(1);
@@ -181,15 +184,17 @@ describe('KeycloakInternalController', () => {
             personFactoryMock.createNew.mockResolvedValueOnce(err);
 
             await expect(
-                keycloakinternalController.onNewLdapUser({
-                    userName: faker.internet.userName(),
-                    email: faker.internet.email(),
-                    firstName: faker.person.firstName(),
-                    lastName: faker.person.lastName(),
-                    keycloakUserId: faker.string.uuid(),
-                    ldapId: faker.string.uuid(),
-                    ldapDn: faker.internet.domainName(),
-                }),
+                keycloakinternalController.onNewLdapUser(
+                    new LdapUserDataBodyParams({
+                        userName: faker.internet.userName(),
+                        email: faker.internet.email(),
+                        firstName: faker.person.firstName(),
+                        lastName: faker.person.lastName(),
+                        keycloakUserId: faker.string.uuid(),
+                        ldapId: faker.string.uuid(),
+                        ldapDn: faker.internet.domainName(),
+                    }),
+                ),
             ).rejects.toThrow(err);
 
             expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
@@ -200,15 +205,17 @@ describe('KeycloakInternalController', () => {
         it('should update existing person', async () => {
             personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(DoFactory.createPerson(true));
 
-            await keycloakinternalController.onNewLdapUser({
-                userName: faker.internet.userName(),
-                email: faker.internet.email(),
-                firstName: faker.person.firstName(),
-                lastName: faker.person.lastName(),
-                keycloakUserId: faker.string.uuid(),
-                ldapId: faker.string.uuid(),
-                ldapDn: faker.internet.domainName(),
-            });
+            await keycloakinternalController.onNewLdapUser(
+                new LdapUserDataBodyParams({
+                    userName: faker.internet.userName(),
+                    email: faker.internet.email(),
+                    firstName: faker.person.firstName(),
+                    lastName: faker.person.lastName(),
+                    keycloakUserId: faker.string.uuid(),
+                    ldapId: faker.string.uuid(),
+                    ldapDn: faker.internet.domainName(),
+                }),
+            );
 
             expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
             expect(personFactoryMock.createNew).toHaveBeenCalledTimes(0);
