@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class LdapUserDataBodyParams {
     @ApiProperty()
@@ -13,15 +13,18 @@ export class LdapUserDataBodyParams {
     @ApiProperty()
     @IsString()
     @IsEmail()
-    public email!: string;
+    @IsOptional()
+    public email?: string;
 
     @ApiProperty()
     @IsString()
-    public firstName!: string;
+    @IsOptional()
+    public firstName?: string;
 
     @ApiProperty()
     @IsString()
-    public lastName!: string;
+    @IsOptional()
+    public lastName?: string;
 
     @ApiProperty()
     @IsString()

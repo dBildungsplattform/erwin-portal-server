@@ -82,15 +82,15 @@ export class KeycloakInternalController {
 
         let personToSave: Person<boolean>;
         if (existingPerson) {
-            existingPerson.familienname = params.lastName;
-            existingPerson.vorname = params.firstName;
+            existingPerson.familienname = params.lastName ?? 'no name';
+            existingPerson.vorname = params.firstName ?? 'no name';
             existingPerson.externalIds.LDAP = params.ldapId;
             existingPerson.username = params.userName;
             personToSave = existingPerson;
         } else {
             const person: Person<false> | DomainError = await this.personFactory.createNew({
-                familienname: params.lastName,
-                vorname: params.firstName,
+                familienname: params.lastName ?? 'no name',
+                vorname: params.firstName ?? 'no name',
                 externalIds: { LDAP: params.ldapId },
                 username: params.userName,
             });
