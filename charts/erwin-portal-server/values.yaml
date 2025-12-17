@@ -80,6 +80,7 @@ auth:
   redis_password: ''
   kafka_username: ''
   kafka_password: ''
+  spsh_no2fa_secret: ''
 
 ox:
   enabled: false
