@@ -448,7 +448,7 @@ export class PersonRepository {
             }
 
             // Take ID from keycloak and update user
-            personEntity.assign(mapAggregateToData(personWithKeycloakUser));
+            personEntity.assign(mapAggregateToData(personWithKeycloakUser), { em: transaction });
 
             // Commit
             await transaction.commit();

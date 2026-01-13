@@ -32,6 +32,10 @@ import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulcon
 import { RollenMappingCreateBodyParams } from './rollenmapping-create-body.params.js';
 import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
 import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
+import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-response.js';
+import { RollenMappingExtractMappingRequestBody } from './rollenmapping-extract-mapping-request.body.js';
+import { RollenMappingService } from './rollenmapping.service.js';
+import { RolleID } from '../../../shared/types/index.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenMapping')
@@ -43,6 +47,7 @@ export class RollenMappingController {
         private readonly rollenMappingRepo: RollenMappingRepo,
         private readonly rollenMappingFactory: RollenMappingFactory,
         private readonly serviceProviderRepo: ServiceProviderRepo,
+        private readonly rollenMappingService: RollenMappingService,
         private readonly logger: ClassLogger,
     ) {}
 
@@ -272,5 +277,37 @@ export class RollenMappingController {
             }
             await this.rollenMappingRepo.delete(id);
         }
+    }
+
+    @Post('extract-mapping/keycloak')
+    @ApiOkResponse({ description: 'Mapping successfully extracted', type: RollenMappingRolleUserIdResponse })
+    @ApiBadRequestResponse({ description: 'Invalid input, mapping not extracted' })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized to extract mapping' })
+    @ApiForbiddenResponse({ description: 'Insufficient rights to extract mapping' })
+    @ApiNotFoundResponse({ description: 'No mapping found for the given user/service provider' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error while extracting mapping' })
+    public async getMappingForRolleAndServiceProvider(
+        @Query('RollenMappingExtractMappingRequestBody')
+        rollenMappingExtractMappingRequestBody: RollenMappingExtractMappingRequestBody,
+    ): Promise<RollenMappingRolleUserIdResponse> {
+        const rolleId: RolleID | null = await this.rollenMappingService.getRoleOnServiceProviderByClientName(
+            rollenMappingExtractMappingRequestBody.clientName,
+            rollenMappingExtractMappingRequestBody.userId,
+        );
+        if (!rolleId) {
+            throw new NotFoundException("User doesn't have access to the requested service provider");
+        }
+
+        const rollenMapping: Option<RollenMapping<true>> = await this.rollenMappingRepo.findByRolleId(rolleId);
+
+        if (!rollenMapping) {
+            this.logger.error(`No rollenMapping object found with rolleId ${rolleId}`);
+            throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
+        }
+
+        return new RollenMappingRolleUserIdResponse(
+            rollenMappingExtractMappingRequestBody.userId,
+            rollenMapping.mapToLmsRolle,
+        );
     }
 }
