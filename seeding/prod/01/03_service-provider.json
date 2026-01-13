@@ -146,19 +146,6 @@
             "requires2fa": false
         },
         {
-            "id": 11,
-            "name": "Psychosoziales Beratungsangebot",
-            "target": "URL",
-            "url": "https://www.schleswig-holstein.de/DE/fachinhalte/P/personalmanagement/BGM/psychosoziale-beratung.html",
-            "kategorie": "HINWEISE",
-            "logoMimeType": "image/svg+xml",
-            "logoBase64": "PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz48IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMjUuMy4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAtLT48c3ZnIHZlcnNpb249JzEuMScgaWQ9J0ViZW5lXzEnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZycgeG1sbnM6eGxpbms9J2h0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsnIHg9JzBweCcgeT0nMHB4JyB2aWV3Qm94PScwIDAgMTUwIDE1MCcgc3R5bGU9J2VuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTUwIDE1MDsnIHhtbDpzcGFjZT0ncHJlc2VydmUnPjxzdHlsZSB0eXBlPSd0ZXh0L2Nzcyc+IC5zdDB7ZmlsbDojODU4NjgxO30KPC9zdHlsZT48cGF0aCBjbGFzcz0nc3QwJyBkPSdNOTMuNSw2My40Yy0xLjgtMS45LTQuMy0yLjktNi44LTIuOGMtMC4xLDAtMC4yLDAtMC40LDAuMWMtNS43LDYuMy0xNS40LDYuNy0yMS43LDFjLTAuMy0wLjMtMC43LTAuNi0xLTEgYy0wLjEtMC4xLTAuMi0wLjEtMC40LTAuMWMtMi42LTAuMS01LjEsMS02LjgsMi45YzUuMSw1LDYuMiwxMi43LDIuNywxOC45YzMuNywwLjQsNi45LDIuNiw4LjgsNS43aDE0YzEuOS0zLjIsNS4xLTUuMyw4LjgtNS43IEM4Ny4zLDc2LjEsODguNCw2OC40LDkzLjUsNjMuNHonLz48ZWxsaXBzZSBjbGFzcz0nc3QwJyBjeD0nNzUnIGN5PSc1MCcgcng9JzEyLjUnIHJ5PScxMi43Jy8+PGVsbGlwc2UgY2xhc3M9J3N0MCcgY3g9JzEwNC4zJyBjeT0nNzQuNicgcng9JzEyLjUnIHJ5PScxMi43Jy8+PGVsbGlwc2UgY2xhc3M9J3N0MCcgY3g9JzQ1LjcnIGN5PSc3NC42JyByeD0nMTIuNScgcnk9JzEyLjcnLz48cGF0aCBjbGFzcz0nc3QwJyBkPSdNMTE2LDg1LjJjLTAuMSwwLTAuMiwwLTAuNCwwLjFjLTUuNyw2LjMtMTUuNCw2LjctMjEuNywxYy0wLjMtMC4zLTAuNy0wLjYtMS0xYy0wLjEtMC4xLTAuMi0wLjEtMC40LTAuMSBjLTkuNiwwLTExLjMsMTEuNS0xMS4zLDE4LjljMCw1LjMsMy41LDguNiw4LjcsOC42aDI4LjZjNS4yLDAsOC43LTMuMiw4LjctOC42QzEyNy4zLDk2LjcsMTI1LjYsODUuMiwxMTYsODUuMnonLz48cGF0aCBjbGFzcz0nc3QwJyBkPSdNNTcuNCw4NS4yYy0wLjEsMC0wLjIsMC0wLjQsMC4xYy01LjcsNi4zLTE1LjQsNi43LTIxLjcsMWMtMC4zLTAuMy0wLjctMC42LTEtMWMtMC4xLTAuMS0wLjItMC4xLTAuNC0wLjEgYy05LjYsMC0xMS4zLDExLjUtMTEuMywxOC45YzAsNS4zLDMuNSw4LjYsOC43LDguNkg2MGM1LjIsMCw4LjctMy4yLDguNy04LjZDNjguNyw5Ni43LDY2LjksODUuMiw1Ny40LDg1LjJ6Jy8+PC9zdmc+",
-            "providedOnSchulstrukturknoten": 0,
-            "keycloakGroup": "Psychosoziales Beratungsangebot-service",
-            "keycloakRole": "Psychosoziales Beratungsangebot-user",
-            "requires2fa": false
-        },
-        {
             "id": 12,
             "name": "LeOniE.SH",
             "target": "URL",
