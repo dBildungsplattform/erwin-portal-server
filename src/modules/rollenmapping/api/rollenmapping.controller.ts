@@ -141,7 +141,12 @@ export class RollenMappingController {
         const serviceProvider: Option<ServiceProvider<true>> =
             await this.serviceProviderRepo.findById(serviceProviderId);
         if (serviceProvider!.providedOnSchulstrukturknoten) {
-            if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
+            if (
+                !(await personPermission.hasSystemrechtAtOrganisation(
+                    serviceProvider!.providedOnSchulstrukturknoten,
+                    RollenSystemRecht.ROLLEN_VERWALTEN,
+                ))
+            ) {
                 throw new ForbiddenException(
                     'Insufficient rights to retrieve the rollenMapping objects from this organization',
                 );
@@ -172,7 +177,12 @@ export class RollenMappingController {
             rollenMappingCreateBodyParams.serviceProviderId,
         );
         if (serviceProvider!.providedOnSchulstrukturknoten) {
-            if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
+            if (
+                !(await personPermission.hasSystemrechtAtOrganisation(
+                    serviceProvider!.providedOnSchulstrukturknoten,
+                    RollenSystemRecht.ROLLEN_VERWALTEN,
+                ))
+            ) {
                 throw new ForbiddenException(
                     'Insufficient rights to create the rollenMapping objects into this organization',
                 );
@@ -210,7 +220,12 @@ export class RollenMappingController {
             originalRollenMapping.serviceProviderId,
         );
         if (serviceProvider!.providedOnSchulstrukturknoten) {
-            if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
+            if (
+                !(await personPermission.hasSystemrechtAtOrganisation(
+                    serviceProvider!.providedOnSchulstrukturknoten,
+                    RollenSystemRecht.ROLLEN_VERWALTEN,
+                ))
+            ) {
                 throw new ForbiddenException(
                     'Insufficient rights to update the rollenMapping objects in this organization',
                 );
@@ -251,7 +266,12 @@ export class RollenMappingController {
             );
 
             if (serviceProvider) {
-                if (!(await personPermission.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
+                if (
+                    !(await personPermission.hasSystemrechtAtOrganisation(
+                        serviceProvider.providedOnSchulstrukturknoten,
+                        RollenSystemRecht.ROLLEN_VERWALTEN,
+                    ))
+                ) {
                     throw new ForbiddenException('Insufficient rights to delete the rollenMapping');
                 }
             }
