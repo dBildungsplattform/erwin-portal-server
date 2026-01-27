@@ -30,21 +30,21 @@ database:
   username: 'erwin_portal_server'
 
 ldap:
-  url:
-  oeffentlicheSchulenDomain:
-  ersatzschulenDomain:
-  base_dn:
+  url: ldap://erwin-portal-ldap.spsh-xxx.svc.cluster.local
+  oeffentlicheSchulenDomain: schule-sh.de
+  ersatzschulenDomain: ersatzschule-sh.de
+  base_dn: dc=schule-sh,dc=de
   retryWrapperDefaultRetries: 3
 
 itslearning:
   enabled: false
-  endpoint: ''
+  endpoint: https://enterprise.itslintegrations.com/WCFServiceLibrary/ImsEnterpriseServicesPort.svc
   root: sh
   rootOeffentlich: oeffentlich
   rootErsatz: ersatz
 
 privacyidea:
-  url:
+  url: https://privacyidea.dev.spsh.dbildungsplattform.de
   renameWaitingTime: 5
   realm: ucs_users
   userResolver: ucs_users
@@ -84,7 +84,7 @@ auth:
 ox:
   enabled: false
   username: 'oxadmin'
-  endpoint: ''
+  endpoint: 'https://webmail.example.com'
   contextId: '10'
   contextName: '10'
 
@@ -92,7 +92,7 @@ email:
   nonEnabledEmailAddressesDeadlineInDays: 180
 
 vidis:
-  url: ''
+  url: 'https://service-stage.vidis.schule'
   regionName: 'test-region'
   keycloakGroup: 'VIDIS-service'
   keycloakRole: 'VIDIS-user'
