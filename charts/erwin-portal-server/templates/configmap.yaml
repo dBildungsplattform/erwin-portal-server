@@ -32,6 +32,7 @@ data:
   OX_CONTEXT_NAME: "{{ .Values.ox.contextName }}"
   SYSTEM_RENAME_WAITING_TIME_IN_SECONDS: "{{ .Values.backend.env.renameWaitingTimeInSeconds }}"
   ITSLEARNING_ENABLED: "{{ .Values.itslearning.enabled }}"
+  ITSLEARNING_ENDPOINT: "{{ .Values.itslearning.endpoint }}"
   VIDIS_BASE_URL: '{{ .Values.vidis.url }}'
   VIDIS_REGION_NAME: '{{ .Values.vidis.regionName }}'
   VIDIS_KEYCLOAK_GROUP: '{{ .Values.vidis.keycloakGroup }}'
