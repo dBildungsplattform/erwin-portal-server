@@ -31,8 +31,6 @@ database:
 
 ldap:
   url: ldap://erwin-portal-ldap.spsh-xxx.svc.cluster.local
-  oeffentlicheSchulenDomain: schule-sh.de
-  ersatzschulenDomain: ersatzschule-sh.de
   base_dn: dc=schule-sh,dc=de
   retryWrapperDefaultRetries: 3
 
