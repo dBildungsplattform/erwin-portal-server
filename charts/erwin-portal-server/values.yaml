@@ -36,6 +36,7 @@ ldap:
 
 itslearning:
   enabled: false
+  endpoint: https://enterprise.itslintegrations.com/WCFServiceLibrary/ImsEnterpriseServicesPort.svc
 
 privacyidea:
   url:
