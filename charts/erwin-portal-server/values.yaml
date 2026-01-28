@@ -41,8 +41,8 @@ itslearning:
 privacyidea:
   url:
   renameWaitingTime: 5
-  realm: ucs_users
-  userResolver: ucs_users
+  realm:
+  userResolver:
 
 system:
   rename_waiting_time_in_seconds: 2
@@ -87,7 +87,7 @@ email:
 
 vidis:
   url: 'https://service-stage.vidis.schule'
-  regionName: 'test-region'
+  regionName:
   keycloakGroup: 'VIDIS-service'
   keycloakRole: 'VIDIS-user'
 
