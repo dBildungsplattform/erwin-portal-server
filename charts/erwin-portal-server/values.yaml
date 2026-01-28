@@ -36,10 +36,6 @@ ldap:
 
 itslearning:
   enabled: false
-  endpoint: https://enterprise.itslintegrations.com/WCFServiceLibrary/ImsEnterpriseServicesPort.svc
-  root: sh
-  rootOeffentlich: oeffentlich
-  rootErsatz: ersatz
 
 privacyidea:
   url:
