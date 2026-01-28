@@ -21,10 +21,7 @@ data:
   LDAP_URL: '{{ .Values.ldap.url | replace "spsh-xxx" .Release.Namespace }}'
   RETRY_WRAPPER_DEFAULT_RETRIES: "{{ .Values.ldap.retryWrapperDefaultRetries }}"
   STATUS_REDIRECT_URL: "{{ .Values.status.url }}"
-  PI_BASE_URL:  "{{ .Values.privacyidea.url }}"
   PI_RENAME_WAITING_TIME:  "{{ .Values.privacyidea.renameWaitingTime }}"
-  PI_REALM: "{{ .Values.privacyidea.realm }}"
-  PI_USER_RESOLVER: "{{ .Values.privacyidea.userResolver }}"
   OX_ENABLED: "{{ .Values.ox.enabled }}"
   OX_USERNAME: "{{ .Values.ox.username }}"
   OX_ENDPOINT: "{{ .Values.ox.endpoint }}"
@@ -34,7 +31,6 @@ data:
   ITSLEARNING_ENABLED: "{{ .Values.itslearning.enabled }}"
   ITSLEARNING_ENDPOINT: "{{ .Values.itslearning.endpoint }}"
   VIDIS_BASE_URL: '{{ .Values.vidis.url }}'
-  VIDIS_REGION_NAME: '{{ .Values.vidis.regionName }}'
   VIDIS_KEYCLOAK_GROUP: '{{ .Values.vidis.keycloakGroup }}'
   VIDIS_KEYCLOAK_ROLE: '{{ .Values.vidis.keycloakRole }}'
   NODE_OPTIONS: "--max-old-space-size={{ .Values.backend.env.maxOldSpaceSize }}"
