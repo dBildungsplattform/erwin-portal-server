@@ -44,7 +44,7 @@ itslearning:
   rootErsatz: ersatz
 
 privacyidea:
-  url: https://privacyidea.dev.spsh.dbildungsplattform.de
+  url:
   renameWaitingTime: 5
   realm: ucs_users
   userResolver: ucs_users
