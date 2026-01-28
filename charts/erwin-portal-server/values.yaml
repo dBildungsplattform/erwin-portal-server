@@ -39,10 +39,8 @@ itslearning:
   endpoint: https://enterprise.itslintegrations.com/WCFServiceLibrary/ImsEnterpriseServicesPort.svc
 
 privacyidea:
-  url:
   renameWaitingTime: 5
-  realm:
-  userResolver:
+
 
 system:
   rename_waiting_time_in_seconds: 2
@@ -87,7 +85,6 @@ email:
 
 vidis:
   url: 'https://service-stage.vidis.schule'
-  regionName:
   keycloakGroup: 'VIDIS-service'
   keycloakRole: 'VIDIS-user'
 
@@ -181,15 +178,6 @@ backend:
     stepUpTimeoutInSeconds: 900
     stepUpTimeoutEnabled: 'false'
     maxOldSpaceSize: 3584
-
-# kafka:
-#   url: "erwin-portal-kafka.spsh.svc.cluster.local:9092"
-#   enabled: false
-#   initEnabled: true
-#   initImage:
-#     repository: docker.io/bitnami/kafka
-#     tag: '3.9.0'
-#     pullPolicy: Always
 
 autoscaling:
   enabled: false
