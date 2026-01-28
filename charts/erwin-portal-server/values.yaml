@@ -51,8 +51,8 @@ privacyidea:
 
 system:
   rename_waiting_time_in_seconds: 2
-  step_up_timeout_in_seconds: 900
-  step_up_timeout_enabled: false
+  step_up_timeout_in_seconds:
+  step_up_timeout_enabled:
 
 auth:
   # existingSecret: Refers to a secret already present in the cluster, which is required.
