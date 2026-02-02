@@ -1,38 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { ValidateNested } from 'class-validator';
+import { KlasseLdapImportBodyParams } from './klasse-ldap-import.body.params.js';
+import { SchuleLdapImportBodyParams } from './schule-ldap-import.body.params.js';
+import { PersonLdapImportDataBody } from './person-ldap-import.body.params.js';
+import { Type } from 'class-transformer';
 
 export class LdapUserDataBodyParams {
-    @ApiProperty()
-    @IsString()
-    public keycloakUserId!: string;
+    @ApiProperty({ type: () => KlasseLdapImportBodyParams })
+    @ValidateNested()
+    @Type(() => KlasseLdapImportBodyParams)
+    public klasseParams!: KlasseLdapImportBodyParams;
 
-    @ApiProperty()
-    @IsString()
-    public userName!: string;
+    @ApiProperty({ type: () => SchuleLdapImportBodyParams })
+    @ValidateNested()
+    @Type(() => SchuleLdapImportBodyParams)
+    public schuleParams!: SchuleLdapImportBodyParams;
 
-    @ApiProperty()
-    @IsString()
-    @IsEmail()
-    @IsOptional()
-    public email?: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    public firstName?: string;
-
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    public lastName?: string;
-
-    @ApiProperty()
-    @IsString()
-    public ldapDn!: string;
-
-    @ApiProperty()
-    @IsString()
-    public ldapId!: string;
+    @ApiProperty({ type: () => PersonLdapImportDataBody })
+    @ValidateNested()
+    @Type(() => PersonLdapImportDataBody)
+    public personParams!: PersonLdapImportDataBody;
 
     public constructor(params: Readonly<LdapUserDataBodyParams>) {
         Object.assign(this, params);
