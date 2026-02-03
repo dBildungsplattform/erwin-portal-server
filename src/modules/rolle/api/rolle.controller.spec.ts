@@ -137,7 +137,7 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
     describe('/GET rollen objects by service provider id', () => {
         const serviceProviderId: string = faker.string.uuid();
         describe('getRollenByServiceProviderId', () => {
-            it('should return an array of RolleNameIdResponse when rollen exist', async () => {
+            it('should return an array of RollenMappingRolleResponse when rollen exist', async () => {
                 const permissionsMock: DeepMocked<PersonPermissions> = createMock<PersonPermissions>();
                 permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
 
