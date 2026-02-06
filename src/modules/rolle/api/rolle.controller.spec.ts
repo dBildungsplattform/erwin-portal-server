@@ -144,6 +144,7 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
                 const rolleMock: DeepMocked<Rolle<true>> = createMock<Rolle<true>>({
                     id: faker.string.uuid(),
                     name: faker.person.fullName(),
+                    rollenart: RollenArt.EXTERN,
                 });
                 rolleRepoMock.findRollenByServiceProviderId.mockResolvedValueOnce([rolleMock]);
 
@@ -157,6 +158,7 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
                 expect(result[0]).toBeInstanceOf(RollenMappingRolleResponse);
                 expect(result[0]?.id).toBe(rolleMock.id);
                 expect(result[0]?.name).toBe(rolleMock.name);
+                expect(result[0]?.rollenart).toBe(rolleMock.rollenart);
                 expect(rolleRepoMock.findRollenByServiceProviderId).toHaveBeenCalledWith(serviceProviderId);
             });
 

@@ -262,7 +262,7 @@ export class RolleRepo {
         const rollenEntities: RolleEntity[] = await this.em.find(
             RolleEntity,
             {
-                serviceProvider: { serviceProvider: serviceProviderId },
+                serviceProvider: { serviceProvider: { id: serviceProviderId } },
             },
             { populate: ['merkmale', 'systemrechte', 'serviceProvider.serviceProvider'] as const },
         );
