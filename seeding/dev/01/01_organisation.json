@@ -479,12 +479,16 @@
         {
             "id": 1002,
             "name": "SVS",
-            "typ": "LMS"
+            "typ": "LMS",
+            "administriertVon": null,
+            "zugehoerigZu": null
         },
         {
             "id": 1003,
             "name": "Moodle",
-            "typ": "LMS"
+            "typ": "LMS",
+            "administriertVon": null,
+            "zugehoerigZu": null
         }
     ]
 }

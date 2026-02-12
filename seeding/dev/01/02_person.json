@@ -473,6 +473,62 @@
             "password": "SPSHtest1!",
             "vorname": "Achim",
             "familienname": "Amtmann"
+        },
+        {
+            "id": 65,
+            "username": "svsadmin",
+            "password": "ErWIntest1!",
+            "vorname": "sysadmin",
+            "familienname": "SVS"
+        },
+        {
+            "id": 66,
+            "username": "svsleiter",
+            "password": "ErWIntest1!",
+            "vorname": "Leiter",
+            "familienname": "SVS"
+        },
+        {
+            "id": 67,
+            "username": "moodleAdmin",
+            "password": "ErWIntest1!",
+            "vorname": "sysadmin",
+            "familienname": "Moodle"
+        },
+        {
+            "id": 68,
+            "username": "moodleleiter",
+            "password": "ErWIntest1!",
+            "vorname": "Leiter",
+            "familienname": "Moodle"
+        },
+        {
+            "id": 69,
+            "username": "svslehrer",
+            "password": "ErWIntest1!",
+            "vorname": "Lehrer",
+            "familienname": "SVS"
+        },
+        {
+            "id": 70,
+            "username": "svsschueler",
+            "password": "ErWIntest1!",
+            "vorname": "Schüler",
+            "familienname": "SVS"
+        },
+        {
+            "id": 71,
+            "username": "moodlelehrer",
+            "password": "ErWIntest1!",
+            "vorname": "Lehrer",
+            "familienname": "Moodle"
+        },
+        {
+            "id": 72,
+            "username": "moodleschueler",
+            "password": "ErWIntest1!",
+            "vorname": "Schüler",
+            "familienname": "Moodle"
         }
     ]
 }
