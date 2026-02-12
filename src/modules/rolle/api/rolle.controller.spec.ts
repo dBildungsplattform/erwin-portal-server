@@ -25,7 +25,7 @@ import { NameForRolleWithTrailingSpaceError } from '../domain/name-with-trailing
 import { Organisation } from '../../organisation/domain/organisation.js';
 import { RolleServiceProviderBodyParams } from './rolle-service-provider.body.params.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
-import { RolleNameIdResponse } from './rolle-name-id.response.js';
+import { RollenMappingRolleResponse } from './rollenmapping-rolle.response.js';
 import { HttpException } from '@nestjs/common';
 
 describe('Rolle API with mocked ServiceProviderRepo', () => {
@@ -137,26 +137,28 @@ describe('Rolle API with mocked ServiceProviderRepo', () => {
     describe('/GET rollen objects by service provider id', () => {
         const serviceProviderId: string = faker.string.uuid();
         describe('getRollenByServiceProviderId', () => {
-            it('should return an array of RolleNameIdResponse when rollen exist', async () => {
+            it('should return an array of RollenMappingRolleResponse when rollen exist', async () => {
                 const permissionsMock: DeepMocked<PersonPermissions> = createMock<PersonPermissions>();
                 permissionsMock.hasSystemrechteAtRootOrganisation.mockResolvedValueOnce(true);
 
                 const rolleMock: DeepMocked<Rolle<true>> = createMock<Rolle<true>>({
                     id: faker.string.uuid(),
                     name: faker.person.fullName(),
+                    rollenart: RollenArt.EXTERN,
                 });
                 rolleRepoMock.findRollenByServiceProviderId.mockResolvedValueOnce([rolleMock]);
 
-                const result: RolleNameIdResponse[] = await rolleController.getRollenByServiceProviderId(
+                const result: RollenMappingRolleResponse[] = await rolleController.getRollenByServiceProviderId(
                     serviceProviderId,
                     permissionsMock,
                 );
 
                 expect(Array.isArray(result)).toBe(true);
                 expect(result.length).toBe(1);
-                expect(result[0]).toBeInstanceOf(RolleNameIdResponse);
+                expect(result[0]).toBeInstanceOf(RollenMappingRolleResponse);
                 expect(result[0]?.id).toBe(rolleMock.id);
                 expect(result[0]?.name).toBe(rolleMock.name);
+                expect(result[0]?.rollenart).toBe(rolleMock.rollenart);
                 expect(rolleRepoMock.findRollenByServiceProviderId).toHaveBeenCalledWith(serviceProviderId);
             });
 
