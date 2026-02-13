@@ -4,9 +4,8 @@ namespaceOverride: ''
 
 backendHostname: ''
 keycloakHostname: 'http://erwin-portal-keycloak'
-keycloak2ndHostname: ""
 keycloakExternalHostname: 'spsh-xxx-keycloak.dev.spsh.dbildungsplattform.de'
-backend2ndHostname: ""
+
 
 containerSecurityContext:
   enabled: true
