@@ -227,7 +227,7 @@
         },
         {
            "id": 104,
-            "administeredBySchulstrukturknoten": 1002,
+            "administeredBySchulstrukturknoten": 1,
             "name": "SVS Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
@@ -238,7 +238,7 @@
         {
            "id": 105,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Sysadmin",
+            "name": "Moodle Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -292,7 +292,7 @@
         {
             "id": 202,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Sysadmin",
+            "name": "SVS Sysadmin2",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
