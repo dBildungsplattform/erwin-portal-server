@@ -228,17 +228,17 @@
         {
            "id": 104,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Systemadministrator",
+            "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [15],
             "istTechnisch": false
         },
         {
            "id": 105,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Systemadministrator",
+            "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -292,7 +292,7 @@
         {
             "id": 202,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Sysadmin2",
+            "name": "SVS Sysadmin",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -301,7 +301,7 @@
         {
             "id": 203,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Sysadmin2",
+            "name": "Moodle Sysadmin",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -352,6 +352,26 @@
             "administeredBySchulstrukturknoten": 1,
             "name": "Moodle Schüler2",
             "rollenart": "LERN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
+            "istTechnisch": false
+        },
+        {
+           "id": 209,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Portal Admin",
+            "rollenart": "PORTALADMIN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
+            "istTechnisch": false
+        },
+        {
+           "id": 210,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Portal Admin",
+            "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
             "serviceProviderIds": [16],

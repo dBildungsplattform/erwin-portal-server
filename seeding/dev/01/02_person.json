@@ -478,57 +478,57 @@
             "id": 65,
             "username": "svsadmin",
             "password": "ErWIntest1!",
-            "vorname": "sysadmin",
-            "familienname": "SVS"
+            "vorname": "SVS",
+            "familienname": "sysadmin"
         },
         {
             "id": 66,
             "username": "svsleiter",
             "password": "ErWIntest1!",
-            "vorname": "Leiter",
-            "familienname": "SVS"
+            "vorname": "SVS",
+            "familienname": "Leiter"
         },
         {
             "id": 67,
             "username": "moodleAdmin",
             "password": "ErWIntest1!",
-            "vorname": "sysadmin",
-            "familienname": "Moodle"
+            "vorname": "Moodle",
+            "familienname": "sysadmin"
         },
         {
             "id": 68,
             "username": "moodleleiter",
             "password": "ErWIntest1!",
-            "vorname": "Leiter",
-            "familienname": "Moodle"
+            "vorname": "Moodle",
+            "familienname": "Leiter"
         },
         {
             "id": 69,
             "username": "svslehrer",
             "password": "ErWIntest1!",
-            "vorname": "Lehrer",
-            "familienname": "SVS"
+            "vorname": "SVS",
+            "familienname": "Lehrer"
         },
         {
             "id": 70,
             "username": "svsschueler",
             "password": "ErWIntest1!",
-            "vorname": "Schüler",
-            "familienname": "SVS"
+            "vorname": "SVS",
+            "familienname": "Schüler"
         },
         {
             "id": 71,
             "username": "moodlelehrer",
             "password": "ErWIntest1!",
-            "vorname": "Lehrer",
-            "familienname": "Moodle"
+            "vorname": "Moodle",
+            "familienname": "Lehrer"
         },
         {
             "id": 72,
             "username": "moodleschueler",
             "password": "ErWIntest1!",
-            "vorname": "Schüler",
-            "familienname": "Moodle"
+            "vorname": "Moodle",
+            "familienname": "Schüler"
         }
     ]
 }
