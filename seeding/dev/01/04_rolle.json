@@ -292,20 +292,21 @@
         {
             "id": 202,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Sysadmin",
-            "rollenart": "SYSADMIN",
+            "name": "Vertretungslehrkraft",
+            "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
             "serviceProviderIds": [15]
         },
         {
-            "id": 203,
+           "id": 203,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Sysadmin",
-            "rollenart": "SYSADMIN",
+            "name": "Portal Admin",
+            "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16]
+            "serviceProviderIds": [16],
+            "istTechnisch": false
         },
         {
            "id": 204,
@@ -365,16 +366,6 @@
             "merkmale": [],
             "systemrechte": [],
             "serviceProviderIds": [15],
-            "istTechnisch": false
-        },
-        {
-           "id": 210,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Portal Admin",
-            "rollenart": "PORTALADMIN",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [16],
             "istTechnisch": false
         }
     ]
