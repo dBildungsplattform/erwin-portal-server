@@ -248,7 +248,7 @@
         {
            "id": 106,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Leiter",
+            "name": "Leiter",
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": [],
@@ -258,7 +258,7 @@
         {
            "id": 107,
             "administeredBySchulstrukturknoten": 0,
-            "name": "Moodle Leiter",
+            "name": "Leiter",
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": [],
@@ -292,7 +292,7 @@
         {
             "id": 202,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Sysadmin",
+            "name": "Sysadmin",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -301,7 +301,7 @@
         {
             "id": 203,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Sysadmin",
+            "name": "Sysadmin",
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
@@ -310,7 +310,7 @@
         {
            "id": 204,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Lehrer",
+            "name": "Lehrer",
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
@@ -320,7 +320,7 @@
         {
            "id": 205,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Lehrer",
+            "name": "Lehrer",
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
@@ -330,7 +330,7 @@
         {
            "id": 206,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Schüler",
+            "name": "Schüler",
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
@@ -340,7 +340,7 @@
         {
            "id": 207,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Schüler",
+            "name": "Schüler",
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
@@ -350,7 +350,7 @@
         {
            "id": 208,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Schüler2",
+            "name": "Schüler2",
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
