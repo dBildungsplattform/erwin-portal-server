@@ -44,40 +44,6 @@ export abstract class ScopeBase<T extends AnyEntity> {
         return result;
     }
 
-    // private async executeQueryForScope(
-    //     em: EntityManager,
-    //     scope: OrganisationScope,
-    // ): Promise<Counted<OrganisationEntity>> {
-    //     // We are in OrganisationRepository, so we can safely pin the entity here
-    //     const qb: QueryBuilder<OrganisationEntity> = em.createQueryBuilder(OrganisationEntity);
-
-    //     // Optional: clean out empty filters ({}), they can produce weird criteria trees
-    //     const filters: QBFilterQuery<OrganisationEntity>[] = scope.queryFilters.filter(
-    //         (f: QBFilterQuery<OrganisationEntity>) => Object.keys(f).length > 0,
-    //     );
-
-    //     // --- MINIMAL CHANGE STARTS HERE ---
-    //     // If there is exactly one filter, DON'T wrap it in {$or: [filter]} / {$and: [filter]}.
-    //     // Use it directly: where(filter)
-    //     let result: SelectQueryBuilder<OrganisationEntity> = qb.select('*');
-
-    //     if (filters.length === 1) {
-    //         result = result.where(filters[0]);
-    //     } else if (filters.length > 1) {
-    //         const combinedFilters: { [x: string]: QBFilterQuery<OrganisationEntity>[] } = {
-    //             [scope.scopeWhereOperator || ScopeOperator.OR]: filters,
-    //         };
-    //         result = result.where(combinedFilters);
-    //     } else {
-    //         // No filters -> avoid calling where({ $or: [] }) or where({ $or: undefined })
-    //         // If this should NEVER happen in your app, you can throw instead:
-    //         // throw new Error('Scope has no filters');
-    //     }
-    //     // --- MINIMAL CHANGE ENDS HERE ---
-
-    //     return result.getResultAndCount();
-    // }
-
     public sortBy(prop: keyof T, order: ScopeOrder): this {
         const queryOrderMap: QBQueryOrderMap<T> = { [prop]: order };
 
