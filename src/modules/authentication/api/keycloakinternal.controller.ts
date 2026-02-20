@@ -8,11 +8,14 @@ import { SchulConnexErrorMapper } from '../../../shared/error/schul-connex-error
 import { UserExternalDataWorkflowError } from '../../../shared/error/user-externaldata-workflow.error.js';
 import { PersonRepository } from '../../person/persistence/person.repository.js';
 import { Person } from '../../person/domain/person.js';
-import { DomainError, EntityNotFoundError } from '../../../shared/error/index.js';
+import { EntityNotFoundError } from '../../../shared/error/index.js';
 import { AccessApiKeyGuard } from './access.apikey.guard.js';
 import { Public } from './public.decorator.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
-import { PersonFactory } from '../../person/domain/person.factory.js';
+import { KeycloakInternalService } from './keycloakinternal.service.js';
+import { ClassLogger } from '../../../core/logging/class-logger.js';
+import { Organisation } from '../../organisation/domain/organisation.js';
+import { Rolle } from '../../rolle/domain/rolle.js';
 
 type WithoutOptional<T> = {
     [K in keyof T]-?: T[K];
@@ -26,7 +29,8 @@ export class KeycloakInternalController {
     public constructor(
         private readonly userExternaldataWorkflowFactory: UserExternaldataWorkflowFactory,
         private readonly personRepository: PersonRepository,
-        private readonly personFactory: PersonFactory,
+        private readonly keycloakInternalService: KeycloakInternalService,
+        private readonly logger: ClassLogger,
     ) {}
 
     /*
@@ -57,7 +61,7 @@ export class KeycloakInternalController {
             throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(
                     new UserExternalDataWorkflowError(
-                        'UserExternaldataWorkflowAggregate has not been successfull initialized',
+                        'UserExternaldataWorkflowAggregate has not been successfully initialized',
                     ),
                 ),
             );
@@ -76,33 +80,47 @@ export class KeycloakInternalController {
         type: LdapUserDataBodyParams,
     })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
-        const existingPerson: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(
-            params.keycloakUserId,
+        // const existingPerson: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(
+        //     params.personParams.keycloakUserId,
+        // );
+
+        const schuleOrg: Organisation<true> = await this.keycloakInternalService.createOrUpdateSchuleOrg(
+            params.schuleParams,
         );
+        const parentOrg: Organisation<true> = await this.keycloakInternalService.findOrCreateSchuleParentOrg(schuleOrg);
+        const person: Person<true> = await this.keycloakInternalService.createOrUpdatePerson(params.personParams);
+        const newRolle: Rolle<true> = await this.keycloakInternalService.findOrCreateRolle(parentOrg, params);
+        await this.keycloakInternalService.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
+        const klasse: Organisation<true> = await this.keycloakInternalService.createOrUpdateKlasse(
+            params.klasseParams,
+            schuleOrg,
+        );
+        await this.keycloakInternalService.createPersonenkontextForKlasseIfNotExists(klasse, newRolle, person);
+        this.logger.info('Ldap user processing completed for Keycloak UserID: ' + params.personParams.keycloakUserId);
 
-        let personToSave: Person<boolean>;
-        if (existingPerson) {
-            existingPerson.familienname = params.lastName ?? 'no name';
-            existingPerson.vorname = params.firstName ?? 'no name';
-            existingPerson.externalIds.LDAP = params.ldapId;
-            existingPerson.username = params.userName;
-            personToSave = existingPerson;
-        } else {
-            const person: Person<false> | DomainError = await this.personFactory.createNew({
-                familienname: params.lastName ?? 'no name',
-                vorname: params.firstName ?? 'no name',
-                externalIds: { LDAP: params.ldapId },
-                username: params.userName,
-            });
+        // let personToSave: Person<boolean>;
+        // if (existingPerson) {
+        //     existingPerson.familienname = params.lastName ?? 'no name';
+        //     existingPerson.vorname = params.firstName ?? 'no name';
+        //     existingPerson.externalIds.LDAP = params.ldapId;
+        //     existingPerson.username = params.userName;
+        //     personToSave = existingPerson;
+        // } else {
+        //     const person: Person<false> | DomainError = await this.personFactory.createNew({
+        //         familienname: params.lastName ?? 'no name',
+        //         vorname: params.firstName ?? 'no name',
+        //         externalIds: { LDAP: params.ldapId },
+        //         username: params.userName,
+        //     });
 
-            if (person instanceof DomainError) {
-                throw person;
-            }
+        //     if (person instanceof DomainError) {
+        //         throw person;
+        //     }
 
-            person.keycloakUserId = params.keycloakUserId;
-            personToSave = person;
-        }
+        //     person.keycloakUserId = params.personParams.keycloakUserId;
+        //     personToSave = person;
+        // }
 
-        await this.personRepository.save(personToSave);
+        // await this.personRepository.save(personToSave);
     }
 }

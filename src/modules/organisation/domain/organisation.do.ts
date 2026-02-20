@@ -1,6 +1,6 @@
 import { AutoMap } from '@automapper/classes';
 import { DoBase } from '../../../shared/types/index.js';
-import { OrganisationsTyp, Traegerschaft } from './organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, Traegerschaft } from './organisation.enums.js';
 import { Organisation } from './organisation.js';
 
 export class OrganisationDo<WasPersisted extends boolean> implements DoBase<WasPersisted> {
@@ -45,4 +45,7 @@ export class OrganisationDo<WasPersisted extends boolean> implements DoBase<WasP
 
     @AutoMap()
     public lernmanagementsystem?: Organisation<WasPersisted>;
+
+    @AutoMap()
+    public externalIds?: Partial<Record<OrganisationExternalIdType, string>>;
 }

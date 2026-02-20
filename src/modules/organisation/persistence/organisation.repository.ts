@@ -26,11 +26,12 @@ import { OrganisationID } from '../../../shared/types/aggregate-ids.types.js';
 import { PermittedOrgas, PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { OrganisationUpdateOutdatedError } from '../domain/orga-update-outdated.error.js';
-import { OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
 import { Organisation } from '../domain/organisation.js';
 import { OrganisationSpecificationError } from '../specification/error/organisation-specification.error.js';
 import { OrganisationEntity } from './organisation.entity.js';
 import { OrganisationScope } from './organisation.scope.js';
+import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
 
 export function mapOrgaAggregateToData(organisation: Organisation<boolean>): RequiredEntityData<OrganisationEntity> {
     return {
@@ -615,6 +616,22 @@ export class OrganisationRepository {
         return this.create(organisation);
     }
 
+    public async createExternalIdOrganisationMapping(
+        externalId: string,
+        type: OrganisationExternalIdType,
+        organisation: Organisation<true>,
+    ): Promise<void> {
+        this.logger.info('creating externalId and Organisation mapping entry into DB table');
+
+        const mapping: OrganisationExternalIdMappingEntity = this.em.create(OrganisationExternalIdMappingEntity, {
+            externalId,
+            type,
+            organisation: this.em.getReference(OrganisationEntity, organisation.id),
+        });
+
+        await this.em.persistAndFlush(mapping);
+    }
+
     private async create(organisation: Organisation<boolean>): Promise<Organisation<true>> {
         const organisationEntity: OrganisationEntity = this.em.create(
             OrganisationEntity,
@@ -682,5 +699,28 @@ export class OrganisationRepository {
         }
 
         return RootDirectChildrenType.OEFFENTLICH;
+    }
+
+    public async findOrganisationByExternalId(
+        externalId: string,
+        type: OrganisationExternalIdType,
+    ): Promise<Organisation<true> | null> {
+        this.logger.info(`fetching organisation with externalId: ${externalId}`);
+
+        const mapping: OrganisationExternalIdMappingEntity | null = await this.em.findOne(
+            OrganisationExternalIdMappingEntity,
+            {
+                externalId,
+                type,
+            },
+            { populate: ['organisation'] },
+        );
+
+        if (!mapping || !mapping.organisation) {
+            this.logger.info(`Organisation with externalId ${externalId} does not exist`);
+            return null;
+        }
+
+        return mapOrgaEntityToAggregate(mapping.organisation);
     }
 }

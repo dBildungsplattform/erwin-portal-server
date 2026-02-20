@@ -1,6 +1,7 @@
 import { AutoMap } from '@automapper/classes';
-import { BigIntType, Entity, Enum, Index, Opt, Property } from '@mikro-orm/core';
+import { BigIntType, Entity, Enum, Index, Opt, Property, OneToMany, Cascade, Collection } from '@mikro-orm/core';
 import { TimestampedEntity } from '../../../persistence/timestamped.entity.js';
+import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
 import { OrganisationsTyp, Traegerschaft } from '../domain/organisation.enums.js';
 
 @Entity({ tableName: 'organisation' })
@@ -58,4 +59,14 @@ export class OrganisationEntity extends TimestampedEntity {
     @AutoMap()
     @Property({ columnType: 'uuid', nullable: true })
     public lernmanagementsystem?: string;
+
+    @OneToMany({
+        entity: () => OrganisationExternalIdMappingEntity,
+        mappedBy: 'organisation',
+        cascade: [Cascade.REMOVE, Cascade.PERSIST],
+        orphanRemoval: true,
+        eager: true,
+    })
+    public externalIds?: Collection<OrganisationExternalIdMappingEntity> =
+        new Collection<OrganisationExternalIdMappingEntity>(this);
 }
