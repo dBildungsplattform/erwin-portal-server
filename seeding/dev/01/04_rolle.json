@@ -22,7 +22,7 @@
                 "HINWEISE_BEARBEITEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [5, 8, 10, 15, 16]
+            "serviceProviderIds": [5, 8, 10]
         },
         {
             "id": 1,
@@ -40,7 +40,7 @@
             "rollenart": "LEHR",
             "merkmale": ["KOPERS_PFLICHT"],
             "systemrechte": [],
-            "serviceProviderIds": [8, 10, 15]
+            "serviceProviderIds": [8, 10]
         },
         {
             "id": 3,
@@ -222,55 +222,47 @@
                 "LMS_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [15, 16],
+            "serviceProviderIds": [],
             "istTechnisch": false
         },
         {
            "id": 104,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Systemadministrator",
+            "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [
-                "PERSONEN_LESEN",
-                "SERVICEPROVIDER_VERWALTEN",
-                "ROLLEN_VERWALTEN"
-            ],
-            "serviceProviderIds": [15, 16],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
             "istTechnisch": false
         },
         {
            "id": 105,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Systemadministrator",
+            "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [
-                "PERSONEN_LESEN",
-                "SERVICEPROVIDER_VERWALTEN",
-                "ROLLEN_VERWALTEN"
-            ],
-            "serviceProviderIds": [15, 16],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
             "istTechnisch": false
         },
         {
            "id": 106,
             "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Leiter",
+            "name": "Leiter",
             "rollenart": "LEIT",
             "merkmale": [],
-            "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [15, 16],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
             "istTechnisch": false
         },
         {
            "id": 107,
             "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Leiter",
+            "name": "Leiter",
             "rollenart": "LEIT",
             "merkmale": [],
-            "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [15, 16],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
             "istTechnisch": false
         },
         {
@@ -294,10 +286,87 @@
             "systemrechte": [],
             "serviceProviderIds": [
                 13,
-                14,
-                15,
-                16
+                14
             ]
+        },
+        {
+            "id": 202,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Vertretungslehrkraft",
+            "rollenart": "LEHR",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [15]
+        },
+        {
+           "id": 203,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Portal Admin",
+            "rollenart": "PORTALADMIN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
+            "istTechnisch": false
+        },
+        {
+           "id": 204,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Lehrer",
+            "rollenart": "LEHR",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
+            "istTechnisch": false
+        },
+        {
+           "id": 205,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Lehrer",
+            "rollenart": "LEHR",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
+            "istTechnisch": false
+        },
+        {
+           "id": 206,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Schüler",
+            "rollenart": "LERN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
+            "istTechnisch": false
+        },
+        {
+           "id": 207,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Schüler",
+            "rollenart": "LERN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
+            "istTechnisch": false
+        },
+        {
+           "id": 208,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Schüler2",
+            "rollenart": "LERN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [16],
+            "istTechnisch": false
+        },
+        {
+           "id": 209,
+            "administeredBySchulstrukturknoten": 1,
+            "name": "Portal Admin",
+            "rollenart": "PORTALADMIN",
+            "merkmale": [],
+            "systemrechte": [],
+            "serviceProviderIds": [15],
+            "istTechnisch": false
         }
     ]
 }
