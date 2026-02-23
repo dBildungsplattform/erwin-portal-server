@@ -257,7 +257,7 @@
         },
         {
            "id": 107,
-            "administeredBySchulstrukturknoten": 0,
+            "administeredBySchulstrukturknoten": 1,
             "name": "Leiter",
             "rollenart": "LEIT",
             "merkmale": [],
