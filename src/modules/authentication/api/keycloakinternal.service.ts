@@ -314,9 +314,6 @@ export class KeycloakInternalService {
     }
 
     private assignSchuleParams(currentOrg: Organisation<true>, schuleLdapParams: SchuleLdapImportBodyParams): void {
-        if (!currentOrg) {
-            throw new Error('Org sent to assignSchuleParams does not exist');
-        }
         currentOrg.zugehoerigZu = schuleLdapParams.zugehoerigZu;
         currentOrg.name = schuleLdapParams.schuleName;
         if (currentOrg.externalIds) {
@@ -329,14 +326,11 @@ export class KeycloakInternalService {
     }
 
     private assignPersonParams(existingPerson: Option<Person<true>>, personLdapParams: PersonLdapImportDataBody): void {
-        if (!existingPerson) {
-            return;
-        }
-        existingPerson.familienname = personLdapParams.lastName;
-        existingPerson.vorname = personLdapParams.firstName;
-        existingPerson.externalIds.LDAP = personLdapParams.ldapDn;
-        existingPerson.email = personLdapParams.email;
-        existingPerson.geburtsdatum = personLdapParams.geburtstag;
+        existingPerson!.familienname = personLdapParams.lastName;
+        existingPerson!.vorname = personLdapParams.firstName;
+        existingPerson!.externalIds.LDAP = personLdapParams.ldapDn;
+        existingPerson!.email = personLdapParams.email;
+        existingPerson!.geburtsdatum = personLdapParams.geburtstag;
     }
 
     private assignKlasseParams(currentOrg: Organisation<true>, klasseLdapParams: KlasseLdapImportBodyParams): void {

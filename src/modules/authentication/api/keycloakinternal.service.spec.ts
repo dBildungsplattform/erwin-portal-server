@@ -83,7 +83,6 @@ describe('KeycloakInternalService', () => {
                 };
 
                 existingOrganisation = DoFactory.createOrganisation(true, {
-                    externalIds: { [OrganisationExternalIdType.LDAP]: schuleLdapParams.ldapOu },
                     name: faker.company.name(),
                     zugehoerigZu: faker.string.uuid(),
                 });
@@ -430,6 +429,117 @@ describe('KeycloakInternalService', () => {
                         await expect(service.findOrCreateRolle(parentOrg, paramsRolle)).rejects.toThrow(domainError);
                         expect(rolleRepoMock.save).toHaveBeenCalledWith(newRolle);
                     });
+                });
+            });
+        });
+
+        describe('createOrUpdatePersonenkontextForSchule', () => {
+            let schuleOrg: Organisation<true>;
+            let rolle: Rolle<true>;
+            let person: Person<true>;
+            let newPersonenkontext: Personenkontext<false>;
+            let persistedPersonenkontext: Personenkontext<true>;
+            let existingPersonenkontexte: Personenkontext<true>[];
+
+            beforeEach(() => {
+                schuleOrg = DoFactory.createOrganisation(true, {
+                    id: faker.string.uuid(),
+                    name: faker.company.name(),
+                    typ: OrganisationsTyp.SCHULE,
+                });
+                rolle = DoFactory.createRolle(true, {
+                    id: faker.string.uuid(),
+                    name: faker.lorem.word(),
+                });
+                person = DoFactory.createPerson(true, {
+                    id: faker.string.uuid(),
+                    familienname: faker.person.lastName(),
+                    vorname: faker.person.firstName(),
+                });
+                newPersonenkontext = DoFactory.createPersonenkontext(false, {
+                    personId: person.id,
+                    organisationId: schuleOrg.id,
+                    rolleId: rolle.id,
+                });
+                persistedPersonenkontext = DoFactory.createPersonenkontext(true, {
+                    personId: person.id,
+                    organisationId: schuleOrg.id,
+                    rolleId: rolle.id,
+                });
+            });
+
+            describe('when no existing personenkontext for the person', () => {
+                it('should create and persist a new personenkontext for the schule', async () => {
+                    personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
+                    personenkontextFactoryMock.createNew.mockReturnValue(newPersonenkontext);
+                    personenkontextRepoMock.save.mockResolvedValueOnce(persistedPersonenkontext);
+
+                    const result: Personenkontext<true> = await service.createOrUpdatePersonenkontextForSchule(
+                        schuleOrg,
+                        rolle,
+                        person,
+                    );
+
+                    expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledWith(person.id);
+                    expect(personenkontextFactoryMock.createNew).toHaveBeenCalledWith(
+                        person.id,
+                        schuleOrg.id,
+                        rolle.id,
+                    );
+                    expect(personenkontextRepoMock.save).toHaveBeenCalledWith(newPersonenkontext);
+                    expect(result).toEqual(persistedPersonenkontext);
+                });
+            });
+
+            describe('when existing personenkontexte exist', () => {
+                beforeEach(() => {
+                    existingPersonenkontexte = [
+                        DoFactory.createPersonenkontext(true, {
+                            personId: person.id,
+                            organisationId: faker.string.uuid(),
+                            rolleId: faker.string.uuid(),
+                        }),
+                        persistedPersonenkontext,
+                    ];
+                });
+
+                it('should fetch the correct personenkontext from the list', async () => {
+                    personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce(
+                        existingPersonenkontexte,
+                    );
+
+                    const result: Personenkontext<true> = await service.createOrUpdatePersonenkontextForSchule(
+                        schuleOrg,
+                        rolle,
+                        person,
+                    );
+
+                    expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledWith(person.id);
+                    expect(result).toEqual(persistedPersonenkontext);
+                });
+
+                it('should throw if more than one personenkontext matches organisation and rolle', async () => {
+                    const duplicatePersonenkontexte: Personenkontext<true>[] = [
+                        DoFactory.createPersonenkontext(true, {
+                            personId: person.id,
+                            organisationId: schuleOrg.id,
+                            rolleId: rolle.id,
+                        }),
+                        DoFactory.createPersonenkontext(true, {
+                            personId: person.id,
+                            organisationId: schuleOrg.id,
+                            rolleId: rolle.id,
+                        }),
+                    ];
+                    personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce(
+                        duplicatePersonenkontexte,
+                    );
+
+                    await expect(
+                        service.createOrUpdatePersonenkontextForSchule(schuleOrg, rolle, person),
+                    ).rejects.toThrow(
+                        'more than one personenkontext exists for this person with the same organisation and role',
+                    );
                 });
             });
         });
