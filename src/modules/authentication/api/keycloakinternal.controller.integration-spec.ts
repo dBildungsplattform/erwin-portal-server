@@ -7,8 +7,6 @@ import { HttpException } from '@nestjs/common';
 import { ConfigTestModule } from '../../../../test/utils/config-test.module.js';
 import { DatabaseTestModule, DoFactory, MapperTestModule } from '../../../../test/utils/index.js';
 import { LoggingTestModule } from '../../../../test/utils/logging-test.module.js';
-import { DomainError } from '../../../shared/error/domain.error.js';
-import { PersonAlreadyExistsError } from '../../../shared/error/person-already-exists.error.js';
 import { PersonFactory } from '../../person/domain/person.factory.js';
 import { Person } from '../../person/domain/person.js';
 import { PersonRepository } from '../../person/persistence/person.repository.js';
@@ -24,13 +22,17 @@ import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.fact
 import { UserExeternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { KeycloakInternalController } from './keycloakinternal.controller.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
+import { KeycloakInternalService } from './keycloakinternal.service.js';
+import { Organisation } from '../../organisation/domain/organisation.js';
+import { Rolle } from '../../rolle/domain/rolle.js';
+import { ErwinLdapMappedRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
 
 describe('KeycloakInternalController', () => {
     let module: TestingModule;
     let keycloakinternalController: KeycloakInternalController;
     let dbiamPersonenkontextRepoMock: DeepMocked<DBiamPersonenkontextRepo>;
     let personRepoMock: DeepMocked<PersonRepository>;
-    let personFactoryMock: DeepMocked<PersonFactory>;
+    let serviceMock: DeepMocked<KeycloakInternalService>;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
@@ -43,7 +45,14 @@ describe('KeycloakInternalController', () => {
                 PersonModule,
                 PersonenKontextModule,
             ],
-            providers: [KeycloakInternalController, UserExternaldataWorkflowFactory],
+            providers: [
+                KeycloakInternalController,
+                UserExternaldataWorkflowFactory,
+                {
+                    provide: KeycloakInternalService,
+                    useValue: createMock<KeycloakInternalService>(),
+                },
+            ],
         })
             .overrideProvider(PersonRepository)
             .useValue(createMock<PersonRepository>())
@@ -55,10 +64,10 @@ describe('KeycloakInternalController', () => {
 
         await DatabaseTestModule.setupDatabase(module.get(MikroORM));
 
+        serviceMock = module.get(KeycloakInternalService);
         keycloakinternalController = module.get(KeycloakInternalController);
         dbiamPersonenkontextRepoMock = module.get(DBiamPersonenkontextRepo);
         personRepoMock = module.get(PersonRepository);
-        personFactoryMock = module.get(PersonFactory);
     });
 
     afterEach(() => {
@@ -156,111 +165,67 @@ describe('KeycloakInternalController', () => {
     });
 
     describe('onNewLdapUser', () => {
-        it('should create new person', async () => {
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
-            personFactoryMock.createNew.mockResolvedValueOnce(DoFactory.createPerson(false));
+        let params: LdapUserDataBodyParams;
+        let schuleOrg: Organisation<true>;
+        let parentOrg: Organisation<true>;
+        let person: Person<true>;
+        let rolle: Rolle<true>;
+        let klasse: Organisation<true>;
 
-            await keycloakinternalController.onNewLdapUser(
-                new LdapUserDataBodyParams({
-                    userName: faker.internet.userName(),
-                    email: faker.internet.email(),
+        beforeEach(() => {
+            params = new LdapUserDataBodyParams({
+                schuleParams: {
+                    schuleName: faker.company.name(),
+                    zugehoerigZu: faker.string.uuid(),
+                    ldapOu: faker.string.uuid(),
+                },
+                klasseParams: {
+                    klasseName: faker.lorem.word(),
+                    ldapDn: faker.string.uuid(),
+                },
+                personParams: {
+                    keycloakUserId: faker.string.uuid(),
                     firstName: faker.person.firstName(),
                     lastName: faker.person.lastName(),
-                    keycloakUserId: faker.string.uuid(),
-                    ldapId: faker.string.uuid(),
-                    ldapDn: faker.internet.domainName(),
-                }),
-            );
-
-            expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
-            expect(personFactoryMock.createNew).toHaveBeenCalledTimes(1);
-            expect(personRepoMock.save).toHaveBeenCalledTimes(1);
-        });
-
-        it('should create new person if optional values are missing', async () => {
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
-            personFactoryMock.createNew.mockResolvedValueOnce(DoFactory.createPerson(false));
-
-            await keycloakinternalController.onNewLdapUser(
-                new LdapUserDataBodyParams({
-                    userName: faker.internet.userName(),
-                    email: undefined,
-                    firstName: undefined,
-                    lastName: undefined,
-                    keycloakUserId: faker.string.uuid(),
-                    ldapId: faker.string.uuid(),
-                    ldapDn: faker.internet.domainName(),
-                }),
-            );
-
-            expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
-            expect(personFactoryMock.createNew).toHaveBeenCalledTimes(1);
-            expect(personRepoMock.save).toHaveBeenCalledTimes(1);
-        });
-
-        it('should throw if creation of person fails', async () => {
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
-
-            const err: DomainError = new PersonAlreadyExistsError('message');
-            personFactoryMock.createNew.mockResolvedValueOnce(err);
-
-            await expect(
-                keycloakinternalController.onNewLdapUser(
-                    new LdapUserDataBodyParams({
-                        userName: faker.internet.userName(),
-                        email: faker.internet.email(),
-                        firstName: faker.person.firstName(),
-                        lastName: faker.person.lastName(),
-                        keycloakUserId: faker.string.uuid(),
-                        ldapId: faker.string.uuid(),
-                        ldapDn: faker.internet.domainName(),
-                    }),
-                ),
-            ).rejects.toThrow(err);
-
-            expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
-            expect(personFactoryMock.createNew).toHaveBeenCalledTimes(1);
-            expect(personRepoMock.save).toHaveBeenCalledTimes(0);
-        });
-
-        it('should update existing person', async () => {
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(DoFactory.createPerson(true));
-
-            await keycloakinternalController.onNewLdapUser(
-                new LdapUserDataBodyParams({
-                    userName: faker.internet.userName(),
+                    ldapDn: faker.string.uuid(),
                     email: faker.internet.email(),
-                    firstName: faker.person.firstName(),
-                    lastName: faker.person.lastName(),
-                    keycloakUserId: faker.string.uuid(),
-                    ldapId: faker.string.uuid(),
-                    ldapDn: faker.internet.domainName(),
-                }),
-            );
+                    geburtstag: faker.date.birthdate(),
+                },
+                rolle: ErwinLdapMappedRollenArt.LEHR,
+            });
 
-            expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
-            expect(personFactoryMock.createNew).toHaveBeenCalledTimes(0);
-            expect(personRepoMock.save).toHaveBeenCalledTimes(1);
+            schuleOrg = DoFactory.createOrganisation(true);
+            parentOrg = DoFactory.createOrganisation(true);
+            person = DoFactory.createPerson(true);
+            rolle = DoFactory.createRolle(true);
+            klasse = DoFactory.createOrganisation(true);
+
+            serviceMock.createOrUpdateSchuleOrg.mockResolvedValue(schuleOrg);
+            serviceMock.findOrCreateSchuleParentOrg.mockResolvedValue(parentOrg);
+            serviceMock.createOrUpdatePerson.mockResolvedValue(person);
+            serviceMock.findOrCreateRolle.mockResolvedValue(rolle);
+            serviceMock.createOrUpdatePersonenkontextForSchule.mockResolvedValue(DoFactory.createPersonenkontext(true));
+            serviceMock.createOrUpdateKlasse.mockResolvedValue(klasse);
+            serviceMock.createPersonenkontextForKlasseIfNotExists.mockResolvedValue(
+                DoFactory.createPersonenkontext(true),
+            );
         });
 
-        it('should update existing person if optional values are missing', async () => {
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(DoFactory.createPerson(true));
+        it('should call service methods in correct order', async () => {
+            await keycloakinternalController.onNewLdapUser(params);
 
-            await keycloakinternalController.onNewLdapUser(
-                new LdapUserDataBodyParams({
-                    userName: faker.internet.userName(),
-                    email: undefined,
-                    firstName: undefined,
-                    lastName: undefined,
-                    keycloakUserId: faker.string.uuid(),
-                    ldapId: faker.string.uuid(),
-                    ldapDn: faker.internet.domainName(),
-                }),
-            );
+            expect(serviceMock.createOrUpdateSchuleOrg).toHaveBeenCalledWith(params.schuleParams);
+            expect(serviceMock.findOrCreateSchuleParentOrg).toHaveBeenCalledWith(schuleOrg);
+            expect(serviceMock.createOrUpdatePerson).toHaveBeenCalledWith(params.personParams);
+            expect(serviceMock.findOrCreateRolle).toHaveBeenCalledWith(parentOrg, params.rolle);
+            expect(serviceMock.createOrUpdatePersonenkontextForSchule).toHaveBeenCalledWith(schuleOrg, rolle, person);
+            expect(serviceMock.createOrUpdateKlasse).toHaveBeenCalledWith(params.klasseParams, schuleOrg);
+            expect(serviceMock.createPersonenkontextForKlasseIfNotExists).toHaveBeenCalledWith(klasse, rolle, person);
+        });
 
-            expect(personRepoMock.findByKeycloakUserId).toHaveBeenCalledTimes(1);
-            expect(personFactoryMock.createNew).toHaveBeenCalledTimes(0);
-            expect(personRepoMock.save).toHaveBeenCalledTimes(1);
+        it('should throw if any service method fails', async () => {
+            serviceMock.createOrUpdateSchuleOrg.mockRejectedValueOnce(new Error('fail'));
+            await expect(keycloakinternalController.onNewLdapUser(params)).rejects.toThrow('fail');
         });
     });
 });

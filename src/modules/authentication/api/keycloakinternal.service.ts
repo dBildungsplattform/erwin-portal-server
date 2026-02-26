@@ -14,7 +14,6 @@ import { PersonenkontextService } from '../../personenkontext/domain/personenkon
 import { RolleRepo } from '../../rolle/repo/rolle.repo.js';
 import { Rolle } from '../../rolle/domain/rolle.js';
 import { RolleFactory } from '../../rolle/domain/rolle.factory.js';
-import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 import { RollenArt } from '../../rolle/domain/rolle.enums.js';
 import { ErwinLdapMappedRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
 import { Personenkontext } from '../../personenkontext/domain/personenkontext.js';
@@ -159,7 +158,7 @@ export class KeycloakInternalService {
 
     public async findOrCreateRolle(
         parentOrg: Organisation<true>,
-        ldapuserParams: LdapUserDataBodyParams,
+        paramsRolle: ErwinLdapMappedRollenArt,
     ): Promise<Rolle<true>> {
         this.logger.info('creating/finding new Rolle for the person in the schule org');
 
@@ -171,14 +170,16 @@ export class KeycloakInternalService {
                 return rolle.administeredBySchulstrukturknoten === parentOrg.id;
             });
 
-            return existingRollen.pop() as Rolle<true>;
+            if (existingRollen.length > 1)
+                throw new ForbiddenException('More than one role exists for the parent organisation');
+            else return existingRollen[existingRollen.length - 1] as Rolle<true>;
         } else {
             this.logger.info('Rolle does not exist, creating new oen');
 
             const resultingRolle: Rolle<false> | DomainError = this.rolleFactory.createNew(
                 `${parentOrg.name}`,
                 parentOrg.id,
-                this.mapToRollenArt(ldapuserParams.rolle),
+                this.mapToRollenArt(paramsRolle),
                 [],
                 [],
                 [],
@@ -221,30 +222,16 @@ export class KeycloakInternalService {
 
             return persistedPersonenkontext;
         } else {
-            const filteredPersonenkontext: Personenkontext<true>[] = existingPersonenkontext.filter(
-                (personkontext: Personenkontext<true>) => {
-                    return personkontext.organisationId === schuleOrg.id && personkontext.rolleId === rolle.id;
-                },
+            this.logger.info('Personenkontext for Schule exists, fetching the correct one');
+
+            const personenkontext: Personenkontext<true> = await this.fetchPersonenkontextFromList(
+                existingPersonenkontext,
+                schuleOrg,
+                rolle,
+                person,
             );
 
-            if (filteredPersonenkontext.length === 0) {
-                const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
-                    person.id,
-                    schuleOrg.id,
-                    rolle.id,
-                );
-                const persistedPersonenkontext: Personenkontext<true> =
-                    await this.personenkontextRepo.save(personenkontext);
-
-                return persistedPersonenkontext;
-            } else if (filteredPersonenkontext.length > 1) {
-                throw new Error('more than one personenkontext exists for this person with the same school and role');
-            } else {
-                const poppedFilteredPersonenkontext: Personenkontext<true> =
-                    filteredPersonenkontext.pop() as Personenkontext<true>;
-
-                return poppedFilteredPersonenkontext;
-            }
+            return personenkontext;
         }
     }
 
@@ -270,7 +257,7 @@ export class KeycloakInternalService {
                 klasseLdapParams.klasseName,
                 schuleOrg.id,
                 schuleOrg.id,
-                OrganisationsTyp.SCHULE,
+                OrganisationsTyp.KLASSE,
                 externalIds,
             );
 
@@ -301,7 +288,7 @@ export class KeycloakInternalService {
         const existingPersonenkontext: Personenkontext<true>[] =
             await this.personenkontextService.findPersonenkontexteByPersonId(person.id);
 
-        if (!existingPersonenkontext) {
+        if (!existingPersonenkontext.length) {
             this.logger.info('Personenkontext for Klasse does not exist, creating a new one');
             const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
                 person.id,
@@ -315,30 +302,14 @@ export class KeycloakInternalService {
         } else {
             this.logger.info('Personenkontext for Klasse exists, fetching the correct one');
 
-            const filteredPersonenkontext: Personenkontext<true>[] = existingPersonenkontext.filter(
-                (personkontext: Personenkontext<true>) => {
-                    return personkontext.organisationId === klasseOrg.id && personkontext.rolleId === rolle.id;
-                },
+            const personenkontext: Personenkontext<true> = await this.fetchPersonenkontextFromList(
+                existingPersonenkontext,
+                klasseOrg,
+                rolle,
+                person,
             );
 
-            if (filteredPersonenkontext.length === 0) {
-                const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
-                    person.id,
-                    klasseOrg.id,
-                    rolle.id,
-                );
-                const persistedPersonenkontext: Personenkontext<true> =
-                    await this.personenkontextRepo.save(personenkontext);
-
-                return persistedPersonenkontext;
-            } else if (filteredPersonenkontext.length > 1) {
-                throw new Error('more than one personenkontext exists for this person with the same school and role');
-            } else {
-                const poppedFilteredPersonenkontext: Personenkontext<true> =
-                    filteredPersonenkontext.pop() as Personenkontext<true>;
-
-                return poppedFilteredPersonenkontext;
-            }
+            return personenkontext;
         }
     }
 
@@ -396,12 +367,47 @@ export class KeycloakInternalService {
             this.logger.error(`Organisation with scope ${organisationScope.findBy.toString()} not found`);
             return undefined;
         } else if (orgs.length === 1) {
-            return orgs[length - 1] as Organisation<true>;
+            return orgs[orgs.length - 1] as Organisation<true>;
         } else {
             this.logger.error(`More than one organisation exists with scope ${organisationScope.findBy.toString()}`);
             throw new ForbiddenException(
                 `More than one organisation exists with scope ${organisationScope.findBy.toString()}`,
             );
+        }
+    }
+
+    private async fetchPersonenkontextFromList(
+        existingPersonenkontext: Personenkontext<true>[],
+        org: Organisation<true>,
+        rolle: Rolle<true>,
+        person: Person<true>,
+    ): Promise<Personenkontext<true>> {
+        const filteredPersonenkontext: Personenkontext<true>[] = existingPersonenkontext.filter(
+            (personkontext: Personenkontext<true>) => {
+                return personkontext.organisationId === org.id && personkontext.rolleId === rolle.id;
+            },
+        );
+
+        if (filteredPersonenkontext.length === 0) {
+            const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
+                person.id,
+                org.id,
+                rolle.id,
+            );
+            const persistedPersonenkontext: Personenkontext<true> =
+                await this.personenkontextRepo.save(personenkontext);
+
+            return persistedPersonenkontext;
+        } else if (filteredPersonenkontext.length > 1) {
+            throw new ForbiddenException(
+                'more than one personenkontext exists for this person with the same organisation and role',
+            );
+        } else {
+            const personenkontext: Personenkontext<true> = filteredPersonenkontext[
+                filteredPersonenkontext.length - 1
+            ] as Personenkontext<true>;
+
+            return personenkontext;
         }
     }
 

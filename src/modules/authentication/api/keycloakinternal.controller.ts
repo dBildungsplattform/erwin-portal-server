@@ -80,16 +80,12 @@ export class KeycloakInternalController {
         type: LdapUserDataBodyParams,
     })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
-        // const existingPerson: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(
-        //     params.personParams.keycloakUserId,
-        // );
-
         const schuleOrg: Organisation<true> = await this.keycloakInternalService.createOrUpdateSchuleOrg(
             params.schuleParams,
         );
         const parentOrg: Organisation<true> = await this.keycloakInternalService.findOrCreateSchuleParentOrg(schuleOrg);
         const person: Person<true> = await this.keycloakInternalService.createOrUpdatePerson(params.personParams);
-        const newRolle: Rolle<true> = await this.keycloakInternalService.findOrCreateRolle(parentOrg, params);
+        const newRolle: Rolle<true> = await this.keycloakInternalService.findOrCreateRolle(parentOrg, params.rolle);
         await this.keycloakInternalService.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
         const klasse: Organisation<true> = await this.keycloakInternalService.createOrUpdateKlasse(
             params.klasseParams,
@@ -97,30 +93,5 @@ export class KeycloakInternalController {
         );
         await this.keycloakInternalService.createPersonenkontextForKlasseIfNotExists(klasse, newRolle, person);
         this.logger.info('Ldap user processing completed for Keycloak UserID: ' + params.personParams.keycloakUserId);
-
-        // let personToSave: Person<boolean>;
-        // if (existingPerson) {
-        //     existingPerson.familienname = params.lastName ?? 'no name';
-        //     existingPerson.vorname = params.firstName ?? 'no name';
-        //     existingPerson.externalIds.LDAP = params.ldapId;
-        //     existingPerson.username = params.userName;
-        //     personToSave = existingPerson;
-        // } else {
-        //     const person: Person<false> | DomainError = await this.personFactory.createNew({
-        //         familienname: params.lastName ?? 'no name',
-        //         vorname: params.firstName ?? 'no name',
-        //         externalIds: { LDAP: params.ldapId },
-        //         username: params.userName,
-        //     });
-
-        //     if (person instanceof DomainError) {
-        //         throw person;
-        //     }
-
-        //     person.keycloakUserId = params.personParams.keycloakUserId;
-        //     personToSave = person;
-        // }
-
-        // await this.personRepository.save(personToSave);
     }
 }
