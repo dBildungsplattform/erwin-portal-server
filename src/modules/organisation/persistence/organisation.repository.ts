@@ -721,6 +721,9 @@ export class OrganisationRepository {
             return null;
         }
 
-        return mapOrgaEntityToAggregate(mapping.organisation);
+        const organisation: Option<Organisation<true>> = await this.findById(mapping.organisation.id);
+
+        if (organisation) return organisation;
+        else return null;
     }
 }
