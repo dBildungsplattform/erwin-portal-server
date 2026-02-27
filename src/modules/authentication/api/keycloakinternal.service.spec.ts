@@ -333,6 +333,7 @@ describe('KeycloakInternalService', () => {
                     id: faker.string.uuid(),
                     name: parentOrg.name,
                     administeredBySchulstrukturknoten: parentOrg.id,
+                    rollenart: RollenArt.LERN,
                 });
 
                 persistedRolle = DoFactory.createRolle(true, {
@@ -352,7 +353,10 @@ describe('KeycloakInternalService', () => {
             describe('when existing rollen are found', () => {
                 it('should return the only rolle administered by the parentOrg', async () => {
                     const rollenList: Rolle<true>[] = [
-                        DoFactory.createRolle(true, { administeredBySchulstrukturknoten: faker.string.uuid() }),
+                        DoFactory.createRolle(true, {
+                            administeredBySchulstrukturknoten: faker.string.uuid(),
+                            rollenart: RollenArt.LERN,
+                        }),
                         existingRolle,
                     ];
                     rolleRepoMock.findByName.mockResolvedValue(rollenList);
@@ -365,7 +369,10 @@ describe('KeycloakInternalService', () => {
 
                 it('should return undefined if no rollen administered by parentOrg', async () => {
                     const rollenList: Rolle<true>[] = [
-                        DoFactory.createRolle(true, { administeredBySchulstrukturknoten: faker.string.uuid() }),
+                        DoFactory.createRolle(true, {
+                            administeredBySchulstrukturknoten: faker.string.uuid(),
+                            rollenart: RollenArt.LERN,
+                        }),
                     ];
                     rolleRepoMock.findByName.mockResolvedValue(rollenList);
 
@@ -377,8 +384,14 @@ describe('KeycloakInternalService', () => {
 
                 it('should throw forbidden exception if more than 1 rolle is administered by parentOrg', async () => {
                     const rollenList: Rolle<true>[] = [
-                        DoFactory.createRolle(true, { administeredBySchulstrukturknoten: parentOrg.id }),
-                        DoFactory.createRolle(true, { administeredBySchulstrukturknoten: parentOrg.id }),
+                        DoFactory.createRolle(true, {
+                            administeredBySchulstrukturknoten: parentOrg.id,
+                            rollenart: RollenArt.LERN,
+                        }),
+                        DoFactory.createRolle(true, {
+                            administeredBySchulstrukturknoten: parentOrg.id,
+                            rollenart: RollenArt.LERN,
+                        }),
                     ];
                     rolleRepoMock.findByName.mockResolvedValue(rollenList);
 

@@ -167,7 +167,10 @@ export class KeycloakInternalService {
             this.logger.info('Rolle exists, fetching');
 
             existingRollen = existingRollen?.filter((rolle: Rolle<true>) => {
-                return rolle.administeredBySchulstrukturknoten === parentOrg.id;
+                return (
+                    rolle.administeredBySchulstrukturknoten === parentOrg.id &&
+                    rolle.rollenart === this.mapToRollenArt(paramsRolle)
+                );
             });
 
             if (existingRollen.length > 1)
