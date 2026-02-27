@@ -1,5 +1,12 @@
 import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiInternalServerErrorResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+} from '@nestjs/swagger';
 import { UserExeternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { ExternalPkData } from '../../personenkontext/persistence/dbiam-personenkontext.repo.js';
 import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
@@ -79,6 +86,9 @@ export class KeycloakInternalController {
         description: 'User was created',
         type: LdapUserDataBodyParams,
     })
+    @ApiOkResponse({ description: 'Ldap User Processing Successfully Completed', type: LdapUserDataBodyParams })
+    @ApiForbiddenResponse({ description: 'Forbidden Operation or Argument' })
+    @ApiInternalServerErrorResponse({ description: 'Internal Server Error while Saving Ldap User' })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
         const schuleOrg: Organisation<true> = await this.keycloakInternalService.createOrUpdateSchuleOrg(
             params.schuleParams,
