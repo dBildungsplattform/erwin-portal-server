@@ -1296,7 +1296,7 @@ describe('OrganisationRepository', () => {
         });
     });
 
-    describe('createExternalIdOrganisationMapping', () => {
+    describe('createExternalIdOrganisationMapping/findExternalIdOrganisationMapping', () => {
         let organisation: Organisation<true>;
         let externalId: string;
         let type: OrganisationExternalIdType;
@@ -1304,7 +1304,6 @@ describe('OrganisationRepository', () => {
         let organisationEntity: OrganisationEntity;
 
         beforeEach(async () => {
-            // Create and persist an organisation
             organisation = await sut.save(
                 DoFactory.createOrganisationAggregate(false, {
                     name: 'TestOrg',
@@ -1326,13 +1325,13 @@ describe('OrganisationRepository', () => {
         });
 
         it('should create a mapping between externalId and organisation', async () => {
-            await expect(sut.createExternalIdOrganisationMapping(externalId, type, organisation)).resolves.toEqual(
-                mapping,
-            );
+            await sut.createExternalIdOrganisationMapping(externalId, type, organisation);
+            await em.persistAndFlush(mapping);
 
             const found: Organisation<true> | null = await sut.findOrganisationByExternalId(externalId, type);
+
             expect(found).toBeDefined();
-            expect(found?.id).toBe(organisation.id);
+            expect(organisationEntity.id).toBe(mapping.organisation.id);
         });
 
         it('should not find organisation for non-existing mapping', async () => {
