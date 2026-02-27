@@ -214,7 +214,7 @@ export class KeycloakInternalService {
         const existingPersonenkontext: Personenkontext<true>[] =
             await this.personenkontextService.findPersonenkontexteByPersonId(person.id);
 
-        if (!existingPersonenkontext) {
+        if (!existingPersonenkontext.length) {
             const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
                 person.id,
                 schuleOrg.id,
