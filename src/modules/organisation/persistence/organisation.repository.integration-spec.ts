@@ -21,7 +21,7 @@ import { ScopeOperator } from '../../../shared/persistence/index.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { OrganisationUpdateOutdatedError } from '../domain/orga-update-outdated.error.js';
-import { OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
 import { Organisation } from '../domain/organisation.js';
 import { OrganisationSpecificationError } from '../specification/error/organisation-specification.error.js';
 import { SchultraegerNameEindeutigError } from '../specification/error/SchultraegerNameEindeutigError.js';
@@ -30,6 +30,7 @@ import { OrganisationPersistenceMapperProfile } from './organisation-persistence
 import { OrganisationEntity } from './organisation.entity.js';
 import { mapOrgaAggregateToData, mapOrgaEntityToAggregate, OrganisationRepository } from './organisation.repository.js';
 import { OrganisationScope } from './organisation.scope.js';
+import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
 
 describe('OrganisationRepository', () => {
     let module: TestingModule;
@@ -1292,6 +1293,51 @@ describe('OrganisationRepository', () => {
                     'Only organisations of typ SCHULE can be enabled for ITSLearning.',
                 ]),
             );
+        });
+    });
+
+    describe('createExternalIdOrganisationMapping', () => {
+        let organisation: Organisation<true>;
+        let externalId: string;
+        let type: OrganisationExternalIdType;
+        let mapping: OrganisationExternalIdMappingEntity;
+        let organisationEntity: OrganisationEntity;
+
+        beforeEach(async () => {
+            // Create and persist an organisation
+            organisation = await sut.save(
+                DoFactory.createOrganisationAggregate(false, {
+                    name: 'TestOrg',
+                    kennung: 'EXTIDTEST',
+                }),
+            );
+            organisationEntity = em.create(
+                OrganisationEntity,
+                mapOrgaAggregateToData(DoFactory.createOrganisation(true)),
+            );
+            externalId = faker.string.uuid();
+            type = OrganisationExternalIdType.LDAP;
+
+            mapping = em.create(OrganisationExternalIdMappingEntity, {
+                organisation: organisationEntity,
+                externalId,
+                type,
+            });
+        });
+
+        it('should create a mapping between externalId and organisation', async () => {
+            await expect(sut.createExternalIdOrganisationMapping(externalId, type, organisation)).resolves.toEqual(
+                mapping,
+            );
+
+            const found: Organisation<true> | null = await sut.findOrganisationByExternalId(externalId, type);
+            expect(found).toBeDefined();
+            expect(found?.id).toBe(organisation.id);
+        });
+
+        it('should not find organisation for non-existing mapping', async () => {
+            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(faker.string.uuid(), type);
+            expect(result).toBeNull();
         });
     });
 
