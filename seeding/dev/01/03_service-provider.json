@@ -109,7 +109,7 @@
         {
             "id": 8,
             "name": "Anleitungen",
-            "target": "URL",
+            "target": "SELF",
             "url": "/anleitungen",
             "kategorie": "HINWEISE",
             "logoMimeType": "image/svg+xml",
@@ -135,7 +135,7 @@
         {
             "id": 10,
             "name": "Helpdesk kontaktieren",
-            "target": "URL",
+            "target": "SELF",
             "url": "/hilfe",
             "kategorie": "HINWEISE",
             "logoMimeType": "image/svg+xml",
