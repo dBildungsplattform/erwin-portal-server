@@ -26,6 +26,9 @@ import { KeycloakInternalService } from './keycloakinternal.service.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
 import { Rolle } from '../../rolle/domain/rolle.js';
 import { ErwinLdapMappedRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
+import { SchuleLdapImportBodyParams } from './ldap/schule-ldap-import.body.params.js';
+import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
+import { PersonLdapImportDataBody } from './ldap/person-ldap-import.body.params.js';
 
 describe('KeycloakInternalController', () => {
     let module: TestingModule;
@@ -178,11 +181,11 @@ describe('KeycloakInternalController', () => {
                     schuleName: faker.company.name(),
                     zugehoerigZu: faker.string.uuid(),
                     ldapOu: faker.string.uuid(),
-                },
+                } as SchuleLdapImportBodyParams,
                 klasseParams: {
                     klasseName: faker.lorem.word(),
                     ldapDn: faker.string.uuid(),
-                },
+                } as KlasseLdapImportBodyParams,
                 personParams: {
                     keycloakUserId: faker.string.uuid(),
                     firstName: faker.person.firstName(),
@@ -190,7 +193,7 @@ describe('KeycloakInternalController', () => {
                     ldapDn: faker.string.uuid(),
                     email: faker.internet.email(),
                     geburtstag: faker.date.birthdate(),
-                },
+                } as PersonLdapImportDataBody,
                 rolle: ErwinLdapMappedRollenArt.LEHR,
             });
 
