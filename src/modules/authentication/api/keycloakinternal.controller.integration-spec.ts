@@ -29,6 +29,8 @@ import { ErwinLdapMappedRollenArt } from '../../rollenmapping/domain/lms-rollena
 import { SchuleLdapImportBodyParams } from './ldap/schule-ldap-import.body.params.js';
 import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
 import { PersonLdapImportDataBody } from './ldap/person-ldap-import.body.params.js';
+import { validate, ValidationError } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
 
 describe('KeycloakInternalController', () => {
     let module: TestingModule;
@@ -229,6 +231,44 @@ describe('KeycloakInternalController', () => {
         it('should throw if any service method fails', async () => {
             serviceMock.createOrUpdateSchuleOrg.mockRejectedValueOnce(new Error('fail'));
             await expect(keycloakinternalController.onNewLdapUser(params)).rejects.toThrow('fail');
+        });
+    });
+
+    describe('LdapUserDataBodyParams decorators', () => {
+        it('transforms + validates nested DTOs', async () => {
+            const payload: LdapUserDataBodyParams = {
+                klasseParams: { klasseName: 'x', ldapDn: 'dn' },
+                schuleParams: { schuleName: 'y', zugehoerigZu: 'z', ldapOu: 'ou' },
+                personParams: {
+                    keycloakUserId: 'id',
+                    firstName: 'a',
+                    lastName: 'b',
+                    ldapDn: 'dn',
+                    email: 'a@b.com',
+                    geburtstag: new Date(),
+                },
+                rolle: ErwinLdapMappedRollenArt.LEHR,
+            };
+
+            const dto: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, payload);
+            const errors: ValidationError[] = await validate(dto);
+
+            expect(errors).toHaveLength(0);
+        });
+
+        it('fails when rolle is not a string', async () => {
+            const payload = {
+                klasseParams: {},
+                schuleParams: {},
+                personParams: {},
+                rolle: 123,
+            };
+
+            const dto: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, payload);
+            const errors: ValidationError[] = await validate(dto);
+
+            expect(errors.length).toBeGreaterThan(0);
+            expect(errors.some((e: ValidationError) => e.property === 'rolle')).toBe(true);
         });
     });
 });
