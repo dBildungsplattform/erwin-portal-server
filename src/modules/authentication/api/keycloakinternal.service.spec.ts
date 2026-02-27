@@ -135,9 +135,7 @@ describe('KeycloakInternalService', () => {
 
             describe('when an organisation exists and its externalIds record is defined with a previous value', () => {
                 it('should update the LDAP value in the record using the LDAP type', async () => {
-                    if (existingOrganisation.externalIds) {
-                        existingOrganisation.externalIds.LDAP = faker.string.uuid();
-                    }
+                    existingOrganisation.externalIds = { [OrganisationExternalIdType.LDAP]: faker.string.uuid() };
 
                     organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValue(existingOrganisation);
                     organisationRepositoryMock.save.mockResolvedValue(persistedOrganisation);
