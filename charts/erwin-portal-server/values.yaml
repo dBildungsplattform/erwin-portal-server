@@ -4,7 +4,6 @@ namespaceOverride: ''
 
 backendHostname: ''
 keycloakHostname: 'http://erwin-portal-keycloak'
-keycloak2ndHostname: ""
 keycloakExternalHostname: 'spsh-xxx-keycloak.dev.spsh.dbildungsplattform.de'
 backend2ndHostname: ""
 
@@ -187,15 +186,6 @@ backend:
     stepUpTimeoutInSeconds: 900
     stepUpTimeoutEnabled: 'false'
     maxOldSpaceSize: 3584
-
-# kafka:
-#   url: "erwin-portal-kafka.spsh.svc.cluster.local:9092"
-#   enabled: false
-#   initEnabled: true
-#   initImage:
-#     repository: docker.io/bitnami/kafka
-#     tag: '3.9.0'
-#     pullPolicy: Always
 
 autoscaling:
   enabled: false

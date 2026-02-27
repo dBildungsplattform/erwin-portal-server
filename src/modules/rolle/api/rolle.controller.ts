@@ -64,7 +64,7 @@ import { Organisation } from '../../organisation/domain/organisation.js';
 import { RolleServiceProviderBodyParams } from './rolle-service-provider.body.params.js';
 import { StepUpGuard } from '../../authentication/api/steup-up.guard.js';
 import { ClassLogger } from '../../../core/logging/class-logger.js';
-import { RolleNameIdResponse } from './rolle-name-id.response.js';
+import { RollenMappingRolleResponse } from './rollenmapping-rolle.response.js';
 import { RollenSystemRecht } from '../domain/rolle.enums.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter(), new RolleExceptionFilter(), new AuthenticationExceptionFilter())
@@ -482,13 +482,13 @@ export class RolleController {
     @Get('/by-provider/:serviceProviderId')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ description: 'Get rollen objects by service provider id.' })
-    @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [RolleNameIdResponse] })
+    @ApiOkResponse({ description: 'Returns a list of rollen objects.', type: [RollenMappingRolleResponse] })
     @ApiNotFoundResponse({ description: 'The service provider does not exist.' })
     @ApiUnauthorizedResponse({ description: 'Not authorized to retrieve rollen for service provider.' })
     public async getRollenByServiceProviderId(
         @Param('serviceProviderId') serviceProviderId: string,
         @Permissions() permissions: PersonPermissions,
-    ): Promise<RolleNameIdResponse[]> {
+    ): Promise<RollenMappingRolleResponse[]> {
         if (!(await permissions.hasSystemrechteAtRootOrganisation([RollenSystemRecht.ROLLEN_VERWALTEN]))) {
             throw new ForbiddenException('You do not have the required permissions to read roles.');
         }
@@ -501,6 +501,6 @@ export class RolleController {
             );
         }
 
-        return rollen.map((rolle: Rolle<boolean>) => new RolleNameIdResponse(rolle));
+        return rollen.map((rolle: Rolle<boolean>) => new RollenMappingRolleResponse(rolle));
     }
 }
