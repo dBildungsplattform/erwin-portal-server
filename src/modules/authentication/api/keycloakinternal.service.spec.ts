@@ -132,6 +132,22 @@ describe('KeycloakInternalService', () => {
                     expect(existingOrganisation.zugehoerigZu).toEqual(schuleLdapParams.zugehoerigZu);
                 });
             });
+
+            describe('when an organisation exists and its externalIds record is defined with a previous value', () => {
+                it('should update the LDAP value in the record using the LDAP type', async () => {
+                    if (existingOrganisation.externalIds) {
+                        existingOrganisation.externalIds.LDAP = faker.string.uuid();
+                    }
+
+                    organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValue(existingOrganisation);
+                    organisationRepositoryMock.save.mockResolvedValue(persistedOrganisation);
+
+                    await service.createOrUpdateSchuleOrg(schuleLdapParams);
+
+                    expect(persistedOrganisation.externalIds).toBeDefined();
+                    expect(persistedOrganisation.externalIds?.LDAP).toEqual(schuleLdapParams.ldapOu);
+                });
+            });
         });
 
         describe('findOrCreateSchuleParentOrg', () => {
@@ -621,7 +637,7 @@ describe('KeycloakInternalService', () => {
                     existingKlasseOrg = DoFactory.createOrganisation(true, {
                         id: faker.string.uuid(),
                         name: faker.company.name(),
-                        externalIds: { [OrganisationExternalIdType.LDAP]: faker.string.uuid() },
+                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn },
                         typ: OrganisationsTyp.KLASSE,
                         administriertVon: schuleOrg.id,
                         zugehoerigZu: schuleOrg.id,
@@ -651,6 +667,27 @@ describe('KeycloakInternalService', () => {
                     expect(result).toEqual(persistedKlasseOrg);
                     expect(existingKlasseOrg.name).toEqual(klasseLdapParams.klasseName);
                     expect(existingKlasseOrg.externalIds?.LDAP).toEqual(klasseLdapParams.ldapDn);
+                });
+
+                it('should initialize externalIds record if it is undefined', async () => {
+                    existingKlasseOrg.externalIds = undefined;
+
+                    organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValue(existingKlasseOrg);
+
+                    organisationRepositoryMock.save.mockResolvedValue(persistedKlasseOrg);
+
+                    const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
+
+                    expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                        klasseLdapParams.ldapDn,
+                        OrganisationExternalIdType.LDAP,
+                    );
+                    expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingKlasseOrg);
+                    expect(result).toEqual(persistedKlasseOrg);
+                    expect(persistedKlasseOrg.externalIds).toBeDefined();
+                    expect(persistedKlasseOrg.externalIds).toEqual({
+                        [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn,
+                    });
                 });
             });
         });
