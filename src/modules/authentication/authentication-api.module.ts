@@ -16,7 +16,6 @@ import { RolleModule } from '../rolle/rolle.module.js';
 import { KeycloakAdministrationModule } from '../keycloak-administration/keycloak-administration.module.js';
 import { UserExternaldataWorkflowFactory } from './domain/user-extenaldata.factory.js';
 import { KeycloakInternalController } from './api/keycloakinternal.controller.js';
-import { KeycloakInternalService } from './api/keycloakinternal.service.js';
 
 @Module({
     imports: [
@@ -37,7 +36,6 @@ import { KeycloakInternalService } from './api/keycloakinternal.service.js';
         PersonPermissionsRepo,
         SessionAccessTokenMiddleware,
         UserExternaldataWorkflowFactory,
-        KeycloakInternalService,
     ],
     controllers: [AuthenticationController, KeycloakInternalController],
     exports: [OIDCClientProvider, PersonPermissionsRepo],
