@@ -135,8 +135,8 @@
         {
             "id": 10,
             "name": "Helpdesk kontaktieren",
-            "target": "SELF",
-            "url": "/hilfe",
+            "target": "URL",
+            "url": "https://www.secure-lernnetz.de/helpdesk/",
             "kategorie": "HINWEISE",
             "logoMimeType": "image/svg+xml",
             "logoBase64": "PHN2ZyBpZD0nRWJlbmVfMScgZGF0YS1uYW1lPSdFYmVuZSAxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNSAxNSc+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiMwMDMwNjQ7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5zdXBwb3J0PC90aXRsZT48ZyBpZD0nRWJlbmVfMicgZGF0YS1uYW1lPSdFYmVuZSAyJz48cGF0aCBjbGFzcz0nY2xzLTEnIGQ9J00xMSw5Yy0xLDEtMSwyLTIsMlM3LDEwLDYsOSw0LDcsNCw2LDUsNSw2LDQsNCwwLDMsMCwwLDMsMCwzYzAsMiwyLjA1LDYuMDUsNCw4czYsNCw4LDRjMCwwLDMtMiwzLTNTMTIsOCwxMSw5WicvPjwvZz48L3N2Zz4=",
