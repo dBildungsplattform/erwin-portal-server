@@ -7,42 +7,40 @@ import { UserExeternalDataResponseVidis } from './user-externaldata-vidis.respon
 import { UserExeternalDataResponseOpshPk } from './user-externaldata-opsh-pk.response.js';
 import { RequiredExternalPkData } from '../authentication.controller.js';
 import { Person } from '../../../person/domain/person.js';
+import { IsString } from 'class-validator';
+import { UserExternalPersonDataResponse } from './user-external-persondata.response.js';
+import { UserExternalKlasseDataResponse } from './user-external-klasse-data.response.js';
+import { UserExternalSchuleDataResponse } from './user-external-schule-data.response.js';
 
-export class UserExeternalDataResponse {
-    @ApiProperty({ type: UserExeternalDataResponseOx })
-    public ox: UserExeternalDataResponseOx;
+export class UserExternalDataResponse {
+    @ApiProperty()
+    @IsString()
+    public sub!: string;
 
-    @ApiProperty({ type: UserExeternalDataResponseItslearning })
-    public itslearning: UserExeternalDataResponseItslearning;
+    @ApiProperty({ type: UserExternalPersonDataResponse })
+    public personData!: UserExternalPersonDataResponse;
 
-    @ApiProperty({ type: UserExeternalDataResponseVidis })
-    public vidis: UserExeternalDataResponseVidis;
+    @ApiProperty({ type: UserExternalSchuleDataResponse })
+    public schuleData!: UserExternalSchuleDataResponse;
 
-    @ApiProperty({ type: UserExeternalDataResponseOpsh })
-    public opsh: UserExeternalDataResponseOpsh;
-
-    @ApiProperty({ type: UserExeternalDataResponseOnlineDateiablage })
-    public onlineDateiablage: UserExeternalDataResponseOnlineDateiablage;
+    @ApiProperty({ type: UserExternalKlasseDataResponse })
+    public klasseData!: UserExternalKlasseDataResponse;
 
     private constructor(
-        ox: UserExeternalDataResponseOx,
-        itslearning: UserExeternalDataResponseItslearning,
-        vidis: UserExeternalDataResponseVidis,
-        opsh: UserExeternalDataResponseOpsh,
-        onlineDateiablage: UserExeternalDataResponseOnlineDateiablage,
+        personData: UserExternalPersonDataResponse,
+        schuleData: UserExternalSchuleDataResponse,
+        klasseData: UserExternalKlasseDataResponse,
     ) {
-        this.ox = ox;
-        this.itslearning = itslearning;
-        this.vidis = vidis;
-        this.opsh = opsh;
-        this.onlineDateiablage = onlineDateiablage;
+        this.personData = personData;
+        this.schuleData = schuleData;
+        this.klasseData = klasseData;
     }
 
     public static createNew(
         person: Person<true>,
         externalPkData: RequiredExternalPkData[],
         contextID: string,
-    ): UserExeternalDataResponse {
+    ): UserExternalDataResponse {
         const ox: UserExeternalDataResponseOx = new UserExeternalDataResponseOx(person.referrer!, contextID);
         const itslearning: UserExeternalDataResponseItslearning = new UserExeternalDataResponseItslearning(person.id);
         const vidis: UserExeternalDataResponseVidis = new UserExeternalDataResponseVidis(
@@ -59,6 +57,6 @@ export class UserExeternalDataResponse {
         const onlineDateiablage: UserExeternalDataResponseOnlineDateiablage =
             new UserExeternalDataResponseOnlineDateiablage(person.id);
 
-        return new UserExeternalDataResponse(ox, itslearning, vidis, opsh, onlineDateiablage);
+        return new UserExternalDataResponse(ox, itslearning, vidis, opsh, onlineDateiablage);
     }
 }

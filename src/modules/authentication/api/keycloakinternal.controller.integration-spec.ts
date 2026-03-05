@@ -21,7 +21,7 @@ import { PersonenKontextModule } from '../../personenkontext/personenkontext.mod
 import { RollenArt } from '../../rolle/domain/rolle.enums.js';
 import { ServiceProviderModule } from '../../service-provider/service-provider.module.js';
 import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
-import { UserExeternalDataResponse } from './externaldata/user-externaldata.response.js';
+import { UserExternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { KeycloakInternalController } from './keycloakinternal.controller.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 
@@ -109,10 +109,10 @@ describe('KeycloakInternalController', () => {
             personRepoMock.findById.mockResolvedValueOnce(person);
             dbiamPersonenkontextRepoMock.findExternalPkData.mockResolvedValueOnce(pkExternalData);
 
-            const result: UserExeternalDataResponse = await keycloakinternalController.getExternalData({
+            const result: UserExternalDataResponse = await keycloakinternalController.getExternalData({
                 sub: keycloakSub,
             });
-            expect(result).toBeInstanceOf(UserExeternalDataResponse);
+            expect(result).toBeInstanceOf(UserExternalDataResponse);
             expect(result.ox.id).toContain(`${person.referrer}@`);
             expect(result.itslearning.personId).toEqual(person.id);
             expect(result.vidis.dienststellenNummern.length).toEqual(2);
