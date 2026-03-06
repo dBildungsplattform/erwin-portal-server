@@ -16,6 +16,7 @@ import { Personenkontext } from '../personenkontext/domain/personenkontext.js';
 import { SchuleLdapImportBodyParams } from './ldap/schule-ldap-import.body.params.js';
 import { PersonLdapImportDataBody } from './ldap/person-ldap-import.body.params.js';
 import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
+import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 import { OrganisationExternalIdType, OrganisationsTyp } from '../organisation/domain/organisation.enums.js';
 import { DomainError } from '../../shared/error/index.js';
 import { ErwinLdapMappedRollenArt } from '../rollenmapping/domain/lms-rollenarten.enums.js';
@@ -42,7 +43,7 @@ describe('KeycloakProvisioningService', () => {
         }
     }
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 KeycloakProvisioningService,
@@ -69,11 +70,169 @@ describe('KeycloakProvisioningService', () => {
         rolleRepoMock = module.get(RolleRepo);
     });
 
-    afterEach(() => {
-        jest.resetAllMocks();
-    });
-
     describe('Service Methods', () => {
+        describe('importLdapUser', () => {
+            let ldapUserDataParams: LdapUserDataBodyParams;
+            let schuleOrg: Organisation<true>;
+            let parentOrg: Organisation<true>;
+            let klasseOrg: Organisation<true>;
+            let person: Person<true>;
+            let rolle: Rolle<true>;
+            let personenkontext: Personenkontext<true>;
+
+            beforeEach(() => {
+                schuleOrg = DoFactory.createOrganisation(true, {
+                    id: faker.string.uuid(),
+                    name: faker.company.name(),
+                    typ: OrganisationsTyp.SCHULE,
+                    externalIds: { LDAP: faker.string.uuid() },
+                });
+
+                parentOrg = DoFactory.createOrganisation(true, {
+                    id: faker.string.uuid(),
+                    name: `${schuleOrg.externalIds?.LDAP} Parent Org`,
+                    typ: OrganisationsTyp.LAND,
+                });
+
+                klasseOrg = DoFactory.createOrganisation(true, {
+                    id: faker.string.uuid(),
+                    name: faker.lorem.word(),
+                    typ: OrganisationsTyp.KLASSE,
+                });
+
+                person = DoFactory.createPerson(true, {
+                    id: faker.string.uuid(),
+                    familienname: faker.person.lastName(),
+                    vorname: faker.person.firstName(),
+                    keycloakUserId: faker.string.uuid(),
+                });
+
+                rolle = DoFactory.createRolle(true, {
+                    id: faker.string.uuid(),
+                    name: parentOrg.name,
+                    administeredBySchulstrukturknoten: parentOrg.id,
+                    rollenart: RollenArt.LEHR,
+                });
+
+                personenkontext = DoFactory.createPersonenkontext(true, {
+                    personId: person.id,
+                    organisationId: schuleOrg.id,
+                    rolleId: rolle.id,
+                });
+
+                ldapUserDataParams = {
+                    schuleParams: {
+                        name: schuleOrg.name,
+                        externalId: schuleOrg.externalIds?.LDAP as string,
+                        zugehoerigZu: faker.string.uuid(),
+                    } as SchuleLdapImportBodyParams,
+                    klasseParams: {
+                        name: klasseOrg.name,
+                        externalId: faker.string.uuid(),
+                    } as KlasseLdapImportBodyParams,
+                    personParams: {
+                        keycloakUserId: person.keycloakUserId as string,
+                        vorname: person.vorname,
+                        nachname: person.familienname,
+                        externalId: faker.string.uuid(),
+                        email: faker.internet.email(),
+                        geburtstag: faker.date.birthdate(),
+                    } as PersonLdapImportDataBody,
+                    role: ErwinLdapMappedRollenArt.LEHR,
+                } as LdapUserDataBodyParams;
+            });
+
+            it('should successfully import a user with all related entities', async () => {
+                // Schule
+                organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(null);
+                organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
+                organisationRepositoryMock.createExternalIdOrganisationMapping.mockResolvedValueOnce(undefined);
+
+                // Parent Org
+                organisationRepositoryMock.findBy.mockResolvedValueOnce([[], 0] as Counted<Organisation<true>>);
+                organisationRepositoryMock.save.mockResolvedValueOnce(parentOrg);
+                organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
+
+                // Person
+                personRepositoryMock.findByKeycloakUserId.mockResolvedValueOnce(undefined);
+                personFactoryMock.createNew.mockResolvedValueOnce(DoFactory.createPerson(false));
+                personRepositoryMock.create.mockResolvedValueOnce(person);
+
+                // Rolle
+                rolleRepoMock.findByName.mockResolvedValueOnce(undefined);
+                rolleFactoryMock.createNew.mockReturnValueOnce(DoFactory.createRolle(false));
+                rolleRepoMock.save.mockResolvedValueOnce(rolle);
+
+                // Personenkontext for Schule
+                personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
+                personenkontextFactoryMock.createNew.mockReturnValueOnce(DoFactory.createPersonenkontext(false));
+                personenkontextRepoMock.save.mockResolvedValueOnce(personenkontext);
+
+                // Klasse
+                organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(null);
+                organisationRepositoryMock.save.mockResolvedValueOnce(klasseOrg);
+                organisationRepositoryMock.createExternalIdOrganisationMapping.mockResolvedValueOnce(undefined);
+
+                // Personenkontext for Klasse
+                personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
+                personenkontextFactoryMock.createNew.mockReturnValueOnce(DoFactory.createPersonenkontext(false));
+                personenkontextRepoMock.save.mockResolvedValueOnce(personenkontext);
+
+                await expect(service.importLdapUser(ldapUserDataParams)).resolves.toBeUndefined();
+
+                expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledTimes(2);
+                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
+                    ldapUserDataParams.personParams.keycloakUserId,
+                );
+                expect(rolleRepoMock.findByName).toHaveBeenCalled();
+                expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledTimes(2);
+            });
+
+            it('should import an existing user and update all related entities', async () => {
+                // Schule exists
+                organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(schuleOrg);
+                organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
+
+                // Parent Org exists
+                organisationRepositoryMock.findBy.mockResolvedValueOnce([[parentOrg], 1] as Counted<
+                    Organisation<true>
+                >);
+                organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
+
+                // Person exists
+                personRepositoryMock.findByKeycloakUserId.mockResolvedValueOnce(person);
+                personRepositoryMock.update.mockResolvedValueOnce(person);
+
+                // Rolle exists
+                rolleRepoMock.findByName.mockResolvedValueOnce([rolle]);
+
+                // Personenkontext for Schule exists
+                personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([personenkontext]);
+
+                // Klasse exists
+                organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(klasseOrg);
+                organisationRepositoryMock.save.mockResolvedValueOnce(klasseOrg);
+
+                // Personenkontext for Klasse exists
+                const klassePersonenkontext: Personenkontext<true> = DoFactory.createPersonenkontext(true, {
+                    personId: person.id,
+                    organisationId: klasseOrg.id,
+                    rolleId: rolle.id,
+                });
+                personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([
+                    klassePersonenkontext,
+                ]);
+
+                await expect(service.importLdapUser(ldapUserDataParams)).resolves.toBeUndefined();
+
+                expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledTimes(2);
+                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
+                    ldapUserDataParams.personParams.keycloakUserId,
+                );
+                expect(personRepositoryMock.update).toHaveBeenCalled();
+            });
+        });
+
         describe('createOrUpdateSchuleOrg', () => {
             let schuleLdapParams: SchuleLdapImportBodyParams;
             let existingOrganisation: Organisation<true>;
@@ -81,8 +240,8 @@ describe('KeycloakProvisioningService', () => {
 
             beforeEach(() => {
                 schuleLdapParams = {
-                    schuleName: faker.company.name(),
-                    ldapOu: faker.string.uuid(),
+                    name: faker.company.name(),
+                    externalId: faker.string.uuid(),
                     zugehoerigZu: faker.string.uuid(),
                 };
 
@@ -92,8 +251,8 @@ describe('KeycloakProvisioningService', () => {
                 });
 
                 persistedOrganisation = DoFactory.createOrganisation(true, {
-                    name: schuleLdapParams.schuleName,
-                    externalIds: { [OrganisationExternalIdType.LDAP]: schuleLdapParams.ldapOu },
+                    name: schuleLdapParams.name,
+                    externalIds: { [OrganisationExternalIdType.LDAP]: schuleLdapParams.externalId },
                 });
             });
 
@@ -105,12 +264,12 @@ describe('KeycloakProvisioningService', () => {
                     const result: Organisation<true> = await service.createOrUpdateSchuleOrg(schuleLdapParams);
 
                     expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
-                        schuleLdapParams.ldapOu,
+                        schuleLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                     );
                     expect(organisationRepositoryMock.save).toHaveBeenCalled();
                     expect(organisationRepositoryMock.createExternalIdOrganisationMapping).toHaveBeenCalledWith(
-                        schuleLdapParams.ldapOu,
+                        schuleLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                         persistedOrganisation,
                     );
@@ -126,13 +285,13 @@ describe('KeycloakProvisioningService', () => {
                     const result: Organisation<true> = await service.createOrUpdateSchuleOrg(schuleLdapParams);
 
                     expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
-                        schuleLdapParams.ldapOu,
+                        schuleLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                     );
                     expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingOrganisation);
                     expect(result).toEqual(persistedOrganisation);
-                    expect(existingOrganisation.name).toEqual(schuleLdapParams.schuleName);
-                    expect(existingOrganisation.externalIds?.LDAP).toEqual(schuleLdapParams.ldapOu);
+                    expect(existingOrganisation.name).toEqual(schuleLdapParams.name);
+                    expect(existingOrganisation.externalIds?.LDAP).toEqual(schuleLdapParams.externalId);
                     expect(existingOrganisation.zugehoerigZu).toEqual(schuleLdapParams.zugehoerigZu);
                 });
             });
@@ -147,7 +306,29 @@ describe('KeycloakProvisioningService', () => {
                     await service.createOrUpdateSchuleOrg(schuleLdapParams);
 
                     expect(persistedOrganisation.externalIds).toBeDefined();
-                    expect(persistedOrganisation.externalIds?.LDAP).toEqual(schuleLdapParams.ldapOu);
+                    expect(persistedOrganisation.externalIds?.LDAP).toEqual(schuleLdapParams.externalId);
+                });
+            });
+
+            describe('when an organisation exists and its externalIds record is undefined', () => {
+                it('should initialize the externalIds record with the LDAP value', async () => {
+                    const orgWithUndefinedExternalIds: Organisation<true> = DoFactory.createOrganisation(true, {
+                        name: faker.company.name(),
+                        zugehoerigZu: faker.string.uuid(),
+                        externalIds: undefined,
+                    });
+
+                    organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValue(
+                        orgWithUndefinedExternalIds,
+                    );
+                    organisationRepositoryMock.save.mockResolvedValue(persistedOrganisation);
+
+                    await service.createOrUpdateSchuleOrg(schuleLdapParams);
+
+                    expect(orgWithUndefinedExternalIds.externalIds).toBeDefined();
+                    expect(orgWithUndefinedExternalIds.externalIds).toEqual({
+                        [OrganisationExternalIdType.LDAP]: schuleLdapParams.externalId,
+                    });
                 });
             });
         });
@@ -245,9 +426,9 @@ describe('KeycloakProvisioningService', () => {
             beforeEach(() => {
                 personLdapParams = {
                     keycloakUserId: faker.string.uuid(),
-                    lastName: faker.person.lastName(),
-                    firstName: faker.person.firstName(),
-                    ldapDn: faker.string.uuid(),
+                    nachname: faker.person.lastName(),
+                    vorname: faker.person.firstName(),
+                    externalId: faker.string.uuid(),
                     email: faker.internet.email(),
                     geburtstag: faker.date.birthdate(),
                 };
@@ -264,15 +445,15 @@ describe('KeycloakProvisioningService', () => {
                 updatedPerson = existingPerson;
 
                 newPerson = DoFactory.createPerson(false, {
-                    familienname: personLdapParams.lastName,
-                    vorname: personLdapParams.firstName,
-                    externalIds: { LDAP: personLdapParams.ldapDn },
+                    familienname: personLdapParams.nachname,
+                    vorname: personLdapParams.vorname,
+                    externalIds: { LDAP: personLdapParams.externalId },
                 });
 
                 persistedPerson = DoFactory.createPerson(true, {
-                    familienname: personLdapParams.lastName,
-                    vorname: personLdapParams.firstName,
-                    externalIds: { LDAP: personLdapParams.ldapDn },
+                    familienname: personLdapParams.nachname,
+                    vorname: personLdapParams.vorname,
+                    externalIds: { LDAP: personLdapParams.externalId },
                     keycloakUserId: personLdapParams.keycloakUserId,
                     email: personLdapParams.email,
                     geburtsdatum: personLdapParams.geburtstag,
@@ -291,9 +472,9 @@ describe('KeycloakProvisioningService', () => {
                     );
                     expect(personRepositoryMock.update).toHaveBeenCalledWith(existingPerson);
                     expect(result).toBe(existingPerson);
-                    expect(existingPerson.familienname).toBe(personLdapParams.lastName);
-                    expect(existingPerson.vorname).toBe(personLdapParams.firstName);
-                    expect(existingPerson.externalIds.LDAP).toBe(personLdapParams.ldapDn);
+                    expect(existingPerson.familienname).toBe(personLdapParams.nachname);
+                    expect(existingPerson.vorname).toBe(personLdapParams.vorname);
+                    expect(existingPerson.externalIds.LDAP).toBe(personLdapParams.externalId);
                     expect(existingPerson.email).toBe(personLdapParams.email);
                     expect(existingPerson.geburtsdatum).toBe(personLdapParams.geburtstag);
                 });
@@ -311,9 +492,9 @@ describe('KeycloakProvisioningService', () => {
                         personLdapParams.keycloakUserId,
                     );
                     expect(personFactoryMock.createNew).toHaveBeenCalledWith({
-                        familienname: personLdapParams.lastName,
-                        vorname: personLdapParams.firstName,
-                        externalIds: { LDAP: personLdapParams.ldapDn },
+                        familienname: personLdapParams.nachname,
+                        vorname: personLdapParams.vorname,
+                        externalIds: { LDAP: personLdapParams.externalId },
                     });
                     expect(personRepositoryMock.create).toHaveBeenCalledWith(newPerson);
                     expect(result).toBe(persistedPerson);
@@ -461,6 +642,31 @@ describe('KeycloakProvisioningService', () => {
                         expect(rolleRepoMock.save).toHaveBeenCalledWith(newRolle);
                     });
                 });
+
+                describe('role mapping', () => {
+                    it.each([
+                        [ErwinLdapMappedRollenArt.LERN, RollenArt.LERN],
+                        [ErwinLdapMappedRollenArt.LEHR, RollenArt.LEHR],
+                        [ErwinLdapMappedRollenArt.LEIT, RollenArt.LEIT],
+                    ])('should map %s to %s correctly', async (ldapRole, expectedRollenArt) => {
+                        rolleRepoMock.findByName.mockResolvedValue(undefined);
+                        rolleFactoryMock.createNew.mockReturnValue(newRolle);
+                        rolleRepoMock.save.mockResolvedValue(persistedRolle);
+
+                        await service.findOrCreateRolle(parentOrg, ldapRole);
+
+                        expect(rolleFactoryMock.createNew).toHaveBeenCalledWith(
+                            parentOrg.name,
+                            parentOrg.id,
+                            expectedRollenArt,
+                            [],
+                            [],
+                            [],
+                            [],
+                            false,
+                        );
+                    });
+                });
             });
         });
 
@@ -572,6 +778,40 @@ describe('KeycloakProvisioningService', () => {
                         'more than one personenkontext exists for this person with the same organisation and role',
                     );
                 });
+
+                describe('when no personenkontext matches organisation and rolle', () => {
+                    it('should create and persist a new personenkontext', async () => {
+                        const unrelatedPersonenkontexte: Personenkontext<true>[] = [
+                            DoFactory.createPersonenkontext(true, {
+                                personId: person.id,
+                                organisationId: faker.string.uuid(),
+                                rolleId: faker.string.uuid(),
+                            }),
+                        ];
+                        personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValue(
+                            unrelatedPersonenkontexte,
+                        );
+                        personenkontextFactoryMock.createNew.mockReturnValue(newPersonenkontext);
+                        personenkontextRepoMock.save.mockResolvedValue(persistedPersonenkontext);
+
+                        const result: Personenkontext<true> = await service.createOrUpdatePersonenkontextForSchule(
+                            schuleOrg,
+                            rolle,
+                            person,
+                        );
+
+                        expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledWith(
+                            person.id,
+                        );
+                        expect(personenkontextFactoryMock.createNew).toHaveBeenCalledWith(
+                            person.id,
+                            schuleOrg.id,
+                            rolle.id,
+                        );
+                        expect(personenkontextRepoMock.save).toHaveBeenCalledWith(newPersonenkontext);
+                        expect(result).toEqual(persistedPersonenkontext);
+                    });
+                });
             });
         });
 
@@ -582,8 +822,8 @@ describe('KeycloakProvisioningService', () => {
             describe('when klasse organisation does not exist', () => {
                 beforeEach(() => {
                     klasseLdapParams = {
-                        klasseName: faker.company.name(),
-                        ldapDn: faker.string.uuid(),
+                        name: faker.company.name(),
+                        externalId: faker.string.uuid(),
                     };
 
                     schuleOrg = DoFactory.createOrganisation(true, {
@@ -593,8 +833,8 @@ describe('KeycloakProvisioningService', () => {
                     });
 
                     persistedKlasseOrg = DoFactory.createOrganisation(true, {
-                        name: klasseLdapParams.klasseName,
-                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn },
+                        name: klasseLdapParams.name,
+                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId },
                         typ: OrganisationsTyp.KLASSE,
                         administriertVon: schuleOrg.id,
                         zugehoerigZu: schuleOrg.id,
@@ -608,12 +848,12 @@ describe('KeycloakProvisioningService', () => {
                     const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                     expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
-                        klasseLdapParams.ldapDn,
+                        klasseLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                     );
                     expect(organisationRepositoryMock.save).toHaveBeenCalled();
                     expect(organisationRepositoryMock.createExternalIdOrganisationMapping).toHaveBeenCalledWith(
-                        klasseLdapParams.ldapDn,
+                        klasseLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                         persistedKlasseOrg,
                     );
@@ -626,8 +866,8 @@ describe('KeycloakProvisioningService', () => {
 
                 beforeEach(() => {
                     klasseLdapParams = {
-                        klasseName: faker.company.name(),
-                        ldapDn: faker.string.uuid(),
+                        name: faker.company.name(),
+                        externalId: faker.string.uuid(),
                     } as KlasseLdapImportBodyParams;
 
                     schuleOrg = DoFactory.createOrganisation(true, {
@@ -639,7 +879,7 @@ describe('KeycloakProvisioningService', () => {
                     existingKlasseOrg = DoFactory.createOrganisation(true, {
                         id: faker.string.uuid(),
                         name: faker.company.name(),
-                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn },
+                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId },
                         typ: OrganisationsTyp.KLASSE,
                         administriertVon: schuleOrg.id,
                         zugehoerigZu: schuleOrg.id,
@@ -647,8 +887,8 @@ describe('KeycloakProvisioningService', () => {
 
                     persistedKlasseOrg = DoFactory.createOrganisation(true, {
                         id: existingKlasseOrg.id,
-                        name: klasseLdapParams.klasseName,
-                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn },
+                        name: klasseLdapParams.name,
+                        externalIds: { [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId },
                         typ: OrganisationsTyp.KLASSE,
                         administriertVon: schuleOrg.id,
                         zugehoerigZu: schuleOrg.id,
@@ -662,13 +902,13 @@ describe('KeycloakProvisioningService', () => {
                     const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                     expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
-                        klasseLdapParams.ldapDn,
+                        klasseLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                     );
                     expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingKlasseOrg);
                     expect(result).toEqual(persistedKlasseOrg);
-                    expect(existingKlasseOrg.name).toEqual(klasseLdapParams.klasseName);
-                    expect(existingKlasseOrg.externalIds?.LDAP).toEqual(klasseLdapParams.ldapDn);
+                    expect(existingKlasseOrg.name).toEqual(klasseLdapParams.name);
+                    expect(existingKlasseOrg.externalIds?.LDAP).toEqual(klasseLdapParams.externalId);
                 });
 
                 it('should initialize externalIds record if it is undefined', async () => {
@@ -681,14 +921,14 @@ describe('KeycloakProvisioningService', () => {
                     const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                     expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
-                        klasseLdapParams.ldapDn,
+                        klasseLdapParams.externalId,
                         OrganisationExternalIdType.LDAP,
                     );
                     expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingKlasseOrg);
                     expect(result).toEqual(persistedKlasseOrg);
                     expect(persistedKlasseOrg.externalIds).toBeDefined();
                     expect(persistedKlasseOrg.externalIds).toEqual({
-                        [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn,
+                        [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId,
                     });
                 });
             });

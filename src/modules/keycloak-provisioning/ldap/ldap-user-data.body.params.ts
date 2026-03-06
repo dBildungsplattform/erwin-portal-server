@@ -24,7 +24,7 @@ export class LdapUserDataBodyParams {
 
     @ApiProperty()
     @IsString()
-    public rolle!: ErwinLdapMappedRollenArt;
+    public role!: ErwinLdapMappedRollenArt;
 
     public constructor(params: Readonly<LdapUserDataBodyParams>) {
         Object.assign(this, params);

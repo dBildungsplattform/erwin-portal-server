@@ -4,7 +4,7 @@ import { IsString } from 'class-validator';
 export class SchuleLdapImportBodyParams {
     @ApiProperty()
     @IsString()
-    public schuleName!: string;
+    public name!: string;
 
     @ApiProperty()
     @IsString()
@@ -12,5 +12,5 @@ export class SchuleLdapImportBodyParams {
 
     @ApiProperty()
     @IsString()
-    public ldapOu!: string; // externalId in Organisation
+    public externalId!: string; // ldapOu
 }

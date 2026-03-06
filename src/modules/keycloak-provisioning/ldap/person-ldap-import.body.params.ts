@@ -8,15 +8,15 @@ export class PersonLdapImportDataBody {
 
     @ApiProperty()
     @IsString()
-    public firstName!: string;
+    public vorname!: string;
 
     @ApiProperty()
     @IsString()
-    public lastName!: string;
+    public nachname!: string;
 
     @ApiProperty()
     @IsString()
-    public ldapDn!: string; //externalId in Person
+    public externalId!: string; //ldapDn
 
     @ApiProperty()
     @IsString()

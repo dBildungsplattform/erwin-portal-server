@@ -2,11 +2,10 @@ import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { MikroORM } from '@mikro-orm/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigTestModule, DatabaseTestModule, DoFactory, MapperTestModule } from '../../../test/utils/index.js';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { ConfigTestModule, DatabaseTestModule, MapperTestModule } from '../../../test/utils/index.js';
 import { LoggingTestModule } from '../../../test/utils/logging-test.module.js';
-import { Organisation } from '../organisation/domain/organisation.js';
-import { Person } from '../person/domain/person.js';
-import { Rolle } from '../rolle/domain/rolle.js';
 import { ErwinLdapMappedRollenArt } from '../rollenmapping/domain/lms-rollenarten.enums.js';
 import { KeycloakProvisioningController } from './keycloak-provisioning.controller.js';
 import { KeycloakProvisioningService } from './keycloak-provisioning.service.js';
@@ -58,66 +57,130 @@ describe('KeycloakProvisioningController', () => {
 
     describe('onNewLdapUser', () => {
         let params: LdapUserDataBodyParams;
-        let schuleOrg: Organisation<true>;
-        let parentOrg: Organisation<true>;
-        let person: Person<true>;
-        let rolle: Rolle<true>;
-        let klasse: Organisation<true>;
 
         beforeEach(() => {
             params = new LdapUserDataBodyParams({
                 schuleParams: {
-                    schuleName: faker.company.name(),
+                    name: faker.company.name(),
                     zugehoerigZu: faker.string.uuid(),
-                    ldapOu: faker.string.uuid(),
+                    externalId: faker.string.uuid(),
                 } as SchuleLdapImportBodyParams,
                 klasseParams: {
-                    klasseName: faker.lorem.word(),
-                    ldapDn: faker.string.uuid(),
+                    name: faker.lorem.word(),
+                    externalId: faker.string.uuid(),
                 } as KlasseLdapImportBodyParams,
                 personParams: {
                     keycloakUserId: faker.string.uuid(),
-                    firstName: faker.person.firstName(),
-                    lastName: faker.person.lastName(),
-                    ldapDn: faker.string.uuid(),
+                    vorname: faker.person.firstName(),
+                    nachname: faker.person.lastName(),
+                    externalId: faker.string.uuid(),
                     email: faker.internet.email(),
                     geburtstag: faker.date.birthdate(),
                 } as PersonLdapImportDataBody,
-                rolle: ErwinLdapMappedRollenArt.LEHR,
+                role: ErwinLdapMappedRollenArt.LEHR,
             });
 
-            schuleOrg = DoFactory.createOrganisation(true);
-            parentOrg = DoFactory.createOrganisation(true);
-            person = DoFactory.createPerson(true);
-            rolle = DoFactory.createRolle(true);
-            klasse = DoFactory.createOrganisation(true);
-
-            serviceMock.createOrUpdateSchuleOrg.mockResolvedValue(schuleOrg);
-            serviceMock.findOrCreateSchuleParentOrg.mockResolvedValue(parentOrg);
-            serviceMock.createOrUpdatePerson.mockResolvedValue(person);
-            serviceMock.findOrCreateRolle.mockResolvedValue(rolle);
-            serviceMock.createOrUpdatePersonenkontextForSchule.mockResolvedValue(DoFactory.createPersonenkontext(true));
-            serviceMock.createOrUpdateKlasse.mockResolvedValue(klasse);
-            serviceMock.createPersonenkontextForKlasseIfNotExists.mockResolvedValue(
-                DoFactory.createPersonenkontext(true),
-            );
+            serviceMock.importLdapUser.mockResolvedValue(undefined);
         });
 
-        it('should call service methods in correct order', async () => {
+        it('should call importLdapUser with correct params', async () => {
             await keycloakProvisioningController.onNewLdapUser(params);
 
-            expect(serviceMock.createOrUpdateSchuleOrg).toHaveBeenCalledWith(params.schuleParams);
-            expect(serviceMock.findOrCreateSchuleParentOrg).toHaveBeenCalledWith(schuleOrg);
-            expect(serviceMock.createOrUpdatePerson).toHaveBeenCalledWith(params.personParams);
-            expect(serviceMock.findOrCreateRolle).toHaveBeenCalledWith(parentOrg, params.rolle);
-            expect(serviceMock.createOrUpdatePersonenkontextForSchule).toHaveBeenCalledWith(schuleOrg, rolle, person);
-            expect(serviceMock.createOrUpdateKlasse).toHaveBeenCalledWith(params.klasseParams, schuleOrg);
-            expect(serviceMock.createPersonenkontextForKlasseIfNotExists).toHaveBeenCalledWith(klasse, rolle, person);
+            expect(serviceMock.importLdapUser).toHaveBeenCalledWith(params);
         });
 
-        it('should throw if any service method fails', async () => {
-            serviceMock.createOrUpdateSchuleOrg.mockRejectedValueOnce(new Error('fail'));
+        it('should throw if importLdapUser fails', async () => {
+            serviceMock.importLdapUser.mockRejectedValueOnce(new Error('fail'));
             await expect(keycloakProvisioningController.onNewLdapUser(params)).rejects.toThrow('fail');
+        });
+    });
+
+    describe('LdapUserDataBodyParams DTO', () => {
+        it('should create an instance via constructor', () => {
+            const params: LdapUserDataBodyParams = new LdapUserDataBodyParams({
+                schuleParams: {
+                    name: faker.company.name(),
+                    zugehoerigZu: faker.string.uuid(),
+                    externalId: faker.string.uuid(),
+                } as SchuleLdapImportBodyParams,
+                klasseParams: {
+                    name: faker.lorem.word(),
+                    externalId: faker.string.uuid(),
+                } as KlasseLdapImportBodyParams,
+                personParams: {
+                    keycloakUserId: faker.string.uuid(),
+                    vorname: faker.person.firstName(),
+                    nachname: faker.person.lastName(),
+                    externalId: faker.string.uuid(),
+                    email: faker.internet.email(),
+                    geburtstag: faker.date.birthdate(),
+                } as PersonLdapImportDataBody,
+                role: ErwinLdapMappedRollenArt.LERN,
+            });
+
+            expect(params).toBeInstanceOf(LdapUserDataBodyParams);
+            expect(params.schuleParams).toBeDefined();
+            expect(params.klasseParams).toBeDefined();
+            expect(params.personParams).toBeDefined();
+            expect(params.role).toBe(ErwinLdapMappedRollenArt.LERN);
+        });
+
+        it('should transform plain object to class instance with nested types', () => {
+            const plainObject: object = {
+                schuleParams: {
+                    name: faker.company.name(),
+                    zugehoerigZu: faker.string.uuid(),
+                    externalId: faker.string.uuid(),
+                },
+                klasseParams: {
+                    name: faker.lorem.word(),
+                    externalId: faker.string.uuid(),
+                },
+                personParams: {
+                    keycloakUserId: faker.string.uuid(),
+                    vorname: faker.person.firstName(),
+                    nachname: faker.person.lastName(),
+                    externalId: faker.string.uuid(),
+                    email: faker.internet.email(),
+                    geburtstag: faker.date.birthdate(),
+                },
+                role: ErwinLdapMappedRollenArt.LEHR,
+            };
+
+            const instance: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, plainObject);
+
+            expect(instance).toBeInstanceOf(LdapUserDataBodyParams);
+            expect(instance.schuleParams).toBeInstanceOf(SchuleLdapImportBodyParams);
+            expect(instance.klasseParams).toBeInstanceOf(KlasseLdapImportBodyParams);
+            expect(instance.personParams).toBeInstanceOf(PersonLdapImportDataBody);
+        });
+
+        it('should validate a valid LdapUserDataBodyParams instance', async () => {
+            const plainObject: object = {
+                schuleParams: {
+                    name: faker.company.name(),
+                    zugehoerigZu: faker.string.uuid(),
+                    externalId: faker.string.uuid(),
+                },
+                klasseParams: {
+                    name: faker.lorem.word(),
+                    externalId: faker.string.uuid(),
+                },
+                personParams: {
+                    keycloakUserId: faker.string.uuid(),
+                    vorname: faker.person.firstName(),
+                    nachname: faker.person.lastName(),
+                    externalId: faker.string.uuid(),
+                    email: faker.internet.email(),
+                    geburtstag: faker.date.birthdate(),
+                },
+                role: ErwinLdapMappedRollenArt.LEIT,
+            };
+
+            const instance: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, plainObject);
+            const errors: object[] = await validate(instance);
+
+            expect(errors.length).toBe(0);
         });
     });
 });

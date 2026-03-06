@@ -21,6 +21,7 @@ import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.param
 import { PersonLdapImportDataBody } from './ldap/person-ldap-import.body.params.js';
 import { SchuleLdapImportBodyParams } from './ldap/schule-ldap-import.body.params.js';
 import { Rolle } from '../rolle/domain/rolle.js';
+import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 
 @Injectable()
 export class KeycloakProvisioningService {
@@ -36,16 +37,29 @@ export class KeycloakProvisioningService {
         private readonly rolleRepo: RolleRepo,
     ) {}
 
+    public async importLdapUser(params: LdapUserDataBodyParams): Promise<void> {
+        const schuleOrg: Organisation<true> = await this.createOrUpdateSchuleOrg(params.schuleParams);
+        const parentOrg: Organisation<true> = await this.findOrCreateSchuleParentOrg(schuleOrg);
+        const person: Person<true> = await this.createOrUpdatePerson(params.personParams);
+        const newRolle: Rolle<true> = await this.findOrCreateRolle(parentOrg, params.role);
+
+        await this.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
+
+        const klasse: Organisation<true> = await this.createOrUpdateKlasse(params.klasseParams, schuleOrg);
+
+        await this.createPersonenkontextForKlasseIfNotExists(klasse, newRolle, person);
+    }
+
     public async createOrUpdateSchuleOrg(schuleLdapParams: SchuleLdapImportBodyParams): Promise<Organisation<true>> {
         this.logger.info('Schule Creation/Update Phase started');
 
         let persistedOrg: Organisation<true>;
         const externalIds: Partial<Record<OrganisationExternalIdType, string>> = {
-            [OrganisationExternalIdType.LDAP]: schuleLdapParams.ldapOu,
+            [OrganisationExternalIdType.LDAP]: schuleLdapParams.externalId,
         };
 
         const organisation: Organisation<true> | null = await this.organisationRepository.findOrganisationByExternalId(
-            schuleLdapParams.ldapOu,
+            schuleLdapParams.externalId,
             OrganisationExternalIdType.LDAP,
         );
 
@@ -53,7 +67,7 @@ export class KeycloakProvisioningService {
             this.logger.info('Schule does not exist, creating new schule organistation');
 
             const newOrg: Organisation<false> = this.createOrganisation(
-                schuleLdapParams.schuleName,
+                schuleLdapParams.name,
                 undefined,
                 undefined,
                 OrganisationsTyp.SCHULE,
@@ -62,7 +76,7 @@ export class KeycloakProvisioningService {
 
             persistedOrg = await this.organisationRepository.save(newOrg);
             await this.organisationRepository.createExternalIdOrganisationMapping(
-                schuleLdapParams.ldapOu,
+                schuleLdapParams.externalId,
                 OrganisationExternalIdType.LDAP,
                 persistedOrg,
             );
@@ -136,9 +150,9 @@ export class KeycloakProvisioningService {
             this.logger.info('Person does not exists, creating new person');
 
             const creationParams: PersonCreationParams = {
-                familienname: personLdapParams.lastName,
-                vorname: personLdapParams.firstName,
-                externalIds: { [PersonExternalIdType.LDAP]: personLdapParams.ldapDn },
+                familienname: personLdapParams.nachname,
+                vorname: personLdapParams.vorname,
+                externalIds: { [PersonExternalIdType.LDAP]: personLdapParams.externalId },
             };
             const result: Person<false> | DomainError = await this.personFactory.createNew(creationParams);
 
@@ -246,10 +260,10 @@ export class KeycloakProvisioningService {
 
         let persistedOrg: Organisation<true>;
         const externalIds: Partial<Record<OrganisationExternalIdType, string>> = {
-            [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn,
+            [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId,
         };
         const organisation: Organisation<true> | null = await this.organisationRepository.findOrganisationByExternalId(
-            klasseLdapParams.ldapDn,
+            klasseLdapParams.externalId,
             OrganisationExternalIdType.LDAP,
         );
 
@@ -257,7 +271,7 @@ export class KeycloakProvisioningService {
             this.logger.info('Klasse does not exist, creating new klasse organistation');
 
             const newOrg: Organisation<false> = this.createOrganisation(
-                klasseLdapParams.klasseName,
+                klasseLdapParams.name,
                 schuleOrg.id,
                 schuleOrg.id,
                 OrganisationsTyp.KLASSE,
@@ -266,7 +280,7 @@ export class KeycloakProvisioningService {
 
             persistedOrg = await this.organisationRepository.save(newOrg);
             await this.organisationRepository.createExternalIdOrganisationMapping(
-                klasseLdapParams.ldapDn,
+                klasseLdapParams.externalId,
                 OrganisationExternalIdType.LDAP,
                 persistedOrg,
             );
@@ -318,30 +332,30 @@ export class KeycloakProvisioningService {
 
     private assignSchuleParams(currentOrg: Organisation<true>, schuleLdapParams: SchuleLdapImportBodyParams): void {
         currentOrg.zugehoerigZu = schuleLdapParams.zugehoerigZu;
-        currentOrg.name = schuleLdapParams.schuleName;
+        currentOrg.name = schuleLdapParams.name;
         if (currentOrg.externalIds) {
-            currentOrg.externalIds.LDAP = schuleLdapParams.ldapOu;
+            currentOrg.externalIds.LDAP = schuleLdapParams.externalId;
         } else {
             currentOrg.externalIds = {
-                [OrganisationExternalIdType.LDAP]: schuleLdapParams.ldapOu,
+                [OrganisationExternalIdType.LDAP]: schuleLdapParams.externalId,
             };
         }
     }
 
     private assignPersonParams(existingPerson: Option<Person<true>>, personLdapParams: PersonLdapImportDataBody): void {
-        existingPerson!.familienname = personLdapParams.lastName;
-        existingPerson!.vorname = personLdapParams.firstName;
-        existingPerson!.externalIds.LDAP = personLdapParams.ldapDn;
+        existingPerson!.familienname = personLdapParams.nachname;
+        existingPerson!.vorname = personLdapParams.vorname;
+        existingPerson!.externalIds.LDAP = personLdapParams.externalId;
         existingPerson!.email = personLdapParams.email;
         existingPerson!.geburtsdatum = personLdapParams.geburtstag;
     }
 
     private assignKlasseParams(currentOrg: Organisation<true>, klasseLdapParams: KlasseLdapImportBodyParams): void {
-        currentOrg.name = klasseLdapParams.klasseName;
+        currentOrg.name = klasseLdapParams.name;
         if (currentOrg.externalIds) {
-            currentOrg.externalIds.LDAP = klasseLdapParams.ldapDn;
+            currentOrg.externalIds.LDAP = klasseLdapParams.externalId;
         } else {
-            currentOrg.externalIds = { [OrganisationExternalIdType.LDAP]: klasseLdapParams.ldapDn };
+            currentOrg.externalIds = { [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId };
         }
     }
 
