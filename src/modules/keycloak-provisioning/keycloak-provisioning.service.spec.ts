@@ -143,37 +143,30 @@ describe('KeycloakProvisioningService', () => {
             });
 
             it('should successfully import a user with all related entities', async () => {
-                // Schule
                 organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(null);
                 organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
                 organisationRepositoryMock.createExternalIdOrganisationMapping.mockResolvedValueOnce(undefined);
 
-                // Parent Org
                 organisationRepositoryMock.findBy.mockResolvedValueOnce([[], 0] as Counted<Organisation<true>>);
                 organisationRepositoryMock.save.mockResolvedValueOnce(parentOrg);
                 organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
 
-                // Person
                 personRepositoryMock.findByKeycloakUserId.mockResolvedValueOnce(undefined);
                 personFactoryMock.createNew.mockResolvedValueOnce(DoFactory.createPerson(false));
                 personRepositoryMock.create.mockResolvedValueOnce(person);
 
-                // Rolle
                 rolleRepoMock.findByName.mockResolvedValueOnce(undefined);
                 rolleFactoryMock.createNew.mockReturnValueOnce(DoFactory.createRolle(false));
                 rolleRepoMock.save.mockResolvedValueOnce(rolle);
 
-                // Personenkontext for Schule
                 personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
                 personenkontextFactoryMock.createNew.mockReturnValueOnce(DoFactory.createPersonenkontext(false));
                 personenkontextRepoMock.save.mockResolvedValueOnce(personenkontext);
 
-                // Klasse
                 organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(null);
                 organisationRepositoryMock.save.mockResolvedValueOnce(klasseOrg);
                 organisationRepositoryMock.createExternalIdOrganisationMapping.mockResolvedValueOnce(undefined);
 
-                // Personenkontext for Klasse
                 personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
                 personenkontextFactoryMock.createNew.mockReturnValueOnce(DoFactory.createPersonenkontext(false));
                 personenkontextRepoMock.save.mockResolvedValueOnce(personenkontext);
@@ -189,31 +182,24 @@ describe('KeycloakProvisioningService', () => {
             });
 
             it('should import an existing user and update all related entities', async () => {
-                // Schule exists
                 organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(schuleOrg);
                 organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
 
-                // Parent Org exists
                 organisationRepositoryMock.findBy.mockResolvedValueOnce([[parentOrg], 1] as Counted<
                     Organisation<true>
                 >);
                 organisationRepositoryMock.save.mockResolvedValueOnce(schuleOrg);
 
-                // Person exists
                 personRepositoryMock.findByKeycloakUserId.mockResolvedValueOnce(person);
                 personRepositoryMock.update.mockResolvedValueOnce(person);
 
-                // Rolle exists
                 rolleRepoMock.findByName.mockResolvedValueOnce([rolle]);
 
-                // Personenkontext for Schule exists
                 personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([personenkontext]);
 
-                // Klasse exists
                 organisationRepositoryMock.findOrganisationByExternalId.mockResolvedValueOnce(klasseOrg);
                 organisationRepositoryMock.save.mockResolvedValueOnce(klasseOrg);
 
-                // Personenkontext for Klasse exists
                 const klassePersonenkontext: Personenkontext<true> = DoFactory.createPersonenkontext(true, {
                     personId: person.id,
                     organisationId: klasseOrg.id,
