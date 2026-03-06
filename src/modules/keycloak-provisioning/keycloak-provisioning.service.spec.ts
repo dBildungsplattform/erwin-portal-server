@@ -121,16 +121,16 @@ describe('KeycloakProvisioningService', () => {
                 });
 
                 ldapUserDataParams = {
-                    schuleParams: {
+                    schule: {
                         name: schuleOrg.name,
                         externalId: schuleOrg.externalIds?.LDAP as string,
                         zugehoerigZu: faker.string.uuid(),
                     } as SchuleLdapImportBodyParams,
-                    klasseParams: {
+                    klasse: {
                         name: klasseOrg.name,
                         externalId: faker.string.uuid(),
                     } as KlasseLdapImportBodyParams,
-                    personParams: {
+                    person: {
                         keycloakUserId: person.keycloakUserId as string,
                         vorname: person.vorname,
                         nachname: person.familienname,
@@ -182,7 +182,7 @@ describe('KeycloakProvisioningService', () => {
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledTimes(2);
                 expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
-                    ldapUserDataParams.personParams.keycloakUserId,
+                    ldapUserDataParams.person.keycloakUserId,
                 );
                 expect(rolleRepoMock.findByName).toHaveBeenCalled();
                 expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledTimes(2);
@@ -227,7 +227,7 @@ describe('KeycloakProvisioningService', () => {
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledTimes(2);
                 expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
-                    ldapUserDataParams.personParams.keycloakUserId,
+                    ldapUserDataParams.person.keycloakUserId,
                 );
                 expect(personRepositoryMock.update).toHaveBeenCalled();
             });

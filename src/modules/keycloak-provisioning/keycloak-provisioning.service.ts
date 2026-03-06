@@ -38,14 +38,14 @@ export class KeycloakProvisioningService {
     ) {}
 
     public async importLdapUser(params: LdapUserDataBodyParams): Promise<void> {
-        const schuleOrg: Organisation<true> = await this.createOrUpdateSchuleOrg(params.schuleParams);
+        const schuleOrg: Organisation<true> = await this.createOrUpdateSchuleOrg(params.schule);
         const parentOrg: Organisation<true> = await this.findOrCreateSchuleParentOrg(schuleOrg);
-        const person: Person<true> = await this.createOrUpdatePerson(params.personParams);
+        const person: Person<true> = await this.createOrUpdatePerson(params.person);
         const newRolle: Rolle<true> = await this.findOrCreateRolle(parentOrg, params.role);
 
         await this.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
 
-        const klasse: Organisation<true> = await this.createOrUpdateKlasse(params.klasseParams, schuleOrg);
+        const klasse: Organisation<true> = await this.createOrUpdateKlasse(params.klasse, schuleOrg);
 
         await this.createPersonenkontextForKlasseIfNotExists(klasse, newRolle, person);
     }

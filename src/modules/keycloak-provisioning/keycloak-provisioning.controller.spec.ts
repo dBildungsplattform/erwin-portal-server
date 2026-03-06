@@ -60,16 +60,16 @@ describe('KeycloakProvisioningController', () => {
 
         beforeEach(() => {
             params = new LdapUserDataBodyParams({
-                schuleParams: {
+                schule: {
                     name: faker.company.name(),
                     zugehoerigZu: faker.string.uuid(),
                     externalId: faker.string.uuid(),
                 } as SchuleLdapImportBodyParams,
-                klasseParams: {
+                klasse: {
                     name: faker.lorem.word(),
                     externalId: faker.string.uuid(),
                 } as KlasseLdapImportBodyParams,
-                personParams: {
+                person: {
                     keycloakUserId: faker.string.uuid(),
                     vorname: faker.person.firstName(),
                     nachname: faker.person.lastName(),
@@ -98,16 +98,16 @@ describe('KeycloakProvisioningController', () => {
     describe('LdapUserDataBodyParams DTO', () => {
         it('should create an instance via constructor', () => {
             const params: LdapUserDataBodyParams = new LdapUserDataBodyParams({
-                schuleParams: {
+                schule: {
                     name: faker.company.name(),
                     zugehoerigZu: faker.string.uuid(),
                     externalId: faker.string.uuid(),
                 } as SchuleLdapImportBodyParams,
-                klasseParams: {
+                klasse: {
                     name: faker.lorem.word(),
                     externalId: faker.string.uuid(),
                 } as KlasseLdapImportBodyParams,
-                personParams: {
+                person: {
                     keycloakUserId: faker.string.uuid(),
                     vorname: faker.person.firstName(),
                     nachname: faker.person.lastName(),
@@ -119,9 +119,9 @@ describe('KeycloakProvisioningController', () => {
             });
 
             expect(params).toBeInstanceOf(LdapUserDataBodyParams);
-            expect(params.schuleParams).toBeDefined();
-            expect(params.klasseParams).toBeDefined();
-            expect(params.personParams).toBeDefined();
+            expect(params.schule).toBeDefined();
+            expect(params.klasse).toBeDefined();
+            expect(params.person).toBeDefined();
             expect(params.role).toBe(ErwinLdapMappedRollenArt.LERN);
         });
 
@@ -150,9 +150,9 @@ describe('KeycloakProvisioningController', () => {
             const instance: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, plainObject);
 
             expect(instance).toBeInstanceOf(LdapUserDataBodyParams);
-            expect(instance.schuleParams).toBeInstanceOf(SchuleLdapImportBodyParams);
-            expect(instance.klasseParams).toBeInstanceOf(KlasseLdapImportBodyParams);
-            expect(instance.personParams).toBeInstanceOf(PersonLdapImportDataBody);
+            expect(instance.schule).toBeInstanceOf(SchuleLdapImportBodyParams);
+            expect(instance.klasse).toBeInstanceOf(KlasseLdapImportBodyParams);
+            expect(instance.person).toBeInstanceOf(PersonLdapImportDataBody);
         });
 
         it('should validate a valid LdapUserDataBodyParams instance', async () => {

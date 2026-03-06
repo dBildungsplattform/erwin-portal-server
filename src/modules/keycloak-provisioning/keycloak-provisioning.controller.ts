@@ -36,6 +36,6 @@ export class KeycloakProvisioningController {
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
         await this.keycloakProvisioningService.importLdapUser(params);
 
-        this.logger.info('Ldap user processing completed for Keycloak UserID: ' + params.personParams.keycloakUserId);
+        this.logger.info('Ldap user processing completed for Keycloak UserID: ' + params.person.keycloakUserId);
     }
 }

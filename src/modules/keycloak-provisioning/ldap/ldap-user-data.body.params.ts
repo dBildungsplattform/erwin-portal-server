@@ -10,17 +10,17 @@ export class LdapUserDataBodyParams {
     @ApiProperty({ type: () => KlasseLdapImportBodyParams })
     @ValidateNested()
     @Type(() => KlasseLdapImportBodyParams)
-    public klasseParams!: KlasseLdapImportBodyParams;
+    public klasse!: KlasseLdapImportBodyParams;
 
     @ApiProperty({ type: () => SchuleLdapImportBodyParams })
     @ValidateNested()
     @Type(() => SchuleLdapImportBodyParams)
-    public schuleParams!: SchuleLdapImportBodyParams;
+    public schule!: SchuleLdapImportBodyParams;
 
     @ApiProperty({ type: () => PersonLdapImportDataBody })
     @ValidateNested()
     @Type(() => PersonLdapImportDataBody)
-    public personParams!: PersonLdapImportDataBody;
+    public person!: PersonLdapImportDataBody;
 
     @ApiProperty()
     @IsString()
