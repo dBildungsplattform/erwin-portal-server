@@ -634,24 +634,27 @@ describe('KeycloakProvisioningService', () => {
                         [ErwinLdapMappedRollenArt.LERN, RollenArt.LERN],
                         [ErwinLdapMappedRollenArt.LEHR, RollenArt.LEHR],
                         [ErwinLdapMappedRollenArt.LEIT, RollenArt.LEIT],
-                    ])('should map %s to %s correctly', async (ldapRole, expectedRollenArt) => {
-                        rolleRepoMock.findByName.mockResolvedValue(undefined);
-                        rolleFactoryMock.createNew.mockReturnValue(newRolle);
-                        rolleRepoMock.save.mockResolvedValue(persistedRolle);
+                    ])(
+                        'should map %s to %s correctly',
+                        async (ldapRole: ErwinLdapMappedRollenArt, expectedRollenArt: RollenArt) => {
+                            rolleRepoMock.findByName.mockResolvedValue(undefined);
+                            rolleFactoryMock.createNew.mockReturnValue(newRolle);
+                            rolleRepoMock.save.mockResolvedValue(persistedRolle);
 
-                        await service.findOrCreateRolle(parentOrg, ldapRole);
+                            await service.findOrCreateRolle(parentOrg, ldapRole);
 
-                        expect(rolleFactoryMock.createNew).toHaveBeenCalledWith(
-                            parentOrg.name,
-                            parentOrg.id,
-                            expectedRollenArt,
-                            [],
-                            [],
-                            [],
-                            [],
-                            false,
-                        );
-                    });
+                            expect(rolleFactoryMock.createNew).toHaveBeenCalledWith(
+                                parentOrg.name,
+                                parentOrg.id,
+                                expectedRollenArt,
+                                [],
+                                [],
+                                [],
+                                [],
+                                false,
+                            );
+                        },
+                    );
                 });
             });
         });
