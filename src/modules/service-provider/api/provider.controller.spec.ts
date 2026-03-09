@@ -392,7 +392,10 @@ describe('Provider Controller Test', () => {
 
             it('should use fallback values from serviceProvider if body params are missing', async () => {
                 const spId: string = faker.string.uuid();
-                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId });
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, {
+                    id: spId,
+                    kategorie: ServiceProviderKategorie.EMAIL,
+                });
                 serviceProviderFactoryMock.construct.mockReturnValueOnce(sp);
                 serviceProviderRepoMock.findById.mockResolvedValueOnce(sp);
                 serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
