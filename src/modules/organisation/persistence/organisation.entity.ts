@@ -67,6 +67,6 @@ export class OrganisationEntity extends TimestampedEntity {
         orphanRemoval: true,
         eager: true,
     })
-    public externalIds?: Collection<OrganisationExternalIdMappingEntity> =
+    public externalIds: Collection<OrganisationExternalIdMappingEntity> =
         new Collection<OrganisationExternalIdMappingEntity>(this);
 }
