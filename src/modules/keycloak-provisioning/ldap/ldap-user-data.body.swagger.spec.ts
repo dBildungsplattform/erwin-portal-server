@@ -134,7 +134,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             expect(isRecord(constraints)).toBe(true);
 
             if (isRecord(constraints)) {
-                expect(Object.keys(constraints)).toContain('isString');
+                expect(Object.keys(constraints)).toContain('isEnum');
             }
         });
     });
