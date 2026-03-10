@@ -23,7 +23,7 @@ export class LdapUserDataBodyParams {
     public person!: PersonLdapImportDataBody;
 
     @ApiProperty()
-    @IsString()
+    @IsEnum(ErwinLdapMappedRollenArt)
     public role!: ErwinLdapMappedRollenArt;
 
     public constructor(params: Readonly<LdapUserDataBodyParams>) {
