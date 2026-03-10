@@ -265,7 +265,8 @@
           "items": [
             "URL",
             "EMAIL",
-            "SCHULPORTAL_ADMINISTRATION"
+            "SCHULPORTAL_ADMINISTRATION",
+            "SELF"
           ]
         },
         "service_provider_kategorie_enum": {
