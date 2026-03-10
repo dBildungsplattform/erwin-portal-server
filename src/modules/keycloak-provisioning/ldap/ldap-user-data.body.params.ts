@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, ValidateNested } from 'class-validator';
+import { IsEnum, ValidateNested } from 'class-validator';
 import { KlasseLdapImportBodyParams } from './klasse-ldap-import.body.params.js';
 import { SchuleLdapImportBodyParams } from './schule-ldap-import.body.params.js';
 import { PersonLdapImportDataBody } from './person-ldap-import.body.params.js';
