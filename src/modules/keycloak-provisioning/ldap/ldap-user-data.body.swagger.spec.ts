@@ -118,7 +118,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
                 klasse: {},
                 schule: {},
                 person: {},
-                role: 123, // not a string → should violate @IsString()
+                rolle: 123, // not a string → should violate @IsString()
             };
 
             const dto: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, invalidPayload);
