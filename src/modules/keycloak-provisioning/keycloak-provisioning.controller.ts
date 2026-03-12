@@ -51,7 +51,7 @@ export class KeycloakProvisioningController {
             params.schule.zugehoerigZu,
         );
         const person: Person<true> = await this.personLdapImportService.createOrUpdatePerson(params.person);
-        const newRolle: Rolle<true> = await this.rolleLdapImportService.findOrCreateRolle(parentOrg, params.role);
+        const newRolle: Rolle<true> = await this.rolleLdapImportService.findOrCreateRolle(parentOrg, params.rolle);
 
         await this.personenkontextLdapImportService.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
 

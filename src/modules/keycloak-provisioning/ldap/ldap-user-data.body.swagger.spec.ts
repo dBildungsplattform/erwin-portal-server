@@ -72,13 +72,13 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
                 klasse: klasse,
                 schule: schule,
                 person: person,
-                role: ErwinLdapMappedRollenArt.LEHR,
+                rolle: ErwinLdapMappedRollenArt.LEHR,
             });
 
             expect(dto.klasse).toBe(klasse);
             expect(dto.schule).toBe(schule);
             expect(dto.person).toBe(person);
-            expect(dto.role).toBe(ErwinLdapMappedRollenArt.LEHR);
+            expect(dto.rolle).toBe(ErwinLdapMappedRollenArt.LEHR);
         });
     });
 
@@ -102,7 +102,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
                     email: 'max.mustermann@example.com',
                     geburtstag: new Date(),
                 },
-                role: ErwinLdapMappedRollenArt.LEHR,
+                rolle: ErwinLdapMappedRollenArt.LEHR,
             };
 
             const dto: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, payload);
@@ -110,7 +110,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             expect(dto.klasse).toBeInstanceOf(KlasseLdapImportBodyParams);
             expect(dto.schule).toBeInstanceOf(SchuleLdapImportBodyParams);
             expect(dto.person).toBeInstanceOf(PersonLdapImportDataBody);
-            expect(dto.role).toBe(ErwinLdapMappedRollenArt.LEHR);
+            expect(dto.rolle).toBe(ErwinLdapMappedRollenArt.LEHR);
         });
 
         it('fails validation when role is not a string (IsString decorator)', async () => {

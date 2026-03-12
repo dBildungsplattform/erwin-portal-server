@@ -24,7 +24,7 @@ export class LdapUserDataBodyParams {
 
     @ApiProperty()
     @IsEnum(ErwinLdapMappedRollenArt)
-    public role!: ErwinLdapMappedRollenArt;
+    public rolle!: ErwinLdapMappedRollenArt;
 
     public constructor(params: Readonly<LdapUserDataBodyParams>) {
         Object.assign(this, params);

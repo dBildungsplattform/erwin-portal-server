@@ -90,10 +90,11 @@ export class OrganisationLdapImportService {
         } else {
             this.logger.info('Schule parent org exists, updating administriertVon and zugehoerigZu');
 
+            existingParentOrganisation.zugehoerigZu = zugehoerigZu;
             schuleOrg.zugehoerigZu = existingParentOrganisation.id;
             schuleOrg.administriertVon = existingParentOrganisation.id;
             await this.organisationRepository.save(schuleOrg);
-            this.logger.info('Schule Org fields saved successfully');
+            this.logger.info('Schule Parent Org fields saved successfully');
 
             return existingParentOrganisation;
         }

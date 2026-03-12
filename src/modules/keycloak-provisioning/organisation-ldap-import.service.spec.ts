@@ -194,6 +194,16 @@ describe('OrganisationLdapImportService', () => {
                 expect(schuleOrg.administriertVon).toEqual(parentOrg.id);
                 expect(result).toEqual(parentOrg);
             });
+
+            it('should update existingParentOrganisation zugehoerigZu with provided value', async () => {
+                const zugehoerigZu: string = faker.string.uuid();
+                organisationRepositoryMock.findBy.mockResolvedValue([[parentOrg], 1] as Counted<Organisation<true>>);
+                organisationRepositoryMock.save.mockResolvedValue(schuleOrg);
+
+                await service.findOrCreateSchuleParentOrg(schuleOrg, zugehoerigZu);
+
+                expect(parentOrg.zugehoerigZu).toEqual(zugehoerigZu);
+            });
         });
 
         describe('when multiple parent organisations exist', () => {

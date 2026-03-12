@@ -102,7 +102,7 @@ describe('KeycloakProvisioningController', () => {
                     email: faker.internet.email(),
                     geburtstag: faker.date.birthdate(),
                 } as PersonLdapImportDataBody,
-                role: ErwinLdapMappedRollenArt.LEHR,
+                rolle: ErwinLdapMappedRollenArt.LEHR,
             });
 
             const schuleOrg: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.SCHULE });
