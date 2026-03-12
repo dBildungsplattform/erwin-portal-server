@@ -43,8 +43,9 @@ export class KeycloakProvisioningController {
     @ApiForbiddenResponse({ description: 'Forbidden Operation or Argument' })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error while Saving Ldap User' })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
-        const schuleOrg: Organisation<true> =
-            await this.organisationLdapImportService.createOrUpdateSchuleOrg(params.schule);
+        const schuleOrg: Organisation<true> = await this.organisationLdapImportService.createOrUpdateSchuleOrg(
+            params.schule,
+        );
         const parentOrg: Organisation<true> = await this.organisationLdapImportService.findOrCreateSchuleParentOrg(
             schuleOrg,
             params.schule.zugehoerigZu,

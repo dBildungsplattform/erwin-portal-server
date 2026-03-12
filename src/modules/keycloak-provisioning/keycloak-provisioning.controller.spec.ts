@@ -16,6 +16,10 @@ import { RolleLdapImportService } from './rolle-ldap-import.service.js';
 import { PersonenkontextLdapImportService } from './personenkontext-ldap-import.service.js';
 import { OrganisationsTyp } from '../organisation/domain/organisation.enums.js';
 import { RollenArt } from '../rolle/domain/rolle.enums.js';
+import { Personenkontext } from '../personenkontext/domain/personenkontext.js';
+import { Rolle } from '../rolle/domain/rolle.js';
+import { Person } from '../person/domain/person.js';
+import { Organisation } from '../organisation/domain/organisation.js';
 
 describe('KeycloakProvisioningController', () => {
     let module: TestingModule;
@@ -101,12 +105,12 @@ describe('KeycloakProvisioningController', () => {
                 role: ErwinLdapMappedRollenArt.LEHR,
             });
 
-            const schuleOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.SCHULE });
-            const parentOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.LAND });
-            const klasseOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.KLASSE });
-            const person = DoFactory.createPerson(true);
-            const rolle = DoFactory.createRolle(true, { rollenart: RollenArt.LEHR });
-            const personenkontext = DoFactory.createPersonenkontext(true);
+            const schuleOrg: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.SCHULE });
+            const parentOrg: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.LAND });
+            const klasseOrg: Organisation<true> = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.KLASSE });
+            const person: Person<true> = DoFactory.createPerson(true);
+            const rolle: Rolle<true> = DoFactory.createRolle(true, { rollenart: RollenArt.LEHR });
+            const personenkontext: Personenkontext<true> = DoFactory.createPersonenkontext(true);
 
             organisationLdapImportServiceMock.createOrUpdateSchuleOrg.mockResolvedValue(schuleOrg);
             organisationLdapImportServiceMock.findOrCreateSchuleParentOrg.mockResolvedValue(parentOrg);

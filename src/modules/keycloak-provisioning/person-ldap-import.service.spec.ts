@@ -87,9 +87,7 @@ describe('PersonLdapImportService', () => {
 
                 const result: Person<true> = await service.createOrUpdatePerson(personLdapParams);
 
-                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
-                    personLdapParams.keycloakUserId,
-                );
+                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(personLdapParams.keycloakUserId);
                 expect(personRepositoryMock.update).toHaveBeenCalledWith(existingPerson);
                 expect(result).toBe(existingPerson);
                 expect(existingPerson.familienname).toBe(personLdapParams.nachname);
@@ -108,9 +106,7 @@ describe('PersonLdapImportService', () => {
 
                 const result: Person<true> = await service.createOrUpdatePerson(personLdapParams);
 
-                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(
-                    personLdapParams.keycloakUserId,
-                );
+                expect(personRepositoryMock.findByKeycloakUserId).toHaveBeenCalledWith(personLdapParams.keycloakUserId);
                 expect(personFactoryMock.createNew).toHaveBeenCalledWith({
                     familienname: personLdapParams.nachname,
                     vorname: personLdapParams.vorname,
