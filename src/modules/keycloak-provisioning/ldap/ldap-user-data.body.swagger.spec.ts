@@ -125,7 +125,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             const errors: ValidationError[] = await validate(dto);
 
             // Find the error for "role"
-            const roleError: ValidationError | undefined = errors.find((e: ValidationError) => e.property === 'role');
+            const roleError: ValidationError | undefined = errors.find((e: ValidationError) => e.property === 'rolle');
             expect(roleError).toBeDefined();
 
             // constraints is usually a record like { isString: 'role must be a string' }
@@ -177,7 +177,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             expect(props).toHaveProperty('klasse');
             expect(props).toHaveProperty('schule');
             expect(props).toHaveProperty('person');
-            expect(props).toHaveProperty('role');
+            expect(props).toHaveProperty('rolle');
         });
     });
 });
