@@ -1,7 +1,10 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { KeycloakProvisioningModule } from './keycloak-provisioning.module.js';
-import { KeycloakProvisioningService } from './keycloak-provisioning.service.js';
 import { ConfigTestModule, DatabaseTestModule, MapperTestModule } from '../../../test/utils/index.js';
+import { OrganisationLdapImportService } from './organisation-ldap-import.service.js';
+import { PersonLdapImportService } from './person-ldap-import.service.js';
+import { RolleLdapImportService } from './rolle-ldap-import.service.js';
+import { PersonenkontextLdapImportService } from './personenkontext-ldap-import.service.js';
 
 describe('KeycloakProvisioningModule', () => {
     let module: TestingModule;
@@ -21,8 +24,20 @@ describe('KeycloakProvisioningModule', () => {
     });
 
     describe('when module is initialized', () => {
-        it('should resolve KeycloakProvisioningService', () => {
-            expect(module.get(KeycloakProvisioningService)).toBeInstanceOf(KeycloakProvisioningService);
+        it('should resolve OrganisationLdapImportService', () => {
+            expect(module.get(OrganisationLdapImportService)).toBeInstanceOf(OrganisationLdapImportService);
+        });
+
+        it('should resolve PersonLdapImportService', () => {
+            expect(module.get(PersonLdapImportService)).toBeInstanceOf(PersonLdapImportService);
+        });
+
+        it('should resolve RolleLdapImportService', () => {
+            expect(module.get(RolleLdapImportService)).toBeInstanceOf(RolleLdapImportService);
+        });
+
+        it('should resolve PersonenkontextLdapImportService', () => {
+            expect(module.get(PersonenkontextLdapImportService)).toBeInstanceOf(PersonenkontextLdapImportService);
         });
     });
 });
