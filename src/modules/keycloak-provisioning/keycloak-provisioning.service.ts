@@ -39,7 +39,10 @@ export class KeycloakProvisioningService {
 
     public async importLdapUser(params: LdapUserDataBodyParams): Promise<void> {
         const schuleOrg: Organisation<true> = await this.createOrUpdateSchuleOrg(params.schule);
-        const parentOrg: Organisation<true> = await this.findOrCreateSchuleParentOrg(schuleOrg);
+        const parentOrg: Organisation<true> = await this.findOrCreateSchuleParentOrg(
+            schuleOrg,
+            params.schule.zugehoerigZu,
+        );
         const person: Person<true> = await this.createOrUpdatePerson(params.person);
         const newRolle: Rolle<true> = await this.findOrCreateRolle(parentOrg, params.role);
 
@@ -91,7 +94,10 @@ export class KeycloakProvisioningService {
         return persistedOrg;
     }
 
-    public async findOrCreateSchuleParentOrg(schuleOrg: Organisation<true>): Promise<Organisation<true>> {
+    public async findOrCreateSchuleParentOrg(
+        schuleOrg: Organisation<true>,
+        zugehoerigZu: string,
+    ): Promise<Organisation<true>> {
         const organisationScope: OrganisationScope = new OrganisationScope();
 
         organisationScope.findBy({
@@ -108,7 +114,7 @@ export class KeycloakProvisioningService {
             const newOrg: Organisation<false> = this.createOrganisation(
                 `${schuleOrg.externalIds?.LDAP} Parent Org`,
                 undefined,
-                undefined,
+                zugehoerigZu,
                 OrganisationsTyp.LAND,
                 {},
             );

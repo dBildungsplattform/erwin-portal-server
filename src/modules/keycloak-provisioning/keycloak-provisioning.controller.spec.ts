@@ -2,20 +2,28 @@ import { faker } from '@faker-js/faker';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { MikroORM } from '@mikro-orm/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigTestModule, DatabaseTestModule, MapperTestModule } from '../../../test/utils/index.js';
+import { ConfigTestModule, DatabaseTestModule, DoFactory, MapperTestModule } from '../../../test/utils/index.js';
 import { LoggingTestModule } from '../../../test/utils/logging-test.module.js';
 import { ErwinLdapMappedRollenArt } from '../rollenmapping/domain/lms-rollenarten.enums.js';
 import { KeycloakProvisioningController } from './keycloak-provisioning.controller.js';
-import { KeycloakProvisioningService } from './keycloak-provisioning.service.js';
 import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 import { PersonLdapImportDataBody } from './ldap/person-ldap-import.body.params.js';
 import { SchuleLdapImportBodyParams } from './ldap/schule-ldap-import.body.params.js';
+import { OrganisationLdapImportService } from './organisation-ldap-import.service.js';
+import { PersonLdapImportService } from './person-ldap-import.service.js';
+import { RolleLdapImportService } from './rolle-ldap-import.service.js';
+import { PersonenkontextLdapImportService } from './personenkontext-ldap-import.service.js';
+import { OrganisationsTyp } from '../organisation/domain/organisation.enums.js';
+import { RollenArt } from '../rolle/domain/rolle.enums.js';
 
 describe('KeycloakProvisioningController', () => {
     let module: TestingModule;
     let keycloakProvisioningController: KeycloakProvisioningController;
-    let serviceMock: DeepMocked<KeycloakProvisioningService>;
+    let organisationLdapImportServiceMock: DeepMocked<OrganisationLdapImportService>;
+    let personLdapImportServiceMock: DeepMocked<PersonLdapImportService>;
+    let rolleLdapImportServiceMock: DeepMocked<RolleLdapImportService>;
+    let personenkontextLdapImportServiceMock: DeepMocked<PersonenkontextLdapImportService>;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
@@ -28,15 +36,30 @@ describe('KeycloakProvisioningController', () => {
             providers: [
                 KeycloakProvisioningController,
                 {
-                    provide: KeycloakProvisioningService,
-                    useValue: createMock<KeycloakProvisioningService>(),
+                    provide: OrganisationLdapImportService,
+                    useValue: createMock<OrganisationLdapImportService>(),
+                },
+                {
+                    provide: PersonLdapImportService,
+                    useValue: createMock<PersonLdapImportService>(),
+                },
+                {
+                    provide: RolleLdapImportService,
+                    useValue: createMock<RolleLdapImportService>(),
+                },
+                {
+                    provide: PersonenkontextLdapImportService,
+                    useValue: createMock<PersonenkontextLdapImportService>(),
                 },
             ],
         }).compile();
 
         await DatabaseTestModule.setupDatabase(module.get(MikroORM));
 
-        serviceMock = module.get(KeycloakProvisioningService);
+        organisationLdapImportServiceMock = module.get(OrganisationLdapImportService);
+        personLdapImportServiceMock = module.get(PersonLdapImportService);
+        rolleLdapImportServiceMock = module.get(RolleLdapImportService);
+        personenkontextLdapImportServiceMock = module.get(PersonenkontextLdapImportService);
         keycloakProvisioningController = module.get(KeycloakProvisioningController);
     });
 
@@ -78,17 +101,36 @@ describe('KeycloakProvisioningController', () => {
                 role: ErwinLdapMappedRollenArt.LEHR,
             });
 
-            serviceMock.importLdapUser.mockResolvedValue(undefined);
+            const schuleOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.SCHULE });
+            const parentOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.LAND });
+            const klasseOrg = DoFactory.createOrganisation(true, { typ: OrganisationsTyp.KLASSE });
+            const person = DoFactory.createPerson(true);
+            const rolle = DoFactory.createRolle(true, { rollenart: RollenArt.LEHR });
+            const personenkontext = DoFactory.createPersonenkontext(true);
+
+            organisationLdapImportServiceMock.createOrUpdateSchuleOrg.mockResolvedValue(schuleOrg);
+            organisationLdapImportServiceMock.findOrCreateSchuleParentOrg.mockResolvedValue(parentOrg);
+            organisationLdapImportServiceMock.createOrUpdateKlasse.mockResolvedValue(klasseOrg);
+            personLdapImportServiceMock.createOrUpdatePerson.mockResolvedValue(person);
+            rolleLdapImportServiceMock.findOrCreateRolle.mockResolvedValue(rolle);
+            personenkontextLdapImportServiceMock.createOrUpdatePersonenkontextForSchule.mockResolvedValue(
+                personenkontext,
+            );
+            personenkontextLdapImportServiceMock.createPersonenkontextForKlasseIfNotExists.mockResolvedValue(
+                personenkontext,
+            );
         });
 
-        it('should call importLdapUser with correct params', async () => {
+        it('should call all services with correct params', async () => {
             await keycloakProvisioningController.onNewLdapUser(params);
 
-            expect(serviceMock.importLdapUser).toHaveBeenCalledWith(params);
+            expect(organisationLdapImportServiceMock.createOrUpdateSchuleOrg).toHaveBeenCalledWith(params.schule);
+            expect(personLdapImportServiceMock.createOrUpdatePerson).toHaveBeenCalledWith(params.person);
+            expect(rolleLdapImportServiceMock.findOrCreateRolle).toHaveBeenCalled();
         });
 
-        it('should throw if importLdapUser fails', async () => {
-            serviceMock.importLdapUser.mockRejectedValueOnce(new Error('fail'));
+        it('should throw if createOrUpdateSchuleOrg fails', async () => {
+            organisationLdapImportServiceMock.createOrUpdateSchuleOrg.mockRejectedValueOnce(new Error('fail'));
             await expect(keycloakProvisioningController.onNewLdapUser(params)).rejects.toThrow('fail');
         });
     });
