@@ -1327,30 +1327,35 @@ describe('OrganisationRepository', () => {
         it('should create a mapping between externalId and organisation', async () => {
             await sut.createExternalIdOrganisationMapping(externalId, type, organisation);
 
-            const found: Organisation<true> | null = await sut.findOrganisationByExternalId(externalId, type);
+            const found: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                organisation.name!,
+                externalId,
+                type,
+            );
 
             expect(found).toBeDefined();
             expect(organisationEntity.id).toBe(mapping.organisation.id);
         });
 
         it('should not find organisation for non-existing mapping', async () => {
-            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(faker.string.uuid(), type);
+            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                faker.company.name(),
+                faker.string.uuid(),
+                type,
+            );
             expect(result).toBeNull();
         });
 
-        it('should return null when mapping exists but organisation cannot be loaded (findById returns null)', async () => {
+        it('should return null when mapping exists but name does not match', async () => {
             await sut.createExternalIdOrganisationMapping(externalId, type, organisation);
 
-            const findByIdSpy: jest.SpyInstance = jest.spyOn(sut, 'findById').mockResolvedValue(null);
-
-            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(externalId, type);
+            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                'NonMatchingName',
+                externalId,
+                type,
+            );
 
             expect(result).toBeNull();
-
-            expect(findByIdSpy).toHaveBeenCalledTimes(1);
-            expect(findByIdSpy).toHaveBeenCalledWith(organisationEntity.id);
-
-            findByIdSpy.mockRestore();
         });
     });
 

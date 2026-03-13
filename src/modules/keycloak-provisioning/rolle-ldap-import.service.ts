@@ -20,12 +20,10 @@ export class RolleLdapImportService {
         parentOrg: Organisation<true>,
         paramsRolle: ErwinLdapMappedRollenArt,
     ): Promise<Rolle<true>> {
-        this.logger.info('creating/finding new Rolle for the person in the schule org');
+        this.logger.info(`Rolle Creation/Find Phase started for organisation: ${parentOrg.name}`);
 
         let existingRollen: Option<Rolle<true>[]> = await this.rolleRepo.findByName(parentOrg.name as string, false);
         if (existingRollen?.length) {
-            this.logger.info('Rolle exists, fetching');
-
             existingRollen = existingRollen?.filter((rolle: Rolle<true>) => {
                 return (
                     rolle.administeredBySchulstrukturknoten === parentOrg.id &&
@@ -34,12 +32,18 @@ export class RolleLdapImportService {
             });
 
             if (existingRollen.length === 1) {
-                return existingRollen[0] as Rolle<true>;
+                const rolle: Rolle<true> = existingRollen[0] as Rolle<true>;
+                this.logger.info(
+                    `Rolle '${rolle.name}' exists for organisation '${parentOrg.name}', fetching with id: ${rolle.id}`,
+                );
+                return rolle;
             } else {
-                throw new ForbiddenException('More than one role exists for the parent organisation');
+                throw new ForbiddenException(
+                    `More than one role exists for the parent organisation '${parentOrg.name}'`,
+                );
             }
         } else {
-            this.logger.info('Rolle does not exist, creating new one');
+            this.logger.info(`Rolle does not exist for organisation '${parentOrg.name}', creating new one`);
 
             const resultingRolle: Rolle<false> | DomainError = this.rolleFactory.createNew(
                 `${parentOrg.name}`,
@@ -53,16 +57,19 @@ export class RolleLdapImportService {
             );
 
             if (resultingRolle instanceof DomainError) {
-                this.logger.error('Failed to create new rolle', resultingRolle);
+                this.logger.error(`Failed to create new rolle for organisation '${parentOrg.name}'`, resultingRolle);
                 throw resultingRolle;
             }
             const persistedRolle: Rolle<true> | DomainError = await this.rolleRepo.save(resultingRolle);
 
             if (persistedRolle instanceof DomainError) {
-                this.logger.error('Failed to save new rolle');
+                this.logger.error(`Failed to save new rolle for organisation '${parentOrg.name}'`);
                 throw persistedRolle;
             }
 
+            this.logger.info(
+                `Rolle '${persistedRolle.name}' successfully created for organisation '${parentOrg.name}' with id: ${persistedRolle.id}`,
+            );
             return persistedRolle;
         }
     }

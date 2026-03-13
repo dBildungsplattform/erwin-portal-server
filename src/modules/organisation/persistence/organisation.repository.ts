@@ -5,6 +5,7 @@ import {
     QBFilterQuery,
     QueryBuilder,
     QueryOrder,
+    Reference,
     RequiredEntityData,
     SelectQueryBuilder,
 } from '@mikro-orm/postgresql';
@@ -729,30 +730,18 @@ export class OrganisationRepository {
     ): Promise<Organisation<true> | null> {
         this.logger.info(`fetching organisation with externalId: ${externalId} and name: ${name}`);
 
-        const mappings: OrganisationExternalIdMappingEntity[] = await this.em.find(
+        const mapping: OrganisationExternalIdMappingEntity | null = await this.em.findOne(
             OrganisationExternalIdMappingEntity,
-            {
-                externalId,
-                type,
-            },
+            { externalId, type, organisation: { name } },
             { populate: ['organisation'] },
         );
 
-        if (mappings.length === 0) {
-            this.logger.info(`No organisations found with externalId ${externalId}`);
+        if (!mapping) {
+            this.logger.info(`Organisation with externalId ${externalId} and name ${name} does not exist`);
             return null;
         }
 
-        for await (const mapping of mappings) {
-            if (!mapping.organisation) continue;
-
-            const organisation: Option<Organisation<true>> = await this.findById(mapping.organisation.id);
-            if (organisation && organisation.name === name) {
-                return organisation;
-            }
-        }
-
-        this.logger.info(`Organisation with externalId ${externalId} and name ${name} does not exist`);
-        return null;
+        const organisationEntity: OrganisationEntity = Reference.unwrapReference(mapping.organisation);
+        return mapOrgaEntityToAggregate(organisationEntity);
     }
 }

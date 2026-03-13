@@ -58,6 +58,7 @@ describe('OrganisationLdapImportService', () => {
                 const result: Organisation<true> = await service.createOrUpdateSchuleOrg(schuleLdapParams);
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                    schuleLdapParams.name,
                     schuleLdapParams.externalId,
                     OrganisationExternalIdType.LDAP,
                 );
@@ -79,6 +80,7 @@ describe('OrganisationLdapImportService', () => {
                 const result: Organisation<true> = await service.createOrUpdateSchuleOrg(schuleLdapParams);
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                    schuleLdapParams.name,
                     schuleLdapParams.externalId,
                     OrganisationExternalIdType.LDAP,
                 );
@@ -255,6 +257,7 @@ describe('OrganisationLdapImportService', () => {
                 const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                    klasseLdapParams.name,
                     klasseLdapParams.externalId,
                     OrganisationExternalIdType.LDAP,
                 );
@@ -309,6 +312,7 @@ describe('OrganisationLdapImportService', () => {
                 const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                    klasseLdapParams.name,
                     klasseLdapParams.externalId,
                     OrganisationExternalIdType.LDAP,
                 );
@@ -328,6 +332,7 @@ describe('OrganisationLdapImportService', () => {
                 const result: Organisation<true> = await service.createOrUpdateKlasse(klasseLdapParams, schuleOrg);
 
                 expect(organisationRepositoryMock.findOrganisationByExternalId).toHaveBeenCalledWith(
+                    klasseLdapParams.name,
                     klasseLdapParams.externalId,
                     OrganisationExternalIdType.LDAP,
                 );

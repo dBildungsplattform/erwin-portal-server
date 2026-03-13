@@ -15,7 +15,7 @@ export class OrganisationLdapImportService {
     ) {}
 
     public async createOrUpdateSchuleOrg(schuleLdapParams: SchuleLdapImportBodyParams): Promise<Organisation<true>> {
-        this.logger.info('Schule Creation/Update Phase started');
+        this.logger.info(`Schule Creation/Update Phase started for: ${schuleLdapParams.name}`);
 
         let persistedOrg: Organisation<true>;
         const externalIds: Partial<Record<OrganisationExternalIdType, string>> = {
@@ -29,7 +29,7 @@ export class OrganisationLdapImportService {
         );
 
         if (!organisation) {
-            this.logger.info('Schule does not exist, creating new schule organistation');
+            this.logger.info(`Schule '${schuleLdapParams.name}' does not exist, creating new schule organisation`);
 
             const newOrg: Organisation<false> = this.createOrganisation(
                 schuleLdapParams.name,
@@ -45,13 +45,14 @@ export class OrganisationLdapImportService {
                 OrganisationExternalIdType.LDAP,
                 persistedOrg,
             );
+            this.logger.info(`Schule '${persistedOrg.name}' successfully created with id: ${persistedOrg.id}`);
         } else {
-            this.logger.info('Schule exists, updating existing schule organistation');
+            this.logger.info(`Schule '${organisation.name}' exists, updating existing schule organisation`);
 
             this.assignSchuleParams(organisation, schuleLdapParams);
             persistedOrg = await this.organisationRepository.save(organisation);
+            this.logger.info(`Schule '${persistedOrg.name}' successfully updated`);
         }
-        this.logger.info('Schule saved successfully');
 
         return persistedOrg;
     }
@@ -70,9 +71,10 @@ export class OrganisationLdapImportService {
             await this.findOrganisationByScope(organisationScope);
 
         if (!existingParentOrganisation) {
-            this.logger.info('Creating schule parent org');
+            const parentOrgName: string = `${schuleOrg.externalIds?.LDAP} Parent Org`;
+            this.logger.info(`Schule parent org '${parentOrgName}' does not exist, creating new parent organisation`);
             const newOrg: Organisation<false> = this.createOrganisation(
-                `${schuleOrg.externalIds?.LDAP} Parent Org`,
+                parentOrgName,
                 undefined,
                 zugehoerigZu,
                 OrganisationsTyp.LAND,
@@ -83,17 +85,21 @@ export class OrganisationLdapImportService {
             schuleOrg.zugehoerigZu = persistedParentOrganization.id;
             schuleOrg.administriertVon = persistedParentOrganization.id;
             await this.organisationRepository.save(schuleOrg);
-            this.logger.info('Schule parent org successfully created');
+            this.logger.info(
+                `Schule parent org '${persistedParentOrganization.name}' successfully created with id: ${persistedParentOrganization.id}`,
+            );
 
             return persistedParentOrganization;
         } else {
-            this.logger.info('Schule parent org exists, updating administriertVon and zugehoerigZu');
+            this.logger.info(
+                `Schule parent org '${existingParentOrganisation.name}' exists, updating administriertVon and zugehoerigZu`,
+            );
 
             existingParentOrganisation.zugehoerigZu = zugehoerigZu;
             schuleOrg.zugehoerigZu = existingParentOrganisation.id;
             schuleOrg.administriertVon = existingParentOrganisation.id;
             await this.organisationRepository.save(schuleOrg);
-            this.logger.info('Schule Parent Org fields saved successfully');
+            this.logger.info(`Schule parent org '${existingParentOrganisation.name}' fields saved successfully`);
 
             return existingParentOrganisation;
         }
@@ -103,7 +109,9 @@ export class OrganisationLdapImportService {
         klasseLdapParams: KlasseLdapImportBodyParams,
         schuleOrg: Organisation<true>,
     ): Promise<Organisation<true>> {
-        this.logger.info('Klasse Creation/Update Phase started');
+        this.logger.info(
+            `Klasse Creation/Update Phase started for: ${klasseLdapParams.name} in Schule: ${schuleOrg.name}`,
+        );
 
         let persistedOrg: Organisation<true>;
         const externalIds: Partial<Record<OrganisationExternalIdType, string>> = {
@@ -116,7 +124,7 @@ export class OrganisationLdapImportService {
         );
 
         if (!organisation) {
-            this.logger.info('Klasse does not exist, creating new klasse organistation');
+            this.logger.info(`Klasse '${klasseLdapParams.name}' does not exist, creating new klasse organisation`);
 
             const newOrg: Organisation<false> = this.createOrganisation(
                 klasseLdapParams.name,
@@ -132,13 +140,14 @@ export class OrganisationLdapImportService {
                 OrganisationExternalIdType.LDAP,
                 persistedOrg,
             );
+            this.logger.info(`Klasse '${persistedOrg.name}' successfully created with id: ${persistedOrg.id}`);
         } else {
-            this.logger.info('Klasse exists, updating existing klasse organistation');
+            this.logger.info(`Klasse '${organisation.name}' exists, updating existing klasse organisation`);
 
             this.assignKlasseParams(organisation, klasseLdapParams);
             persistedOrg = await this.organisationRepository.save(organisation);
+            this.logger.info(`Klasse '${persistedOrg.name}' successfully updated`);
         }
-        this.logger.info('Klasse saved successfully');
 
         return persistedOrg;
     }

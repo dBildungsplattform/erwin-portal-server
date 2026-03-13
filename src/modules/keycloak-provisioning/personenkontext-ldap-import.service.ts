@@ -22,11 +22,17 @@ export class PersonenkontextLdapImportService {
         rolle: Rolle<true>,
         person: Person<true>,
     ): Promise<Personenkontext<true>> {
-        this.logger.info(`PersonenKontext for Schule Creation/Update Phase Started`);
+        const personFullName: string = `${person.vorname} ${person.familienname}`;
+        this.logger.info(
+            `Personenkontext for Schule Creation/Update Phase started for person '${personFullName}' in organisation '${schuleOrg.name}'`,
+        );
         const existingPersonenkontext: Personenkontext<true>[] =
             await this.personenkontextService.findPersonenkontexteByPersonId(person.id);
 
         if (!existingPersonenkontext.length) {
+            this.logger.info(
+                `Personenkontext does not exist for person '${personFullName}' in Schule '${schuleOrg.name}', creating new one`,
+            );
             const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
                 person.id,
                 schuleOrg.id,
@@ -35,9 +41,14 @@ export class PersonenkontextLdapImportService {
             const persistedPersonenkontext: Personenkontext<true> =
                 await this.personenkontextRepo.save(personenkontext);
 
+            this.logger.info(
+                `Personenkontext successfully created for person '${personFullName}' in Schule '${schuleOrg.name}' with id: ${persistedPersonenkontext.id}`,
+            );
             return persistedPersonenkontext;
         } else {
-            this.logger.info('Personenkontext for Schule exists, fetching the correct one');
+            this.logger.info(
+                `Personenkontext for Schule exists for person '${personFullName}', fetching the correct one`,
+            );
 
             const personenkontext: Personenkontext<true> = await this.fetchPersonenkontextFromList(
                 existingPersonenkontext,
@@ -55,13 +66,18 @@ export class PersonenkontextLdapImportService {
         rolle: Rolle<true>,
         person: Person<true>,
     ): Promise<Personenkontext<true>> {
-        this.logger.info(`PersonenKontext for Klasse Creation Phase Started`);
+        const personFullName: string = `${person.vorname} ${person.familienname}`;
+        this.logger.info(
+            `Personenkontext for Klasse Creation Phase started for person '${personFullName}' in organisation '${klasseOrg.name}'`,
+        );
 
         const existingPersonenkontext: Personenkontext<true>[] =
             await this.personenkontextService.findPersonenkontexteByPersonId(person.id);
 
         if (!existingPersonenkontext.length) {
-            this.logger.info('Personenkontext for Klasse does not exist, creating a new one');
+            this.logger.info(
+                `Personenkontext does not exist for person '${personFullName}' in Klasse '${klasseOrg.name}', creating a new one`,
+            );
             const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
                 person.id,
                 klasseOrg.id,
@@ -70,9 +86,14 @@ export class PersonenkontextLdapImportService {
             const persistedPersonenkontext: Personenkontext<true> =
                 await this.personenkontextRepo.save(personenkontext);
 
+            this.logger.info(
+                `Personenkontext successfully created for person '${personFullName}' in Klasse '${klasseOrg.name}' with id: ${persistedPersonenkontext.id}`,
+            );
             return persistedPersonenkontext;
         } else {
-            this.logger.info('Personenkontext for Klasse exists, fetching the correct one');
+            this.logger.info(
+                `Personenkontext for Klasse exists for person '${personFullName}', fetching the correct one`,
+            );
 
             const personenkontext: Personenkontext<true> = await this.fetchPersonenkontextFromList(
                 existingPersonenkontext,
@@ -91,6 +112,7 @@ export class PersonenkontextLdapImportService {
         rolle: Rolle<true>,
         person: Person<true>,
     ): Promise<Personenkontext<true>> {
+        const personFullName: string = `${person.vorname} ${person.familienname}`;
         const filteredPersonenkontext: Personenkontext<true>[] = existingPersonenkontext.filter(
             (personkontext: Personenkontext<true>) => {
                 return personkontext.organisationId === org.id && personkontext.rolleId === rolle.id;
@@ -98,6 +120,9 @@ export class PersonenkontextLdapImportService {
         );
 
         if (filteredPersonenkontext.length === 0) {
+            this.logger.info(
+                `No matching Personenkontext found for person '${personFullName}' in organisation '${org.name}', creating new one`,
+            );
             const personenkontext: Personenkontext<false> = this.personenkontextFactory.createNew(
                 person.id,
                 org.id,
@@ -106,16 +131,22 @@ export class PersonenkontextLdapImportService {
             const persistedPersonenkontext: Personenkontext<true> =
                 await this.personenkontextRepo.save(personenkontext);
 
+            this.logger.info(
+                `Personenkontext successfully created for person '${personFullName}' in organisation '${org.name}' with id: ${persistedPersonenkontext.id}`,
+            );
             return persistedPersonenkontext;
         } else if (filteredPersonenkontext.length > 1) {
             throw new ForbiddenException(
-                'more than one personenkontext exists for this person with the same organisation and role',
+                `More than one personenkontext exists for person '${personFullName}' in organisation '${org.name}' with the same role`,
             );
         } else {
             const personenkontext: Personenkontext<true> = filteredPersonenkontext[
                 filteredPersonenkontext.length - 1
             ] as Personenkontext<true>;
 
+            this.logger.info(
+                `Personenkontext found for person '${personFullName}' in organisation '${org.name}' with id: ${personenkontext.id}`,
+            );
             return personenkontext;
         }
     }
