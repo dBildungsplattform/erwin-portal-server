@@ -33,11 +33,13 @@ export class RolleLdapImportService {
                 );
             });
 
-            if (existingRollen.length > 1)
+            if (existingRollen.length > 1) {
                 throw new ForbiddenException('More than one role exists for the parent organisation');
-            else return existingRollen[existingRollen.length - 1] as Rolle<true>;
+            } else {
+                return existingRollen[existingRollen.length - 1] as Rolle<true>;
+            }
         } else {
-            this.logger.info('Rolle does not exist, creating new oen');
+            this.logger.info('Rolle does not exist, creating new one');
 
             const resultingRolle: Rolle<false> | DomainError = this.rolleFactory.createNew(
                 `${parentOrg.name}`,
