@@ -33,10 +33,10 @@ export class RolleLdapImportService {
                 );
             });
 
-            if (existingRollen.length > 1) {
-                throw new ForbiddenException('More than one role exists for the parent organisation');
+            if (existingRollen.length === 1) {
+                return existingRollen[0] as Rolle<true>;
             } else {
-                return existingRollen[existingRollen.length - 1] as Rolle<true>;
+                throw new ForbiddenException('More than one role exists for the parent organisation');
             }
         } else {
             this.logger.info('Rolle does not exist, creating new one');
