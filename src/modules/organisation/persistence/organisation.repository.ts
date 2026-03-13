@@ -32,8 +32,18 @@ import { OrganisationSpecificationError } from '../specification/error/organisat
 import { OrganisationEntity } from './organisation.entity.js';
 import { OrganisationScope } from './organisation.scope.js';
 import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
+import { mapDefinedObjectProperties } from '../../../shared/util/object-utils.js';
 
 export function mapOrgaAggregateToData(organisation: Organisation<boolean>): RequiredEntityData<OrganisationEntity> {
+    const externalIds: RequiredEntityData<OrganisationExternalIdMappingEntity>[] = mapDefinedObjectProperties(
+        organisation.externalIds ?? {},
+        (type: OrganisationExternalIdType, externalId: string) => ({
+            organisation: organisation.id,
+            type,
+            externalId,
+        }),
+    );
+
     return {
         id: organisation.id,
         administriertVon: organisation.administriertVon,
@@ -48,10 +58,19 @@ export function mapOrgaAggregateToData(organisation: Organisation<boolean>): Req
         emailAddress: organisation.emailAdress,
         itslearningEnabled: organisation.itslearningEnabled,
         lernmanagementsystem: organisation.lernmanagementsystem?.id ?? undefined,
+        externalIds: externalIds,
     };
 }
 
 export function mapOrgaEntityToAggregate(entity: OrganisationEntity): Organisation<true> {
+    const externalIds: Partial<Record<OrganisationExternalIdType, string>> = entity.externalIds.reduce(
+        (aggr: Partial<Record<OrganisationExternalIdType, string>>, mapping: OrganisationExternalIdMappingEntity) => {
+            aggr[mapping.type] = mapping.externalId;
+            return aggr;
+        },
+        {} as Partial<Record<OrganisationExternalIdType, string>>,
+    );
+
     return Organisation.construct(
         entity.id,
         entity.createdAt,
@@ -68,6 +87,8 @@ export function mapOrgaEntityToAggregate(entity: OrganisationEntity): Organisati
         entity.emailDomain,
         entity.emailAddress,
         entity.itslearningEnabled,
+        undefined,
+        externalIds,
     );
 }
 
