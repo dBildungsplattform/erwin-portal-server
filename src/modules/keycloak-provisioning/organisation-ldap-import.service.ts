@@ -23,6 +23,7 @@ export class OrganisationLdapImportService {
         };
 
         const organisation: Organisation<true> | null = await this.organisationRepository.findOrganisationByExternalId(
+            schuleLdapParams.name,
             schuleLdapParams.externalId,
             OrganisationExternalIdType.LDAP,
         );
@@ -60,7 +61,6 @@ export class OrganisationLdapImportService {
         zugehoerigZu: string,
     ): Promise<Organisation<true>> {
         const organisationScope: OrganisationScope = new OrganisationScope();
-
         organisationScope.findBy({
             name: `${schuleOrg.externalIds?.LDAP} Parent Org`,
             typ: OrganisationsTyp.LAND,
@@ -71,7 +71,6 @@ export class OrganisationLdapImportService {
 
         if (!existingParentOrganisation) {
             this.logger.info('Creating schule parent org');
-
             const newOrg: Organisation<false> = this.createOrganisation(
                 `${schuleOrg.externalIds?.LDAP} Parent Org`,
                 undefined,
@@ -111,6 +110,7 @@ export class OrganisationLdapImportService {
             [OrganisationExternalIdType.LDAP]: klasseLdapParams.externalId,
         };
         const organisation: Organisation<true> | null = await this.organisationRepository.findOrganisationByExternalId(
+            klasseLdapParams.name,
             klasseLdapParams.externalId,
             OrganisationExternalIdType.LDAP,
         );

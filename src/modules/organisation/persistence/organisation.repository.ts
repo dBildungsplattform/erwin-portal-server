@@ -723,12 +723,13 @@ export class OrganisationRepository {
     }
 
     public async findOrganisationByExternalId(
+        name: string,
         externalId: string,
         type: OrganisationExternalIdType,
     ): Promise<Organisation<true> | null> {
-        this.logger.info(`fetching organisation with externalId: ${externalId}`);
+        this.logger.info(`fetching organisation with externalId: ${externalId} and name: ${name}`);
 
-        const mapping: OrganisationExternalIdMappingEntity | null = await this.em.findOne(
+        const mappings: OrganisationExternalIdMappingEntity[] = await this.em.find(
             OrganisationExternalIdMappingEntity,
             {
                 externalId,
@@ -737,14 +738,21 @@ export class OrganisationRepository {
             { populate: ['organisation'] },
         );
 
-        if (!mapping || !mapping.organisation) {
-            this.logger.info(`Organisation with externalId ${externalId} does not exist`);
+        if (mappings.length === 0) {
+            this.logger.info(`No organisations found with externalId ${externalId}`);
             return null;
         }
 
-        const organisation: Option<Organisation<true>> = await this.findById(mapping.organisation.id);
+        for await (const mapping of mappings) {
+            if (!mapping.organisation) continue;
 
-        if (organisation) return organisation;
-        else return null;
+            const organisation: Option<Organisation<true>> = await this.findById(mapping.organisation.id);
+            if (organisation && organisation.name === name) {
+                return organisation;
+            }
+        }
+
+        this.logger.info(`Organisation with externalId ${externalId} and name ${name} does not exist`);
+        return null;
     }
 }
