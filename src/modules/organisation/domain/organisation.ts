@@ -7,7 +7,7 @@ import { DomainError } from '../../../shared/error/domain.error.js';
 import { NameValidator } from '../../../shared/validation/name-validator.js';
 import { KennungForOrganisationWithTrailingSpaceError } from '../specification/error/kennung-with-trailing-space.error.js';
 import { NameForOrganisationWithTrailingSpaceError } from '../specification/error/name-with-trailing-space.error.js';
-import { OrganisationsTyp, Traegerschaft } from './organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, Traegerschaft } from './organisation.enums.js';
 import { SchultraegerNameEindeutigError } from '../specification/error/SchultraegerNameEindeutigError.js';
 import { TraegerNameUniqueInSubtree } from '../specification/traeger-name-unique-in-subtree.js';
 import { TraegerUnterRootChild } from '../specification/traeger-unter-root-child.js';
@@ -31,6 +31,7 @@ export class Organisation<WasPersisted extends boolean> {
         public emailDomain?: string,
         public emailAdress?: string,
         public lernmanagementsystem?: Organisation<WasPersisted>,
+        public externalIds?: Partial<Record<OrganisationExternalIdType, string>>,
     ) {}
 
     public static construct<WasPersisted extends boolean = false>(
@@ -50,6 +51,7 @@ export class Organisation<WasPersisted extends boolean> {
         emailAdress?: string,
         itslearningEnabled: boolean = false,
         lernmanagementsystem?: Organisation<WasPersisted>,
+        externalIds?: Partial<Record<OrganisationExternalIdType, string>>,
     ): Organisation<WasPersisted> {
         return new Organisation(
             id,
@@ -68,6 +70,7 @@ export class Organisation<WasPersisted extends boolean> {
             emailDomain,
             emailAdress,
             lernmanagementsystem,
+            externalIds ?? {},
         );
     }
 
@@ -84,6 +87,7 @@ export class Organisation<WasPersisted extends boolean> {
         emailAdress?: string,
         itslearningEnabled: boolean = false,
         lernmanagementsystem?: Organisation<false>,
+        externalIds?: Partial<Record<OrganisationExternalIdType, string>>,
     ): Organisation<false> | DomainError {
         const organisation: Organisation<false> = new Organisation(
             undefined,
@@ -102,6 +106,7 @@ export class Organisation<WasPersisted extends boolean> {
             emailDomain,
             emailAdress,
             typ === OrganisationsTyp.SCHULE ? lernmanagementsystem : undefined,
+            externalIds ?? {},
         );
 
         const validationError: void | OrganisationSpecificationError = organisation.validateFieldNames();

@@ -5,6 +5,7 @@ import {
     QBFilterQuery,
     QueryBuilder,
     QueryOrder,
+    Reference,
     RequiredEntityData,
     SelectQueryBuilder,
 } from '@mikro-orm/postgresql';
@@ -26,13 +27,24 @@ import { OrganisationID } from '../../../shared/types/aggregate-ids.types.js';
 import { PermittedOrgas, PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { OrganisationUpdateOutdatedError } from '../domain/orga-update-outdated.error.js';
-import { OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
 import { Organisation } from '../domain/organisation.js';
 import { OrganisationSpecificationError } from '../specification/error/organisation-specification.error.js';
 import { OrganisationEntity } from './organisation.entity.js';
 import { OrganisationScope } from './organisation.scope.js';
+import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
+import { mapDefinedObjectProperties } from '../../../shared/util/object-utils.js';
 
 export function mapOrgaAggregateToData(organisation: Organisation<boolean>): RequiredEntityData<OrganisationEntity> {
+    const externalIds: RequiredEntityData<OrganisationExternalIdMappingEntity>[] = mapDefinedObjectProperties(
+        organisation.externalIds ?? {},
+        (type: OrganisationExternalIdType, externalId: string) => ({
+            organisation: organisation.id,
+            type,
+            externalId,
+        }),
+    );
+
     return {
         id: organisation.id,
         administriertVon: organisation.administriertVon,
@@ -47,10 +59,19 @@ export function mapOrgaAggregateToData(organisation: Organisation<boolean>): Req
         emailAddress: organisation.emailAdress,
         itslearningEnabled: organisation.itslearningEnabled,
         lernmanagementsystem: organisation.lernmanagementsystem?.id ?? undefined,
+        externalIds: externalIds,
     };
 }
 
 export function mapOrgaEntityToAggregate(entity: OrganisationEntity): Organisation<true> {
+    const externalIds: Partial<Record<OrganisationExternalIdType, string>> = entity.externalIds.reduce(
+        (aggr: Partial<Record<OrganisationExternalIdType, string>>, mapping: OrganisationExternalIdMappingEntity) => {
+            aggr[mapping.type] = mapping.externalId;
+            return aggr;
+        },
+        {} as Partial<Record<OrganisationExternalIdType, string>>,
+    );
+
     return Organisation.construct(
         entity.id,
         entity.createdAt,
@@ -67,6 +88,8 @@ export function mapOrgaEntityToAggregate(entity: OrganisationEntity): Organisati
         entity.emailDomain,
         entity.emailAddress,
         entity.itslearningEnabled,
+        undefined,
+        externalIds,
     );
 }
 
@@ -615,6 +638,22 @@ export class OrganisationRepository {
         return this.create(organisation);
     }
 
+    public async createExternalIdOrganisationMapping(
+        externalId: string,
+        type: OrganisationExternalIdType,
+        organisation: Organisation<true>,
+    ): Promise<void> {
+        this.logger.info('creating externalId and Organisation mapping entry into DB table');
+
+        const mapping: OrganisationExternalIdMappingEntity = this.em.create(OrganisationExternalIdMappingEntity, {
+            externalId,
+            type,
+            organisation: this.em.getReference(OrganisationEntity, organisation.id),
+        });
+
+        await this.em.persistAndFlush(mapping);
+    }
+
     private async create(organisation: Organisation<boolean>): Promise<Organisation<true>> {
         const organisationEntity: OrganisationEntity = this.em.create(
             OrganisationEntity,
@@ -682,5 +721,27 @@ export class OrganisationRepository {
         }
 
         return RootDirectChildrenType.OEFFENTLICH;
+    }
+
+    public async findOrganisationByExternalId(
+        name: string,
+        externalId: string,
+        type: OrganisationExternalIdType,
+    ): Promise<Organisation<true> | null> {
+        this.logger.info(`fetching organisation with externalId: ${externalId} and name: ${name}`);
+
+        const mapping: OrganisationExternalIdMappingEntity | null = await this.em.findOne(
+            OrganisationExternalIdMappingEntity,
+            { externalId, type, organisation: { name } },
+            { populate: ['organisation'] },
+        );
+
+        if (!mapping) {
+            this.logger.info(`Organisation with externalId ${externalId} and name ${name} does not exist`);
+            return null;
+        }
+
+        const organisationEntity: OrganisationEntity = Reference.unwrapReference(mapping.organisation);
+        return mapOrgaEntityToAggregate(organisationEntity);
     }
 }

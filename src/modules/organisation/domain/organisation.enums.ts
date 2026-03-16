@@ -26,3 +26,7 @@ export enum RootDirectChildrenType {
     ERSATZ = 'ERSATZ',
     OEFFENTLICH = 'OEFFENTLICH',
 }
+
+export enum OrganisationExternalIdType {
+    LDAP = 'LDAP',
+}
