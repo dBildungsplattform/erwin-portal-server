@@ -91,7 +91,7 @@ describe('RolleLdapImportService', () => {
                 expect(result).toEqual(existingRolle);
             });
 
-            it('should return undefined if no rollen administered by parentOrg', async () => {
+            it('should create new rolle if no rollen administered by parentOrg', async () => {
                 const rollenList: Rolle<true>[] = [
                     DoFactory.createRolle(true, {
                         administeredBySchulstrukturknoten: faker.string.uuid(),
@@ -99,11 +99,15 @@ describe('RolleLdapImportService', () => {
                     }),
                 ];
                 rolleRepoMock.findByName.mockResolvedValue(rollenList);
+                rolleFactoryMock.createNew.mockReturnValue(newRolle);
+                rolleRepoMock.save.mockResolvedValue(persistedRolle);
 
                 const result: Rolle<true> = await service.findOrCreateRolle(parentOrg, paramsRolle);
 
                 expect(rolleRepoMock.findByName).toHaveBeenCalledWith(parentOrg.name, false);
-                expect(result).toBeUndefined();
+                expect(rolleFactoryMock.createNew).toHaveBeenCalled();
+                expect(rolleRepoMock.save).toHaveBeenCalledWith(newRolle);
+                expect(result).toEqual(persistedRolle);
             });
 
             it('should throw forbidden exception if more than 1 rolle is administered by parentOrg', async () => {

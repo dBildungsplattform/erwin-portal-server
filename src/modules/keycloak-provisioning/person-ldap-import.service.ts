@@ -24,10 +24,14 @@ export class PersonLdapImportService {
         );
 
         if (existingPerson) {
-            this.logger.info(`Person '${existingPerson.vorname} ${existingPerson.familienname}' exists, updating existing person`);
+            this.logger.info(
+                `Person '${existingPerson.vorname} ${existingPerson.familienname}' exists, updating existing person`,
+            );
             this.assignPersonParams(existingPerson, personLdapParams);
             await this.personRepository.update(existingPerson);
-            this.logger.info(`Person '${existingPerson.vorname} ${existingPerson.familienname}' successfully updated with id: ${existingPerson.id}`);
+            this.logger.info(
+                `Person '${existingPerson.vorname} ${existingPerson.familienname}' successfully updated with id: ${existingPerson.id}`,
+            );
 
             return existingPerson;
         } else {
@@ -48,7 +52,9 @@ export class PersonLdapImportService {
             const newPerson: Person<false> = result;
             const persistedPerson: Person<true> = (await this.personRepository.create(newPerson)) as Person<true>;
 
-            this.logger.info(`Person '${persistedPerson.vorname} ${persistedPerson.familienname}' successfully created with id: ${persistedPerson.id}`);
+            this.logger.info(
+                `Person '${persistedPerson.vorname} ${persistedPerson.familienname}' successfully created with id: ${persistedPerson.id}`,
+            );
 
             return persistedPerson;
         }

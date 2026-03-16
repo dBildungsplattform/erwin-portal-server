@@ -37,41 +37,41 @@ export class RolleLdapImportService {
                     `Rolle '${rolle.name}' exists for organisation '${parentOrg.name}', fetching with id: ${rolle.id}`,
                 );
                 return rolle;
-            } else {
+            } else if (existingRollen.length > 1) {
                 throw new ForbiddenException(
                     `More than one role exists for the parent organisation '${parentOrg.name}'`,
                 );
             }
-        } else {
-            this.logger.info(`Rolle does not exist for organisation '${parentOrg.name}', creating new one`);
-
-            const resultingRolle: Rolle<false> | DomainError = this.rolleFactory.createNew(
-                `${parentOrg.name}`,
-                parentOrg.id,
-                this.mapToRollenArt(paramsRolle),
-                [],
-                [],
-                [],
-                [],
-                false,
-            );
-
-            if (resultingRolle instanceof DomainError) {
-                this.logger.error(`Failed to create new rolle for organisation '${parentOrg.name}'`, resultingRolle);
-                throw resultingRolle;
-            }
-            const persistedRolle: Rolle<true> | DomainError = await this.rolleRepo.save(resultingRolle);
-
-            if (persistedRolle instanceof DomainError) {
-                this.logger.error(`Failed to save new rolle for organisation '${parentOrg.name}'`);
-                throw persistedRolle;
-            }
-
-            this.logger.info(
-                `Rolle '${persistedRolle.name}' successfully created for organisation '${parentOrg.name}' with id: ${persistedRolle.id}`,
-            );
-            return persistedRolle;
         }
+
+        this.logger.info(`Rolle does not exist for organisation '${parentOrg.name}', creating new one`);
+
+        const resultingRolle: Rolle<false> | DomainError = this.rolleFactory.createNew(
+            `${parentOrg.name}`,
+            parentOrg.id,
+            this.mapToRollenArt(paramsRolle),
+            [],
+            [],
+            [],
+            [],
+            false,
+        );
+
+        if (resultingRolle instanceof DomainError) {
+            this.logger.error(`Failed to create new rolle for organisation '${parentOrg.name}'`, resultingRolle);
+            throw resultingRolle;
+        }
+        const persistedRolle: Rolle<true> | DomainError = await this.rolleRepo.save(resultingRolle);
+
+        if (persistedRolle instanceof DomainError) {
+            this.logger.error(`Failed to save new rolle for organisation '${parentOrg.name}'`);
+            throw persistedRolle;
+        }
+
+        this.logger.info(
+            `Rolle '${persistedRolle.name}' successfully created for organisation '${parentOrg.name}' with id: ${persistedRolle.id}`,
+        );
+        return persistedRolle;
     }
 
     private mapToRollenArt(role: ErwinLdapMappedRollenArt): RollenArt {

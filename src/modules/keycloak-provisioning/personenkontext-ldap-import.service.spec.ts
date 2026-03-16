@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
+import { ForbiddenException } from '@nestjs/common';
 import { ClassLogger } from '../../core/logging/class-logger.js';
 import { PersonenkontextFactory } from '../personenkontext/domain/personenkontext.factory.js';
 import { PersonenkontextService } from '../personenkontext/domain/personenkontext.service.js';
@@ -135,7 +136,7 @@ describe('PersonenkontextLdapImportService', () => {
                 );
 
                 await expect(service.createOrUpdatePersonenkontextForSchule(schuleOrg, rolle, person)).rejects.toThrow(
-                    'more than one personenkontext exists for this person with the same organisation and role',
+                    ForbiddenException,
                 );
             });
 
@@ -304,9 +305,7 @@ describe('PersonenkontextLdapImportService', () => {
 
                     await expect(
                         service.createPersonenkontextForKlasseIfNotExists(klasseOrg, rolle, person),
-                    ).rejects.toThrow(
-                        'more than one personenkontext exists for this person with the same organisation and role',
-                    );
+                    ).rejects.toThrow(ForbiddenException);
                     expect(personenkontextServiceMock.findPersonenkontexteByPersonId).toHaveBeenCalledWith(person.id);
                 });
             });
