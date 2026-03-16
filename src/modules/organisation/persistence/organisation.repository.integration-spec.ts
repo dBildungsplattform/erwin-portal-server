@@ -138,6 +138,38 @@ describe('OrganisationRepository', () => {
                 expect(result).toHaveProperty(prop);
             });
         });
+
+        it('should map externalIds when provided', () => {
+            const externalIdValue: string = faker.string.uuid();
+            const organisation: Organisation<true> = Organisation.construct(
+                faker.string.uuid(),
+                faker.date.past(),
+                faker.date.recent(),
+                faker.number.int(),
+                faker.string.uuid(),
+                faker.string.uuid(),
+                faker.lorem.word(),
+                faker.lorem.word(),
+                faker.lorem.word(),
+                faker.string.uuid(),
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                false,
+                undefined,
+                { [OrganisationExternalIdType.LDAP]: externalIdValue },
+            );
+
+            const result: RequiredEntityData<OrganisationEntity> = mapOrgaAggregateToData(organisation);
+
+            expect(result.externalIds).toBeDefined();
+            expect(result.externalIds).toHaveLength(1);
+            expect((result.externalIds as RequiredEntityData<OrganisationExternalIdMappingEntity>[])[0]).toMatchObject({
+                type: OrganisationExternalIdType.LDAP,
+                externalId: externalIdValue,
+            });
+        });
     });
 
     describe('mapEntityToAggregate', () => {
