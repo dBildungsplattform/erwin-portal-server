@@ -233,10 +233,14 @@ describe('Provider Controller Test', () => {
             it('should create a new service-provider with undefined logo', async () => {
                 const spId: string = faker.string.uuid();
                 const spNew: ServiceProvider<false> = {
-                    ...DoFactory.createServiceProvider(false),
+                    ...DoFactory.createServiceProvider(false, { kategorie: ServiceProviderKategorie.EMAIL }),
                     logo: undefined,
                 };
-                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId, logo: undefined });
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, {
+                    id: spId,
+                    logo: undefined,
+                    kategorie: ServiceProviderKategorie.EMAIL,
+                });
 
                 serviceProviderFactoryMock.createNew.mockReturnValueOnce(spNew);
                 serviceProviderRepoMock.save.mockResolvedValueOnce(sp);
@@ -392,7 +396,10 @@ describe('Provider Controller Test', () => {
 
             it('should use fallback values from serviceProvider if body params are missing', async () => {
                 const spId: string = faker.string.uuid();
-                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, { id: spId });
+                const sp: ServiceProvider<true> = DoFactory.createServiceProvider(true, {
+                    id: spId,
+                    kategorie: ServiceProviderKategorie.EMAIL,
+                });
                 serviceProviderFactoryMock.construct.mockReturnValueOnce(sp);
                 serviceProviderRepoMock.findById.mockResolvedValueOnce(sp);
                 serviceProviderRepoMock.save.mockResolvedValueOnce(sp);

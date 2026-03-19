@@ -14,6 +14,7 @@ export enum ServiceProviderTarget {
     URL = 'URL',
     EMAIL = 'EMAIL',
     SCHULPORTAL_ADMINISTRATION = 'SCHULPORTAL_ADMINISTRATION',
+    SELF = 'SELF',
 }
 
 export enum ServiceProviderSystem {

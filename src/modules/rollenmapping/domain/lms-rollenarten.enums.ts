@@ -18,4 +18,10 @@ export enum MoodleRollenArt {
     EDITING_TEACHER_SELF = 'editingteacher_self',
 }
 
+export enum ErwinLdapMappedRollenArt {
+    LERN = 'LERN',
+    LEHR = 'LEHR',
+    LEIT = 'LEIT',
+}
+
 export type LmsRollenArt = SchulcloudRollenArt | MoodleRollenArt;

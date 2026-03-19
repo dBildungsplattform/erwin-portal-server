@@ -21,7 +21,7 @@ import { ScopeOperator } from '../../../shared/persistence/index.js';
 import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
 import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
 import { OrganisationUpdateOutdatedError } from '../domain/orga-update-outdated.error.js';
-import { OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
+import { OrganisationExternalIdType, OrganisationsTyp, RootDirectChildrenType } from '../domain/organisation.enums.js';
 import { Organisation } from '../domain/organisation.js';
 import { OrganisationSpecificationError } from '../specification/error/organisation-specification.error.js';
 import { SchultraegerNameEindeutigError } from '../specification/error/SchultraegerNameEindeutigError.js';
@@ -30,6 +30,7 @@ import { OrganisationPersistenceMapperProfile } from './organisation-persistence
 import { OrganisationEntity } from './organisation.entity.js';
 import { mapOrgaAggregateToData, mapOrgaEntityToAggregate, OrganisationRepository } from './organisation.repository.js';
 import { OrganisationScope } from './organisation.scope.js';
+import { OrganisationExternalIdMappingEntity } from './external-id-organisation-mappings.entity.js';
 
 describe('OrganisationRepository', () => {
     let module: TestingModule;
@@ -135,6 +136,38 @@ describe('OrganisationRepository', () => {
 
             expectedProperties.forEach((prop: string) => {
                 expect(result).toHaveProperty(prop);
+            });
+        });
+
+        it('should map externalIds when provided', () => {
+            const externalIdValue: string = faker.string.uuid();
+            const organisation: Organisation<true> = Organisation.construct(
+                faker.string.uuid(),
+                faker.date.past(),
+                faker.date.recent(),
+                faker.number.int(),
+                faker.string.uuid(),
+                faker.string.uuid(),
+                faker.lorem.word(),
+                faker.lorem.word(),
+                faker.lorem.word(),
+                faker.string.uuid(),
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                false,
+                undefined,
+                { [OrganisationExternalIdType.LDAP]: externalIdValue },
+            );
+
+            const result: RequiredEntityData<OrganisationEntity> = mapOrgaAggregateToData(organisation);
+
+            expect(result.externalIds).toBeDefined();
+            expect(result.externalIds).toHaveLength(1);
+            expect((result.externalIds as RequiredEntityData<OrganisationExternalIdMappingEntity>[])[0]).toMatchObject({
+                type: OrganisationExternalIdType.LDAP,
+                externalId: externalIdValue,
             });
         });
     });
@@ -1292,6 +1325,69 @@ describe('OrganisationRepository', () => {
                     'Only organisations of typ SCHULE can be enabled for ITSLearning.',
                 ]),
             );
+        });
+    });
+
+    describe('createExternalIdOrganisationMapping/findExternalIdOrganisationMapping', () => {
+        let organisation: Organisation<true>;
+        let externalId: string;
+        let type: OrganisationExternalIdType;
+        let mapping: OrganisationExternalIdMappingEntity;
+        let organisationEntity: OrganisationEntity;
+
+        beforeEach(async () => {
+            organisation = await sut.save(
+                DoFactory.createOrganisationAggregate(false, {
+                    name: 'TestOrg',
+                    kennung: 'EXTIDTEST',
+                }),
+            );
+            organisationEntity = em.create(
+                OrganisationEntity,
+                mapOrgaAggregateToData(DoFactory.createOrganisation(true)),
+            );
+            externalId = faker.string.uuid();
+            type = OrganisationExternalIdType.LDAP;
+
+            mapping = em.create(OrganisationExternalIdMappingEntity, {
+                organisation: organisationEntity,
+                externalId,
+                type,
+            });
+        });
+
+        it('should create a mapping between externalId and organisation', async () => {
+            await sut.createExternalIdOrganisationMapping(externalId, type, organisation);
+
+            const found: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                organisation.name!,
+                externalId,
+                type,
+            );
+
+            expect(found).toBeDefined();
+            expect(organisationEntity.id).toBe(mapping.organisation.id);
+        });
+
+        it('should not find organisation for non-existing mapping', async () => {
+            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                faker.company.name(),
+                faker.string.uuid(),
+                type,
+            );
+            expect(result).toBeNull();
+        });
+
+        it('should return null when mapping exists but name does not match', async () => {
+            await sut.createExternalIdOrganisationMapping(externalId, type, organisation);
+
+            const result: Organisation<true> | null = await sut.findOrganisationByExternalId(
+                'NonMatchingName',
+                externalId,
+                type,
+            );
+
+            expect(result).toBeNull();
         });
     });
 

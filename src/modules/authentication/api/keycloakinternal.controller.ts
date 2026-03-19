@@ -8,11 +8,9 @@ import { SchulConnexErrorMapper } from '../../../shared/error/schul-connex-error
 import { UserExternalDataWorkflowError } from '../../../shared/error/user-externaldata-workflow.error.js';
 import { PersonRepository } from '../../person/persistence/person.repository.js';
 import { Person } from '../../person/domain/person.js';
-import { DomainError, EntityNotFoundError } from '../../../shared/error/index.js';
+import { EntityNotFoundError } from '../../../shared/error/index.js';
 import { AccessApiKeyGuard } from './access.apikey.guard.js';
 import { Public } from './public.decorator.js';
-import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
-import { PersonFactory } from '../../person/domain/person.factory.js';
 
 type WithoutOptional<T> = {
     [K in keyof T]-?: T[K];
@@ -26,7 +24,6 @@ export class KeycloakInternalController {
     public constructor(
         private readonly userExternaldataWorkflowFactory: UserExternaldataWorkflowFactory,
         private readonly personRepository: PersonRepository,
-        private readonly personFactory: PersonFactory,
     ) {}
 
     /*
@@ -57,52 +54,12 @@ export class KeycloakInternalController {
             throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
                 SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(
                     new UserExternalDataWorkflowError(
-                        'UserExternaldataWorkflowAggregate has not been successfull initialized',
+                        'UserExternaldataWorkflowAggregate has not been successfully initialized',
                     ),
                 ),
             );
         }
 
         return UserExternalDataResponse.createNew(workflow.person, workflow.checkedExternalPkData, workflow.contextID);
-    }
-
-    @Post('newldapuser')
-    @HttpCode(201)
-    @Public()
-    @UseGuards(AccessApiKeyGuard)
-    @ApiOperation({ summary: 'Send data for a new LDAP user' })
-    @ApiCreatedResponse({
-        description: 'User was created',
-        type: LdapUserDataBodyParams,
-    })
-    public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
-        const existingPerson: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(
-            params.keycloakUserId,
-        );
-
-        let personToSave: Person<boolean>;
-        if (existingPerson) {
-            existingPerson.familienname = params.lastName ?? 'no name';
-            existingPerson.vorname = params.firstName ?? 'no name';
-            existingPerson.externalIds.LDAP = params.ldapId;
-            existingPerson.username = params.userName;
-            personToSave = existingPerson;
-        } else {
-            const person: Person<false> | DomainError = await this.personFactory.createNew({
-                familienname: params.lastName ?? 'no name',
-                vorname: params.firstName ?? 'no name',
-                externalIds: { LDAP: params.ldapId },
-                username: params.userName,
-            });
-
-            if (person instanceof DomainError) {
-                throw person;
-            }
-
-            person.keycloakUserId = params.keycloakUserId;
-            personToSave = person;
-        }
-
-        await this.personRepository.save(personToSave);
     }
 }
