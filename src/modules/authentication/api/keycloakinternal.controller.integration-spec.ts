@@ -179,5 +179,11 @@ describe('KeycloakInternalController', () => {
                 EntityNotFoundError,
             );
         });
+
+        it('should throw ForbiddenException if sub is empty', async () => {
+            await expect(keycloakinternalController.getExternalData({ sub: '' })).rejects.toThrow(
+                'Sub must be initialized to provision user',
+            );
+        });
     });
 });
