@@ -13,7 +13,7 @@ export class UserExternalDataResponse {
     public personData!: UserExternalPersonDataResponse;
 
     @ApiProperty({ type: UserExternalSchuleDataResponse, required: false })
-    public schuleData?: UserExternalSchuleDataResponse; //not nullable
+    public schuleData!: UserExternalSchuleDataResponse;
 
     @ApiProperty({ type: [UserExternalKlasseDataResponse] })
     @IsArray()
@@ -22,7 +22,7 @@ export class UserExternalDataResponse {
     public constructor(
         sub: string,
         personData: UserExternalPersonDataResponse,
-        schuleData: UserExternalSchuleDataResponse | undefined,
+        schuleData: UserExternalSchuleDataResponse,
         klasseData: UserExternalKlasseDataResponse[],
     ) {
         this.sub = sub;
@@ -30,19 +30,4 @@ export class UserExternalDataResponse {
         this.schuleData = schuleData;
         this.klasseData = klasseData;
     }
-
-    // public static createNew(
-    //     sub: string,
-    //     personData: UserExternalPersonDataResponse,
-    //     schuleData: UserExternalSchuleDataResponse,
-    //     klasseData: UserExternalKlasseDataResponse[],
-    // ): UserExternalDataResponse {
-    //     const response: UserExternalDataResponse = new UserExternalDataResponse(
-    //         sub,
-    //         personData,
-    //         schuleData,
-    //         klasseData,
-    //     );
-    //     return response;
-    // }
 }
