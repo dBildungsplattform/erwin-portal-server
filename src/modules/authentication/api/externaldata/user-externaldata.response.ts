@@ -1,28 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsUUID } from 'class-validator';
 import { UserExternalPersonDataResponse } from './user-external-person-data.response.js';
 import { UserExternalKlasseDataResponse } from './user-external-klasse-data.response.js';
 import { UserExternalSchuleDataResponse } from './user-external-schule-data.response.js';
 
 export class UserExternalDataResponse {
     @ApiProperty()
-    @IsString()
+    @IsUUID()
     public sub!: string;
 
     @ApiProperty({ type: UserExternalPersonDataResponse })
     public personData!: UserExternalPersonDataResponse;
 
-    @ApiProperty({ type: UserExternalSchuleDataResponse })
-    public schuleData!: UserExternalSchuleDataResponse;
+    @ApiProperty({ type: UserExternalSchuleDataResponse, required: false })
+    public schuleData?: UserExternalSchuleDataResponse; //not nullable
 
     @ApiProperty({ type: [UserExternalKlasseDataResponse] })
     @IsArray()
     public klasseData?: UserExternalKlasseDataResponse[];
 
-    private constructor(
+    public constructor(
         sub: string,
         personData: UserExternalPersonDataResponse,
-        schuleData: UserExternalSchuleDataResponse,
+        schuleData: UserExternalSchuleDataResponse | undefined,
         klasseData: UserExternalKlasseDataResponse[],
     ) {
         this.sub = sub;

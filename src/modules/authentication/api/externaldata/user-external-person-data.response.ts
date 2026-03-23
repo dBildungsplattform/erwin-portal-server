@@ -1,41 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsString, IsUUID } from 'class-validator';
 import { RollenArt } from '../../../rolle/domain/rolle.enums.js';
-
-export interface UserExternalPersonData {
-    externalId: string;
-    firstName: string;
-    lastName: string;
-    role: RollenArt;
-    email: string;
-}
 
 export class UserExternalPersonDataResponse {
     @ApiProperty()
     @IsString()
-    public externalId!: string;
+    public externalId?: string;
 
     @ApiProperty()
     @IsString()
-    public firstName!: string;
+    public vorname!: string;
 
     @ApiProperty()
     @IsString()
-    public lastName!: string;
+    public familienname!: string;
 
     @ApiProperty()
     @IsEnum(RollenArt)
-    public role!: RollenArt;
+    public rolle!: RollenArt;
 
     @ApiProperty()
     @IsString()
     public email!: string;
 
-    public constructor(data: UserExternalPersonData) {
-        this.externalId = data.externalId;
-        this.firstName = data.firstName;
-        this.lastName = data.lastName;
-        this.role = data.role;
-        this.email = data.email;
+    @ApiProperty()
+    @IsUUID()
+    public erwinId!: string;
+
+    public constructor(personResponse: Partial<UserExternalPersonDataResponse>) {
+        this.externalId = personResponse.externalId;
+        this.vorname = personResponse.vorname!;
+        this.familienname = personResponse.familienname!;
+        this.rolle = personResponse.rolle!;
+        this.email = personResponse.email!;
+        this.erwinId = personResponse.erwinId!;
     }
 }

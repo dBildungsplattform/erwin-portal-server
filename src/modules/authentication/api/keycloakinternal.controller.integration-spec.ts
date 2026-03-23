@@ -3,7 +3,6 @@ import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { MikroORM } from '@mikro-orm/core';
-import { HttpException } from '@nestjs/common';
 import { ConfigTestModule } from '../../../../test/utils/config-test.module.js';
 import { DatabaseTestModule, MapperTestModule } from '../../../../test/utils/index.js';
 import { LoggingTestModule } from '../../../../test/utils/logging-test.module.js';
@@ -11,22 +10,31 @@ import { PersonFactory } from '../../person/domain/person.factory.js';
 import { Person } from '../../person/domain/person.js';
 import { PersonRepository } from '../../person/persistence/person.repository.js';
 import { PersonModule } from '../../person/person.module.js';
-import {
-    DBiamPersonenkontextRepo,
-    ExternalPkData,
-} from '../../personenkontext/persistence/dbiam-personenkontext.repo.js';
 import { PersonenKontextModule } from '../../personenkontext/personenkontext.module.js';
 import { RollenArt } from '../../rolle/domain/rolle.enums.js';
 import { ServiceProviderModule } from '../../service-provider/service-provider.module.js';
-import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
 import { UserExternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { KeycloakInternalController } from './keycloakinternal.controller.js';
+import { KeycloakInternalService } from './keycloakinternal.service.js';
+import { PersonenkontextService } from '../../personenkontext/domain/personenkontext.service.js';
+import { OrganisationRepository } from '../../organisation/persistence/organisation.repository.js';
+import { RolleRepo } from '../../rolle/repo/rolle.repo.js';
+import { DoFactory } from '../../../../test/utils/do-factory.js';
+import { Personenkontext } from '../../personenkontext/domain/personenkontext.js';
+import { Organisation } from '../../organisation/domain/organisation.js';
+import { OrganisationsTyp } from '../../organisation/domain/organisation.enums.js';
+import { Rolle } from '../../rolle/domain/rolle.js';
+import { OrganisationModule } from '../../organisation/organisation.module.js';
+import { RolleModule } from '../../rolle/rolle.module.js';
+import { EntityNotFoundError } from '../../../shared/error/entity-not-found.error.js';
 
 describe('KeycloakInternalController', () => {
     let module: TestingModule;
     let keycloakinternalController: KeycloakInternalController;
-    let dbiamPersonenkontextRepoMock: DeepMocked<DBiamPersonenkontextRepo>;
     let personRepoMock: DeepMocked<PersonRepository>;
+    let personenkontextServiceMock: DeepMocked<PersonenkontextService>;
+    let organisationRepositoryMock: DeepMocked<OrganisationRepository>;
+    let rolleRepoMock: DeepMocked<RolleRepo>;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
@@ -38,13 +46,19 @@ describe('KeycloakInternalController', () => {
                 DatabaseTestModule.forRoot({ isDatabaseRequired: true }),
                 PersonModule,
                 PersonenKontextModule,
+                OrganisationModule,
+                RolleModule,
             ],
-            providers: [KeycloakInternalController, UserExternaldataWorkflowFactory],
+            providers: [KeycloakInternalController, KeycloakInternalService],
         })
             .overrideProvider(PersonRepository)
             .useValue(createMock<PersonRepository>())
-            .overrideProvider(DBiamPersonenkontextRepo)
-            .useValue(createMock<DBiamPersonenkontextRepo>())
+            .overrideProvider(PersonenkontextService)
+            .useValue(createMock<PersonenkontextService>())
+            .overrideProvider(OrganisationRepository)
+            .useValue(createMock<OrganisationRepository>())
+            .overrideProvider(RolleRepo)
+            .useValue(createMock<RolleRepo>())
             .overrideProvider(PersonFactory)
             .useValue(createMock<PersonFactory>())
             .compile();
@@ -52,8 +66,10 @@ describe('KeycloakInternalController', () => {
         await DatabaseTestModule.setupDatabase(module.get(MikroORM));
 
         keycloakinternalController = module.get(KeycloakInternalController);
-        dbiamPersonenkontextRepoMock = module.get(DBiamPersonenkontextRepo);
         personRepoMock = module.get(PersonRepository);
+        personenkontextServiceMock = module.get(PersonenkontextService);
+        organisationRepositoryMock = module.get(OrganisationRepository);
+        rolleRepoMock = module.get(RolleRepo);
     });
 
     afterEach(() => {
@@ -72,80 +88,95 @@ describe('KeycloakInternalController', () => {
     describe('externalData', () => {
         it('should return user external data', async () => {
             const keycloakSub: string = faker.string.uuid();
-            const person: Person<true> = Person.construct(
-                faker.string.uuid(),
-                faker.date.past(),
-                faker.date.recent(),
-                faker.person.lastName(),
-                faker.person.firstName(),
-                '1',
-                faker.lorem.word(),
-                keycloakSub,
-                faker.string.uuid(),
-            );
-            person.geburtsdatum = faker.date.past();
+            const person: Person<true> = DoFactory.createPerson(true, {
+                keycloakUserId: keycloakSub,
+                externalIds: { LDAP: faker.string.uuid() },
+                email: faker.internet.email(),
+                vorname: faker.person.firstName(),
+                familienname: faker.person.lastName(),
+            });
 
-            const pkExternalData: ExternalPkData[] = [
-                {
-                    rollenart: RollenArt.LEHR,
-                    kennung: faker.lorem.word(),
-                },
-                {
-                    rollenart: RollenArt.LERN,
-                    kennung: faker.lorem.word(),
-                },
-                {
-                    rollenart: RollenArt.EXTERN,
-                    kennung: undefined, //To Be Filtered Out
-                },
-            ];
+            const schuleOrg: Organisation<true> = DoFactory.createOrganisation(true, {
+                typ: OrganisationsTyp.SCHULE,
+                externalIds: { LDAP: faker.string.uuid() },
+                zugehoerigZu: faker.string.uuid(),
+                name: faker.company.name(),
+            });
+
+            const klasseOrg: Organisation<true> = DoFactory.createOrganisation(true, {
+                typ: OrganisationsTyp.KLASSE,
+                externalIds: { LDAP: faker.string.uuid() },
+                name: faker.company.name(),
+            });
+
+            const personenkontext: Personenkontext<true> = DoFactory.createPersonenkontext(true, {
+                personId: person.id,
+                rolleId: faker.string.uuid(),
+                organisationId: schuleOrg.id,
+            });
+
+            const klassePersonenkontext: Personenkontext<true> = DoFactory.createPersonenkontext(true, {
+                personId: person.id,
+                rolleId: personenkontext.rolleId,
+                organisationId: klasseOrg.id,
+            });
+
+            const rolle: Rolle<true> = DoFactory.createRolle(true, {
+                id: personenkontext.rolleId,
+                rollenart: RollenArt.LEHR,
+            });
 
             personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(person);
-            personRepoMock.findById.mockResolvedValueOnce(person);
-            dbiamPersonenkontextRepoMock.findExternalPkData.mockResolvedValueOnce(pkExternalData);
+            personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([
+                personenkontext,
+                klassePersonenkontext,
+            ]);
+            rolleRepoMock.findById.mockResolvedValueOnce(rolle);
+            organisationRepositoryMock.findById.mockResolvedValueOnce(schuleOrg).mockResolvedValueOnce(klasseOrg);
 
             const result: UserExternalDataResponse = await keycloakinternalController.getExternalData({
                 sub: keycloakSub,
             });
+
             expect(result).toBeInstanceOf(UserExternalDataResponse);
-            expect(result.ox.id).toContain(`${person.referrer}@`);
-            expect(result.itslearning.personId).toEqual(person.id);
-            expect(result.vidis.dienststellenNummern.length).toEqual(2);
-            expect(result.opsh.vorname).toEqual(person.vorname);
-            expect(result.opsh.nachname).toEqual(person.familienname);
-            expect(result.opsh.emailAdresse).toEqual(person.email);
-            expect(result.opsh.personenkontexte.length).toEqual(2);
-            expect(result.onlineDateiablage.personId).toEqual(person.id);
+            expect(result.sub).toEqual(keycloakSub);
+            expect(result.personData.externalId).toEqual(person.externalIds.LDAP);
+            expect(result.personData.vorname).toEqual(person.vorname);
+            expect(result.personData.familienname).toEqual(person.familienname);
+            expect(result.personData.email).toEqual(person.email);
+            expect(result.personData.rolle).toEqual(RollenArt.LEHR);
+            expect(result.personData.erwinId).toEqual(person.id);
+            expect(result.schuleData).toBeDefined();
+            expect(result.schuleData?.externalId).toEqual(schuleOrg.externalIds?.LDAP);
+            expect(result.schuleData?.name).toEqual(schuleOrg.name);
+            expect(result.schuleData?.zugehoerigZu).toEqual(schuleOrg.zugehoerigZu);
+            expect(result.schuleData?.erwinId).toEqual(schuleOrg.id);
+            expect(result.klasseData).toHaveLength(1);
+            expect(result.klasseData?.[0]?.externalId).toEqual(klasseOrg.externalIds?.LDAP);
+            expect(result.klasseData?.[0]?.name).toEqual(klasseOrg.name);
+            expect(result.klasseData?.[0]?.erwinId).toEqual(klasseOrg.id);
         });
 
-        it('should throw error if aggregate doesnt initialize fields field correctly', async () => {
+        it('should throw error if person is not found', async () => {
             const keycloakSub: string = faker.string.uuid();
-            const pkExternalData: ExternalPkData[] = [
-                {
-                    rollenart: RollenArt.LEHR,
-                    kennung: faker.lorem.word(),
-                },
-                {
-                    rollenart: RollenArt.LERN,
-                    kennung: faker.lorem.word(),
-                },
-            ];
-
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(createMock<Person<true>>());
-            personRepoMock.findById.mockResolvedValueOnce(undefined);
-            dbiamPersonenkontextRepoMock.findExternalPkData.mockResolvedValueOnce(pkExternalData);
+            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
 
             await expect(keycloakinternalController.getExternalData({ sub: keycloakSub })).rejects.toThrow(
-                HttpException,
+                EntityNotFoundError,
             );
         });
 
-        it('should throw error if aggregate doesnt initialize fields field correctly', async () => {
+        it('should throw error if no personenkontext entities are found', async () => {
             const keycloakSub: string = faker.string.uuid();
-            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(undefined);
+            const person: Person<true> = DoFactory.createPerson(true, {
+                keycloakUserId: keycloakSub,
+            });
+
+            personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(person);
+            personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
 
             await expect(keycloakinternalController.getExternalData({ sub: keycloakSub })).rejects.toThrow(
-                HttpException,
+                EntityNotFoundError,
             );
         });
     });
