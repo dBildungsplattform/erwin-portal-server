@@ -119,7 +119,7 @@ export class KeycloakInternalService {
         }
 
         if (schuleResponses.length === 0) {
-            throw new EntityNotFoundError('No SCHULE organisation found for user');
+            throw new EntityNotFoundError('SCHULE Organisation', 'user has none');
         }
 
         if (schuleResponses.length > 1) {

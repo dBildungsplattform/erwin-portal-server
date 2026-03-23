@@ -5,6 +5,7 @@ import { ExternalPkData } from '../../personenkontext/persistence/dbiam-personen
 import { AccessApiKeyGuard } from './access.apikey.guard.js';
 import { Public } from './public.decorator.js';
 import { KeycloakInternalService } from './keycloakinternal.service.js';
+import { KeycloakInternalDataBody } from './keycloakinternal-data.body.js';
 
 type WithoutOptional<T> = {
     [K in keyof T]-?: T[K];
@@ -29,7 +30,7 @@ export class KeycloakInternalController {
     @UseGuards(AccessApiKeyGuard)
     @ApiOperation({ summary: 'External Data about requested in user.' })
     @ApiOkResponse({ description: 'Returns external Data about the requested user.', type: UserExternalDataResponse })
-    public async getExternalData(@Body() params: { sub: string }): Promise<UserExternalDataResponse> {
+    public async getExternalData(@Body() params: KeycloakInternalDataBody): Promise<UserExternalDataResponse> {
         if (!params.sub) {
             throw new ForbiddenException('Sub must be initialized to provision user');
         }
