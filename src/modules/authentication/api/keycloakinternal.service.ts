@@ -58,11 +58,11 @@ export class KeycloakInternalService {
         );
     }
 
-    private async findPersonByKeycloakId(sub: string): Promise<Person<true>> {
-        const person: Option<Person<true>> = await this.personRepo.findByKeycloakUserId(sub);
+    private async findPersonByKeycloakId(keycloakUserId: string): Promise<Person<true>> {
+        const person: Option<Person<true>> = await this.personRepo.findByKeycloakUserId(keycloakUserId);
         if (!person) {
-            this.logger.error(`person with keycloakId ${sub} not found`);
-            throw new EntityNotFoundError(`person with keycloakId ${sub} not found`);
+            this.logger.error(`person with keycloakId ${keycloakUserId} not found`);
+            throw new EntityNotFoundError(`person with keycloakId ${keycloakUserId} not found`);
         }
         return person;
     }
