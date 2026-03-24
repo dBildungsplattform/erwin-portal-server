@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 
 export class KeycloakInternalDataBody {
     @ApiProperty({
-        description: 'The Keycloak sub (subject identifier) of the user.',
+        description: 'The Keycloak user ID of the user to be provisioned.',
     })
     @IsString()
     public keycloakUserId!: string;
