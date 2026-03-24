@@ -44,7 +44,7 @@ export class KeycloakInternalService {
             schuleResponse,
             klasseResponses,
         }: {
-            schuleResponse: UserExternalSchuleDataResponse | undefined;
+            schuleResponse: UserExternalSchuleDataResponse;
             klasseResponses: UserExternalKlasseDataResponse[];
         } = await this.processOrganisations(personenkontextList);
 
@@ -80,7 +80,7 @@ export class KeycloakInternalService {
     }
 
     private async processOrganisations(personenkontextList: Personenkontext<true>[]): Promise<{
-        schuleResponse: UserExternalSchuleDataResponse | undefined;
+        schuleResponse: UserExternalSchuleDataResponse;
         klasseResponses: UserExternalKlasseDataResponse[];
     }> {
         const klasseResponses: UserExternalKlasseDataResponse[] = [];
@@ -127,7 +127,7 @@ export class KeycloakInternalService {
         }
 
         return {
-            schuleResponse: schuleResponses[0],
+            schuleResponse: schuleResponses[0]!,
             klasseResponses,
         };
     }
