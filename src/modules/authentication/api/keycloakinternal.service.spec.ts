@@ -113,7 +113,7 @@ describe('KeycloakInternalService', () => {
 
                 const result: UserExternalDataResponse = await service.createUserExternalResponse(sub);
 
-                expect(result.sub).toEqual(sub);
+                expect(result.keycloakUserId).toEqual(sub);
                 expect(result.personData).toEqual({
                     externalId: person.externalIds.LDAP,
                     email: person.email,

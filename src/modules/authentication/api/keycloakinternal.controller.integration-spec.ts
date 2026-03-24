@@ -139,7 +139,7 @@ describe('KeycloakInternalController', () => {
             });
 
             expect(result).toBeInstanceOf(UserExternalDataResponse);
-            expect(result.sub).toEqual(keycloakSub);
+            expect(result.keycloakUserId).toEqual(keycloakSub);
             expect(result.personData.externalId).toEqual(person.externalIds.LDAP);
             expect(result.personData.vorname).toEqual(person.vorname);
             expect(result.personData.familienname).toEqual(person.familienname);
@@ -180,7 +180,7 @@ describe('KeycloakInternalController', () => {
             );
         });
 
-        it('should throw ForbiddenException if sub is empty', async () => {
+        it('should throw ForbiddenException if keycloakUserId is empty', async () => {
             await expect(keycloakinternalController.getExternalData({ keycloakUserId: '' })).rejects.toThrow(
                 'Sub must be initialized to provision user',
             );

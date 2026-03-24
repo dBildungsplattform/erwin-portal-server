@@ -5,7 +5,7 @@ import { UserExternalSchuleDataResponse } from './user-external-schule-data.resp
 
 export class UserExternalDataResponse {
     @ApiProperty()
-    public sub!: string;
+    public keycloakUserId!: string;
 
     @ApiProperty({ type: UserExternalPersonDataResponse })
     public personData!: UserExternalPersonDataResponse;
@@ -22,7 +22,7 @@ export class UserExternalDataResponse {
         schuleData: UserExternalSchuleDataResponse,
         klasseData: UserExternalKlasseDataResponse[],
     ) {
-        this.sub = sub;
+        this.keycloakUserId = sub;
         this.personData = personData;
         this.schuleData = schuleData;
         this.klasseData = klasseData;
