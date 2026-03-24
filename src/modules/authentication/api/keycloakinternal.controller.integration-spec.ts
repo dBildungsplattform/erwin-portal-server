@@ -135,7 +135,7 @@ describe('KeycloakInternalController', () => {
             organisationRepositoryMock.findById.mockResolvedValueOnce(schuleOrg).mockResolvedValueOnce(klasseOrg);
 
             const result: UserExternalDataResponse = await keycloakinternalController.getExternalData({
-                sub: keycloakSub,
+                keycloakUserId: keycloakSub,
             });
 
             expect(result).toBeInstanceOf(UserExternalDataResponse);
@@ -161,7 +161,7 @@ describe('KeycloakInternalController', () => {
             const keycloakSub: string = faker.string.uuid();
             personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(null);
 
-            await expect(keycloakinternalController.getExternalData({ sub: keycloakSub })).rejects.toThrow(
+            await expect(keycloakinternalController.getExternalData({ keycloakUserId: keycloakSub })).rejects.toThrow(
                 EntityNotFoundError,
             );
         });
@@ -175,13 +175,13 @@ describe('KeycloakInternalController', () => {
             personRepoMock.findByKeycloakUserId.mockResolvedValueOnce(person);
             personenkontextServiceMock.findPersonenkontexteByPersonId.mockResolvedValueOnce([]);
 
-            await expect(keycloakinternalController.getExternalData({ sub: keycloakSub })).rejects.toThrow(
+            await expect(keycloakinternalController.getExternalData({ keycloakUserId: keycloakSub })).rejects.toThrow(
                 EntityNotFoundError,
             );
         });
 
         it('should throw ForbiddenException if sub is empty', async () => {
-            await expect(keycloakinternalController.getExternalData({ sub: '' })).rejects.toThrow(
+            await expect(keycloakinternalController.getExternalData({ keycloakUserId: '' })).rejects.toThrow(
                 'Sub must be initialized to provision user',
             );
         });

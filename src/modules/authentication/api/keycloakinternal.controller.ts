@@ -31,10 +31,10 @@ export class KeycloakInternalController {
     @ApiOperation({ summary: 'External Data about requested in user.' })
     @ApiOkResponse({ description: 'Returns external Data about the requested user.', type: UserExternalDataResponse })
     public async getExternalData(@Body() params: KeycloakInternalDataBody): Promise<UserExternalDataResponse> {
-        if (!params.sub) {
+        if (!params.keycloakUserId) {
             throw new ForbiddenException('Sub must be initialized to provision user');
         }
 
-        return this.service.createUserExternalResponse(params.sub);
+        return this.service.createUserExternalResponse(params.keycloakUserId);
     }
 }

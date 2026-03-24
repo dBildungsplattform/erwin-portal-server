@@ -6,5 +6,5 @@ export class KeycloakInternalDataBody {
         description: 'The Keycloak sub (subject identifier) of the user.',
     })
     @IsString()
-    public sub!: string;
+    public keycloakUserId!: string;
 }

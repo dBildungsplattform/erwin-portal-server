@@ -25,14 +25,16 @@ export class KeycloakInternalService {
         private readonly rolleRepo: RolleRepo,
     ) {}
 
-    public async createUserExternalResponse(sub: string): Promise<UserExternalDataResponse> {
-        const person: Person<true> = await this.findPersonByKeycloakId(sub);
+    public async createUserExternalResponse(keycloakUserId: string): Promise<UserExternalDataResponse> {
+        const person: Person<true> = await this.findPersonByKeycloakId(keycloakUserId);
         const personenkontextList: Personenkontext<true>[] =
             await this.personenkontextService.findPersonenkontexteByPersonId(person.id);
 
         if (!personenkontextList.length) {
-            this.logger.error(`No personenkontext entities found for person with keycloakId ${sub}`);
-            throw new EntityNotFoundError(`No personenkontext entities found for person with keycloakId ${sub}`);
+            this.logger.error(`No personenkontext entities found for person with keycloakId ${keycloakUserId}`);
+            throw new EntityNotFoundError(
+                `No personenkontext entities found for person with keycloakId ${keycloakUserId}`,
+            );
         }
 
         const userExternalPersonDataResponse: UserExternalPersonDataResponse = await this.createPersonDataResponse(
@@ -48,7 +50,12 @@ export class KeycloakInternalService {
             klasseResponses: UserExternalKlasseDataResponse[];
         } = await this.processOrganisations(personenkontextList);
 
-        return new UserExternalDataResponse(sub, userExternalPersonDataResponse, schuleResponse, klasseResponses);
+        return new UserExternalDataResponse(
+            keycloakUserId,
+            userExternalPersonDataResponse,
+            schuleResponse,
+            klasseResponses,
+        );
     }
 
     private async findPersonByKeycloakId(sub: string): Promise<Person<true>> {
