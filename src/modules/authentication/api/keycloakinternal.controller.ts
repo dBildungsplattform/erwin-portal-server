@@ -1,16 +1,11 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, HttpCode, Post, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserExeternalDataResponse } from './externaldata/user-externaldata.response.js';
+import { UserExternalDataResponse } from './externaldata/user-externaldata.response.js';
 import { ExternalPkData } from '../../personenkontext/persistence/dbiam-personenkontext.repo.js';
-import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
-import { UserExternaldataWorkflowAggregate } from '../domain/user-extenaldata.workflow.js';
-import { SchulConnexErrorMapper } from '../../../shared/error/schul-connex-error.mapper.js';
-import { UserExternalDataWorkflowError } from '../../../shared/error/user-externaldata-workflow.error.js';
-import { PersonRepository } from '../../person/persistence/person.repository.js';
-import { Person } from '../../person/domain/person.js';
-import { EntityNotFoundError } from '../../../shared/error/index.js';
 import { AccessApiKeyGuard } from './access.apikey.guard.js';
 import { Public } from './public.decorator.js';
+import { KeycloakInternalService } from './keycloakinternal.service.js';
+import { KeycloakInternalDataBody } from './keycloakinternal-data.body.js';
 
 type WithoutOptional<T> = {
     [K in keyof T]-?: T[K];
@@ -21,10 +16,7 @@ export type RequiredExternalPkData = WithoutOptional<ExternalPkData>;
 @ApiTags('Keycloakinternal')
 @Controller({ path: 'keycloakinternal' })
 export class KeycloakInternalController {
-    public constructor(
-        private readonly userExternaldataWorkflowFactory: UserExternaldataWorkflowFactory,
-        private readonly personRepository: PersonRepository,
-    ) {}
+    public constructor(private readonly service: KeycloakInternalService) {}
 
     /*
     Dieser Endpunkt fragt lediglich Daten ab ist allerdigs trotzdem als POST definiert, da:
@@ -37,29 +29,12 @@ export class KeycloakInternalController {
     @Public()
     @UseGuards(AccessApiKeyGuard)
     @ApiOperation({ summary: 'External Data about requested in user.' })
-    @ApiOkResponse({ description: 'Returns external Data about the requested user.', type: UserExeternalDataResponse })
-    public async getExternalData(@Body() params: { sub: string }): Promise<UserExeternalDataResponse> {
-        const person: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(params.sub);
-        if (!person) {
-            throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
-                SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(
-                    new EntityNotFoundError('Person with keycloak sub', params.sub),
-                ),
-            );
+    @ApiOkResponse({ description: 'Returns external Data about the requested user.', type: UserExternalDataResponse })
+    public async getExternalData(@Body() params: KeycloakInternalDataBody): Promise<UserExternalDataResponse> {
+        if (!params.keycloakUserId) {
+            throw new ForbiddenException('Sub must be initialized to provision user');
         }
 
-        const workflow: UserExternaldataWorkflowAggregate = this.userExternaldataWorkflowFactory.createNew();
-        await workflow.initialize(person.id);
-        if (!workflow.person || !workflow.checkedExternalPkData) {
-            throw SchulConnexErrorMapper.mapSchulConnexErrorToHttpException(
-                SchulConnexErrorMapper.mapDomainErrorToSchulConnexError(
-                    new UserExternalDataWorkflowError(
-                        'UserExternaldataWorkflowAggregate has not been successfully initialized',
-                    ),
-                ),
-            );
-        }
-
-        return UserExeternalDataResponse.createNew(workflow.person, workflow.checkedExternalPkData, workflow.contextID);
+        return this.service.createUserExternalResponse(params.keycloakUserId);
     }
 }

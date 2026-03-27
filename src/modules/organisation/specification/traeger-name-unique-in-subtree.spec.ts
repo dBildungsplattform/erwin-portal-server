@@ -29,6 +29,30 @@ describe('TraegerNameUniqueInSubtree Specification', () => {
         await expect(sut.isSatisfiedBy(traegerWithoutName)).resolves.toBe(false);
     });
 
+    it('when traeger name matches ersatz root but not oeffentlich, it should return false', async () => {
+        const root: Organisation<true> = DoFactory.createOrganisationAggregate(true, {
+            typ: OrganisationsTyp.ROOT,
+            name: 'RootName',
+        });
+        const oeffentlich: Organisation<true> = DoFactory.createOrganisationAggregate(true, {
+            typ: OrganisationsTyp.LAND,
+            name: 'OeffentlichName',
+        });
+        const ersatz: Organisation<true> = DoFactory.createOrganisationAggregate(true, {
+            typ: OrganisationsTyp.LAND,
+            name: 'ErsatzName',
+        });
+        orgaRepoMock.findById.mockResolvedValueOnce(root);
+        orgaRepoMock.findRootDirectChildren.mockResolvedValueOnce([oeffentlich, ersatz]);
+
+        const traeger: Organisation<true> = DoFactory.createOrganisationAggregate(true, {
+            typ: OrganisationsTyp.TRAEGER,
+            name: 'ErsatzName',
+        });
+
+        await expect(sut.isSatisfiedBy(traeger)).resolves.toBe(false);
+    });
+
     type RootNode = 'ROOT' | 'OEFFENTLICH' | 'ERSATZ';
     it.each([['ROOT' as RootNode], ['OEFFENTLICH' as RootNode], ['ERSATZ' as RootNode]])(
         'when traeger has the same name as %s, it should return false',

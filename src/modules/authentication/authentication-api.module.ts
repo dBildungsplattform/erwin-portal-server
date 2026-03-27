@@ -14,8 +14,8 @@ import { JwtStrategy } from './passport/jwt.strategy.js';
 import { OrganisationModule } from '../organisation/organisation.module.js';
 import { RolleModule } from '../rolle/rolle.module.js';
 import { KeycloakAdministrationModule } from '../keycloak-administration/keycloak-administration.module.js';
-import { UserExternaldataWorkflowFactory } from './domain/user-extenaldata.factory.js';
 import { KeycloakInternalController } from './api/keycloakinternal.controller.js';
+import { KeycloakInternalService } from './api/keycloakinternal.service.js';
 
 @Module({
     imports: [
@@ -35,7 +35,7 @@ import { KeycloakInternalController } from './api/keycloakinternal.controller.js
         OIDCClientProvider,
         PersonPermissionsRepo,
         SessionAccessTokenMiddleware,
-        UserExternaldataWorkflowFactory,
+        KeycloakInternalService,
     ],
     controllers: [AuthenticationController, KeycloakInternalController],
     exports: [OIDCClientProvider, PersonPermissionsRepo],
