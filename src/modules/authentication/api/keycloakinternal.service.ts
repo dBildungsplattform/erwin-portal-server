@@ -82,6 +82,7 @@ export class KeycloakInternalService {
             vorname: person.vorname ?? '',
             familienname: person.familienname ?? '',
             rolle: rolle,
+            geburtsdatum: person.geburtsdatum,
             erwinId: person.id,
         });
     }

@@ -94,6 +94,7 @@ describe('KeycloakInternalController', () => {
                 email: faker.internet.email(),
                 vorname: faker.person.firstName(),
                 familienname: faker.person.lastName(),
+                geburtsdatum: faker.date.past(),
             });
 
             const schuleOrg: Organisation<true> = DoFactory.createOrganisation(true, {
@@ -145,6 +146,7 @@ describe('KeycloakInternalController', () => {
             expect(result.personData.familienname).toEqual(person.familienname);
             expect(result.personData.email).toEqual(person.email);
             expect(result.personData.rolle).toEqual(RollenArt.LEHR);
+            expect(result.personData.geburtsdatum).toEqual(person.geburtsdatum);
             expect(result.personData.erwinId).toEqual(person.id);
             expect(result.schuleData).toBeDefined();
             expect(result.schuleData?.externalId).toEqual(schuleOrg.externalIds?.LDAP);

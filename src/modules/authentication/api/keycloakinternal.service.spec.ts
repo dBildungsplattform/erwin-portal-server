@@ -67,6 +67,7 @@ describe('KeycloakInternalService', () => {
                 email: faker.internet.email(),
                 vorname: faker.person.firstName(),
                 familienname: faker.person.lastName(),
+                geburtsdatum: faker.date.past(),
             });
 
             personenkontext = DoFactory.createPersonenkontext(true, {
@@ -120,6 +121,7 @@ describe('KeycloakInternalService', () => {
                     vorname: person.vorname,
                     familienname: person.familienname,
                     rolle: RollenArt.LEHR,
+                    geburtsdatum: person.geburtsdatum,
                     erwinId: person.id,
                 });
                 expect(result.schuleData).toEqual({

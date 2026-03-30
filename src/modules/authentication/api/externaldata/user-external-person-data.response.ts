@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+﻿import { ApiProperty } from '@nestjs/swagger';
 import { RollenArt } from '../../../rolle/domain/rolle.enums.js';
 
 export class UserExternalPersonDataResponse {
@@ -18,6 +18,9 @@ export class UserExternalPersonDataResponse {
     public email!: string;
 
     @ApiProperty()
+    public geburtsdatum!: Date;
+
+    @ApiProperty()
     public erwinId!: string;
 
     public constructor(personResponse: Partial<UserExternalPersonDataResponse>) {
@@ -26,6 +29,7 @@ export class UserExternalPersonDataResponse {
         this.familienname = personResponse.familienname!;
         this.rolle = personResponse.rolle!;
         this.email = personResponse.email!;
+        this.geburtsdatum = personResponse.geburtsdatum!;
         this.erwinId = personResponse.erwinId!;
     }
 }
