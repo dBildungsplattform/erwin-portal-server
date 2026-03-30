@@ -28,7 +28,6 @@ import { KeycloakConfig } from '../../../shared/config/keycloak.config.js';
 import { KeycloakUserService } from '../../keycloak-administration/index.js';
 import { TimeLimitOccasion } from '../../person/domain/time-limit-occasion.enums.js';
 import PersonTimeLimitService from '../../person/domain/person-time-limit-info.service.js';
-import { UserExternaldataWorkflowFactory } from '../domain/user-extenaldata.factory.js';
 import { PersonRepository } from '../../person/persistence/person.repository.js';
 import { Organisation } from '../../organisation/domain/organisation.js';
 
@@ -57,7 +56,6 @@ describe('AuthenticationController', () => {
             ],
             providers: [
                 AuthenticationController,
-                UserExternaldataWorkflowFactory,
                 {
                     provide: PersonPermissionsRepo,
                     useValue: createMock<PersonPermissionsRepo>(),
