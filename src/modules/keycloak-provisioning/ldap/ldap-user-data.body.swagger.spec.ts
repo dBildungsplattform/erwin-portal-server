@@ -69,13 +69,13 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             const person: PersonLdapImportDataBody = plainToInstance(PersonLdapImportDataBody, {});
 
             const dto: LdapUserDataBodyParams = new LdapUserDataBodyParams({
-                klasse: klasse,
+                klassen: [klasse],
                 schule: schule,
                 person: person,
                 rolle: ErwinLdapMappedRollenArt.LEHR,
             });
 
-            expect(dto.klasse).toBe(klasse);
+            expect(dto.klassen).toBe([klasse]);
             expect(dto.schule).toBe(schule);
             expect(dto.person).toBe(person);
             expect(dto.rolle).toBe(ErwinLdapMappedRollenArt.LEHR);
@@ -85,10 +85,12 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
     describe('@Type() + @ValidateNested() + @IsString()', () => {
         it('transforms nested properties into DTO instances (Type decorator)', () => {
             const payload: LdapUserDataBodyParams = {
-                klasse: {
-                    name: 'Testklasse',
-                    externalId: 'cn=Testklasse,ou=Klassen,dc=example,dc=com',
-                },
+                klassen: [
+                    {
+                        name: 'Testklasse',
+                        externalId: 'cn=Testklasse,ou=Klassen,dc=example,dc=com',
+                    },
+                ],
                 schule: {
                     name: 'Testschule',
                     zugehoerigZu: 'Testverband',
@@ -107,7 +109,8 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
 
             const dto: LdapUserDataBodyParams = plainToInstance(LdapUserDataBodyParams, payload);
 
-            expect(dto.klasse).toBeInstanceOf(KlasseLdapImportBodyParams);
+            expect(dto.klassen).toBeInstanceOf(Array);
+            expect(dto.klassen[0]).toBeInstanceOf(KlasseLdapImportBodyParams);
             expect(dto.schule).toBeInstanceOf(SchuleLdapImportBodyParams);
             expect(dto.person).toBeInstanceOf(PersonLdapImportDataBody);
             expect(dto.rolle).toBe(ErwinLdapMappedRollenArt.LEHR);
@@ -115,7 +118,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
 
         it('fails validation when role is not a string (IsString decorator)', async () => {
             const invalidPayload: Record<string, unknown> = {
-                klasse: {},
+                klassen: [],
                 schule: {},
                 person: {},
                 rolle: 123, // not a string → should violate @IsString()
@@ -174,7 +177,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
             const schema: Record<string, unknown> = getSchemaObject(document, 'LdapUserDataBodyParams');
             const props: Record<string, unknown> = getProperties(schema);
 
-            expect(props).toHaveProperty('klasse');
+            expect(props).toHaveProperty('klassen');
             expect(props).toHaveProperty('schule');
             expect(props).toHaveProperty('person');
             expect(props).toHaveProperty('rolle');
