@@ -75,7 +75,7 @@ describe('LdapUserDataBodyParams DTO decorators', () => {
                 rolle: ErwinLdapMappedRollenArt.LEHR,
             });
 
-            expect(dto.klassen).toBe([klasse]);
+            expect(dto.klassen).toStrictEqual([klasse]);
             expect(dto.schule).toBe(schule);
             expect(dto.person).toBe(person);
             expect(dto.rolle).toBe(ErwinLdapMappedRollenArt.LEHR);
