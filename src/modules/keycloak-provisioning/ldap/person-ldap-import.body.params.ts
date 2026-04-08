@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 
 export class PersonLdapImportDataBody {
     @ApiProperty()
@@ -20,9 +20,11 @@ export class PersonLdapImportDataBody {
 
     @ApiProperty()
     @IsString()
-    public email!: string;
+    @IsOptional()
+    public email?: string;
 
     @ApiProperty()
     @IsDate()
-    public geburtstag!: Date;
+    @IsOptional()
+    public geburtstag?: Date;
 }

@@ -3,11 +3,10 @@ import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
-    ApiOkResponse,
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'nest-keycloak-connect';
+import { Public } from '../authentication/api/public.decorator.js';
 import { AccessApiKeyGuard } from '../authentication/api/access.apikey.guard.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
 import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
@@ -38,9 +37,7 @@ export class KeycloakProvisioningController {
     @ApiOperation({ summary: 'Send data for a new LDAP user' })
     @ApiCreatedResponse({
         description: 'User was created',
-        type: LdapUserDataBodyParams,
     })
-    @ApiOkResponse({ description: 'Ldap User Processing Successfully Completed', type: LdapUserDataBodyParams })
     @ApiForbiddenResponse({ description: 'Forbidden Operation or Argument' })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error while Saving Ldap User' })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
