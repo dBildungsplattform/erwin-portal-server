@@ -90,10 +90,12 @@ describe('KeycloakProvisioningController', () => {
                     zugehoerigZu: faker.string.uuid(),
                     externalId: faker.string.uuid(),
                 } as SchuleLdapImportBodyParams,
-                klasse: {
-                    name: faker.lorem.word(),
-                    externalId: faker.string.uuid(),
-                } as KlasseLdapImportBodyParams,
+                klassen: [
+                    {
+                        name: faker.lorem.word(),
+                        externalId: faker.string.uuid(),
+                    } as KlasseLdapImportBodyParams,
+                ],
                 person: {
                     keycloakUserId: faker.string.uuid(),
                     vorname: faker.person.firstName(),

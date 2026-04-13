@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, ValidateNested } from 'class-validator';
 import { KlasseLdapImportBodyParams } from './klasse-ldap-import.body.params.js';
 import { SchuleLdapImportBodyParams } from './schule-ldap-import.body.params.js';
 import { PersonLdapImportDataBody } from './person-ldap-import.body.params.js';
@@ -7,10 +7,11 @@ import { Type } from 'class-transformer';
 import { ErwinLdapMappedRollenArt } from '../../rollenmapping/domain/lms-rollenarten.enums.js';
 
 export class LdapUserDataBodyParams {
-    @ApiProperty({ type: () => KlasseLdapImportBodyParams })
+    @IsArray()
+    @ApiProperty({ type: () => [KlasseLdapImportBodyParams] })
     @ValidateNested()
     @Type(() => KlasseLdapImportBodyParams)
-    public klasse!: KlasseLdapImportBodyParams;
+    public klassen!: KlasseLdapImportBodyParams[];
 
     @ApiProperty({ type: () => SchuleLdapImportBodyParams })
     @ValidateNested()

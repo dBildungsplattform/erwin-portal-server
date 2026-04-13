@@ -3,13 +3,13 @@ import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
-    ApiOkResponse,
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'nest-keycloak-connect';
+import { Public } from '../authentication/api/public.decorator.js';
 import { AccessApiKeyGuard } from '../authentication/api/access.apikey.guard.js';
 import { LdapUserDataBodyParams } from './ldap/ldap-user-data.body.params.js';
+import { KlasseLdapImportBodyParams } from './ldap/klasse-ldap-import.body.params.js';
 import { ClassLogger } from '../../core/logging/class-logger.js';
 import { OrganisationLdapImportService } from './organisation-ldap-import.service.js';
 import { PersonLdapImportService } from './person-ldap-import.service.js';
@@ -37,9 +37,7 @@ export class KeycloakProvisioningController {
     @ApiOperation({ summary: 'Send data for a new LDAP user' })
     @ApiCreatedResponse({
         description: 'User was created',
-        type: LdapUserDataBodyParams,
     })
-    @ApiOkResponse({ description: 'Ldap User Processing Successfully Completed', type: LdapUserDataBodyParams })
     @ApiForbiddenResponse({ description: 'Forbidden Operation or Argument' })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error while Saving Ldap User' })
     public async onNewLdapUser(@Body() params: LdapUserDataBodyParams): Promise<void> {
@@ -55,12 +53,20 @@ export class KeycloakProvisioningController {
 
         await this.personenkontextLdapImportService.createOrUpdatePersonenkontextForSchule(schuleOrg, newRolle, person);
 
-        const klasse: Organisation<true> = await this.organisationLdapImportService.createOrUpdateKlasse(
-            params.klasse,
-            schuleOrg,
-        );
+        await Promise.all(
+            params.klassen.map(async (klasseParam: KlasseLdapImportBodyParams) => {
+                const klasse: Organisation<true> = await this.organisationLdapImportService.createOrUpdateKlasse(
+                    klasseParam,
+                    schuleOrg,
+                );
 
-        await this.personenkontextLdapImportService.createPersonenkontextForKlasseIfNotExists(klasse, newRolle, person);
+                await this.personenkontextLdapImportService.createPersonenkontextForKlasseIfNotExists(
+                    klasse,
+                    newRolle,
+                    person,
+                );
+            }),
+        );
 
         this.logger.info('Ldap user processing completed for Keycloak UserID: ' + params.person.keycloakUserId);
     }
