@@ -203,8 +203,8 @@ status:
 cronjobs:
   enabled: true
   image:
-    tag: '1.2.1'
-    repository: docker.io/schulcloud/cron-tools
+    tag: 'DBP-2198-latest'
+    repository: ghcr.io/dbildungsplattform/cron-tools
     pullPolicy: IfNotPresent
   port: 5656
   keycloakTokenUrl: '/realms/SPSH/protocol/openid-connect/token'
