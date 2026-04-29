@@ -204,7 +204,7 @@ cronjobs:
   enabled: true
   image:
     tag: '1.2.1'
-    repository: docker.io/schulcloud/cron-tools
+    repository: ghcr.io/dbildungsplattform/cron-tools
     pullPolicy: IfNotPresent
   port: 5656
   keycloakTokenUrl: '/realms/SPSH/protocol/openid-connect/token'
