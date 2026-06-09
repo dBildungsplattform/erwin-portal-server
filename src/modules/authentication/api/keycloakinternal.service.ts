@@ -104,10 +104,10 @@ export class KeycloakInternalService {
                 continue;
             }
 
-            if (org.typ === OrganisationsTyp.SCHULE && org.externalIds?.LDAP && org.zugehoerigZu && org.name) {
+            if (org.typ === OrganisationsTyp.SCHULE && org.zugehoerigZu && org.name) {
                 schuleResponses.push(
                     new UserExternalSchuleDataResponse({
-                        externalId: org.externalIds.LDAP,
+                        externalId: org.externalIds?.LDAP,
                         zugehoerigZu: org.zugehoerigZu,
                         name: org.name,
                         erwinId: org.id,
@@ -115,11 +115,11 @@ export class KeycloakInternalService {
                 );
             }
 
-            if (org.typ === OrganisationsTyp.KLASSE && org.externalIds?.LDAP && org.name) {
+            if (org.typ === OrganisationsTyp.KLASSE && org.name) {
                 klasseResponses.push(
                     new UserExternalKlasseDataResponse({
                         name: org.name,
-                        externalId: org.externalIds.LDAP,
+                        externalId: org.externalIds?.LDAP,
                         erwinId: org.id,
                     }),
                 );
