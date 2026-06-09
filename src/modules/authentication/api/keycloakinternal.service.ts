@@ -77,7 +77,7 @@ export class KeycloakInternalService {
             : RollenArt.EXTERN;
 
         return new UserExternalPersonDataResponse({
-            externalId: person.externalIds.LDAP,
+            externalId: person.externalIds.LDAP ?? person.id,
             email: person.email ?? '',
             vorname: person.vorname ?? '',
             familienname: person.familienname ?? '',
@@ -107,7 +107,7 @@ export class KeycloakInternalService {
             if (org.typ === OrganisationsTyp.SCHULE && org.zugehoerigZu && org.name) {
                 schuleResponses.push(
                     new UserExternalSchuleDataResponse({
-                        externalId: org.externalIds?.LDAP,
+                        externalId: org.externalIds?.LDAP ?? org.id,
                         zugehoerigZu: org.zugehoerigZu,
                         name: org.name,
                         erwinId: org.id,
@@ -119,7 +119,7 @@ export class KeycloakInternalService {
                 klasseResponses.push(
                     new UserExternalKlasseDataResponse({
                         name: org.name,
-                        externalId: org.externalIds?.LDAP,
+                        externalId: org.externalIds?.LDAP ?? org.id,
                         erwinId: org.id,
                     }),
                 );
