@@ -40,7 +40,7 @@
             "rollenart": "LEHR",
             "merkmale": ["KOPERS_PFLICHT"],
             "systemrechte": [],
-            "serviceProviderIds": [8, 10]
+            "serviceProviderIds": [8, 10, 15]
         },
         {
             "id": 3,
