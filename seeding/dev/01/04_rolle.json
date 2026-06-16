@@ -222,7 +222,7 @@
                 "LMS_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [8, 10, 5],
             "istTechnisch": false
         },
         {
