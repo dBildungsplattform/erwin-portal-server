@@ -22,7 +22,7 @@
                 "HINWEISE_BEARBEITEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 1,
@@ -31,7 +31,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [3]
+            "serviceProviderIds": [3, 15]
         },
         {
             "id": 2,
@@ -58,7 +58,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 5,
@@ -67,7 +67,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": []
+            "serviceProviderIds": [15]
         },
         {
             "id": 6,
@@ -94,7 +94,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 10,
