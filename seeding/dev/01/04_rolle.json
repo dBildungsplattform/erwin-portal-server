@@ -31,7 +31,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [3, 15]
+            "serviceProviderIds": [3, 8, 10, 15]
         },
         {
             "id": 2,
@@ -67,7 +67,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15]
+            "serviceProviderIds": [8, 10, 15]
         },
         {
             "id": 6,
@@ -232,7 +232,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -242,7 +242,7 @@
             "rollenart": "SYSADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -252,7 +252,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -296,7 +296,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15]
+            "serviceProviderIds": [8, 10, 15]
         },
         {
            "id": 203,
@@ -305,7 +305,7 @@
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -315,7 +315,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -325,7 +325,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -335,7 +335,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -345,7 +345,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -355,7 +355,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -365,7 +365,7 @@
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         }
     ]
