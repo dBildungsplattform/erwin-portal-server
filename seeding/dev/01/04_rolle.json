@@ -231,8 +231,22 @@
             "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10, 15],
+            "systemrechte": [
+                "ROLLEN_VERWALTEN",
+                "PERSONEN_VERWALTEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
+                "PERSON_SYNCHRONISIEREN",
+                "IMPORT_DURCHFUEHREN",
+                "PERSONEN_ANLEGEN",
+                "BULK_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN",
+                "HINWEISE_BEARBEITEN",
+                "SERVICEPROVIDER_VERWALTEN"
+            ],
+            "serviceProviderIds": [5, 8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -241,8 +255,22 @@
             "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10, 16],
+            "systemrechte": [
+                "ROLLEN_VERWALTEN",
+                "PERSONEN_VERWALTEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
+                "PERSON_SYNCHRONISIEREN",
+                "IMPORT_DURCHFUEHREN",
+                "PERSONEN_ANLEGEN",
+                "BULK_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN",
+                "HINWEISE_BEARBEITEN",
+                "SERVICEPROVIDER_VERWALTEN"
+            ],
+            "serviceProviderIds": [5, 8, 10, 16],
             "istTechnisch": false
         },
         {
