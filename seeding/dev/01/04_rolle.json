@@ -22,7 +22,7 @@
                 "HINWEISE_BEARBEITEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 1,
@@ -31,7 +31,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [3]
+            "serviceProviderIds": [3, 8, 10, 15]
         },
         {
             "id": 2,
@@ -40,7 +40,7 @@
             "rollenart": "LEHR",
             "merkmale": ["KOPERS_PFLICHT"],
             "systemrechte": [],
-            "serviceProviderIds": [8, 10]
+            "serviceProviderIds": [8, 10, 15]
         },
         {
             "id": 3,
@@ -58,7 +58,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 5,
@@ -67,7 +67,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": []
+            "serviceProviderIds": [8, 10, 15]
         },
         {
             "id": 6,
@@ -94,7 +94,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
+            "serviceProviderIds": [5, 8, 10, 15]
         },
         {
             "id": 10,
@@ -222,7 +222,7 @@
                 "LMS_VERWALTEN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [8, 10, 5],
             "istTechnisch": false
         },
         {
@@ -231,8 +231,22 @@
             "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [15],
+            "systemrechte": [
+                "ROLLEN_VERWALTEN",
+                "PERSONEN_VERWALTEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
+                "PERSON_SYNCHRONISIEREN",
+                "IMPORT_DURCHFUEHREN",
+                "PERSONEN_ANLEGEN",
+                "BULK_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN",
+                "HINWEISE_BEARBEITEN",
+                "SERVICEPROVIDER_VERWALTEN"
+            ],
+            "serviceProviderIds": [5, 8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -241,8 +255,22 @@
             "name": "Systemadministrator",
             "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [16],
+            "systemrechte": [
+                "ROLLEN_VERWALTEN",
+                "PERSONEN_VERWALTEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
+                "PERSON_SYNCHRONISIEREN",
+                "IMPORT_DURCHFUEHREN",
+                "PERSONEN_ANLEGEN",
+                "BULK_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN",
+                "HINWEISE_BEARBEITEN",
+                "SERVICEPROVIDER_VERWALTEN"
+            ],
+            "serviceProviderIds": [5, 8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -252,7 +280,7 @@
             "rollenart": "LEIT",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -296,7 +324,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15]
+            "serviceProviderIds": [8, 10, 15]
         },
         {
            "id": 203,
@@ -305,7 +333,7 @@
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -315,7 +343,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -325,7 +353,7 @@
             "rollenart": "LEHR",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -335,7 +363,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         },
         {
@@ -345,7 +373,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -355,7 +383,7 @@
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [16],
+            "serviceProviderIds": [8, 10, 16],
             "istTechnisch": false
         },
         {
@@ -365,7 +393,7 @@
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [15],
+            "serviceProviderIds": [8, 10, 15],
             "istTechnisch": false
         }
     ]

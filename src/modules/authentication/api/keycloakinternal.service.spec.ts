@@ -210,7 +210,7 @@ describe('KeycloakInternalService', () => {
 
         describe('when schule organisation is missing required fields', () => {
             describe('when schule has no externalIds.LDAP', () => {
-                it('should throw EntityNotFoundError', async () => {
+                it('should return schule.id as externalId', async () => {
                     const schuleWithoutLdap: Organisation<true> = DoFactory.createOrganisation(true, {
                         typ: OrganisationsTyp.SCHULE,
                         externalIds: undefined,
@@ -223,7 +223,8 @@ describe('KeycloakInternalService', () => {
                     rolleRepoMock.findById.mockResolvedValue(rolle);
                     organisationRepositoryMock.findById.mockResolvedValue(schuleWithoutLdap);
 
-                    await expect(service.createUserExternalResponse(sub)).rejects.toThrow(EntityNotFoundError);
+                    const result: UserExternalDataResponse = await service.createUserExternalResponse(sub);
+                    expect(result.schuleData.externalId).toBe(schuleWithoutLdap.id);
                 });
             });
 
@@ -380,7 +381,7 @@ describe('KeycloakInternalService', () => {
         });
 
         describe('when person has no LDAP externalId', () => {
-            it('should return undefined for person externalId', async () => {
+            it('should return person.id as externalId', async () => {
                 const personWithoutLdap: Person<true> = DoFactory.createPerson(true, {
                     keycloakUserId: sub,
                     externalIds: {},
@@ -394,7 +395,7 @@ describe('KeycloakInternalService', () => {
 
                 const result: UserExternalDataResponse = await service.createUserExternalResponse(sub);
 
-                expect(result.personData.externalId).toBeUndefined();
+                expect(result.personData.externalId).toBe(personWithoutLdap.id);
             });
         });
 

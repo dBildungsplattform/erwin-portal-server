@@ -3,7 +3,7 @@ import { RollenArt } from '../../../rolle/domain/rolle.enums.js';
 
 export class UserExternalPersonDataResponse {
     @ApiProperty()
-    public externalId?: string;
+    public externalId!: string;
 
     @ApiProperty()
     public vorname!: string;
@@ -24,7 +24,7 @@ export class UserExternalPersonDataResponse {
     public erwinId!: string;
 
     public constructor(personResponse: Partial<UserExternalPersonDataResponse>) {
-        this.externalId = personResponse.externalId;
+        this.externalId = personResponse.externalId!;
         this.vorname = personResponse.vorname!;
         this.familienname = personResponse.familienname!;
         this.rolle = personResponse.rolle!;

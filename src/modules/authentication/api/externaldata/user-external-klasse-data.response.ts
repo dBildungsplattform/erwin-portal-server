@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserExternalKlasseDataResponse {
     @ApiProperty()
-    public externalId?: string;
+    public externalId!: string;
 
     @ApiProperty()
     public name!: string;
@@ -11,7 +11,7 @@ export class UserExternalKlasseDataResponse {
     public erwinId!: string;
 
     public constructor(klasseResponse: Partial<UserExternalKlasseDataResponse>) {
-        this.externalId = klasseResponse.externalId;
+        this.externalId = klasseResponse.externalId!;
         this.name = klasseResponse.name!;
         this.erwinId = klasseResponse.erwinId!;
     }
