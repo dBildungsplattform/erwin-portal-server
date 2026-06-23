@@ -648,6 +648,20 @@
             "password": "SPSHtest1!",
             "vorname": "Paul",
             "familienname": "Portaladmin"
+        },
+        {
+            "id": 90,
+            "username": "${SEED_ADMIN_USERNAME}",
+            "password": "${SEED_ADMIN_PASSWORD}",
+            "vorname": "${SEED_ADMIN_VORNAME}",
+            "familienname": "${SEED_ADMIN_FAMILIENNAME}"
+        },
+        {
+            "id": 91,
+            "username": "${SEED_USER_USERNAME}",
+            "password": "${SEED_USER_PASSWORD}",
+            "vorname": "${SEED_USER_VORNAME}",
+            "familienname": "${SEED_USER_FAMILIENNAME}"
         }
     ]
 }

@@ -690,6 +690,16 @@
             "personId": 89,
             "organisationId": 0,
             "rolleId": 103
+        },
+        {
+            "personId": 90,
+            "organisationId": 0,
+            "rolleId": 0
+        },
+        {
+            "personId": 91,
+            "organisationId": 0,
+            "rolleId": 6
         }
     ]
 }
