@@ -74,7 +74,7 @@
             "rollenart": "LEHR",
             "merkmale": ["BEFRISTUNG_PFLICHT"],
             "systemrechte": [],
-            "serviceProviderIds": [8, 10]
+            "serviceProviderIds": [13, 14]
         },
         {
             "id": 7,
@@ -192,7 +192,7 @@
                 "PERSON_SYNCHRONISIEREN",
                 "SERVICEPROVIDER_VERWALTEN"
             ],
-            "serviceProviderIds": [],
+            "serviceProviderIds": [13, 14],
             "istTechnisch": true
         },
         {

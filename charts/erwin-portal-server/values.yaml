@@ -79,6 +79,14 @@ auth:
   redis_password: ''
   kafka_username: ''
   kafka_password: ''
+  seed_admin_username: ''
+  seed_admin_password: ''
+  seed_admin_vorname: ''
+  seed_admin_familienname: ''
+  seed_user_username: ''
+  seed_user_password: ''
+  seed_user_vorname: ''
+  seed_user_familienname: ''
 
 ox:
   enabled: false

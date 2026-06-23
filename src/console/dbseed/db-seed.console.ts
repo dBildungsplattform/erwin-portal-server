@@ -54,6 +54,16 @@ export class DbSeedConsole extends CommandRunner {
         throw new Error('No directory provided!');
     }
 
+    private resolveEnvVars(content: string): string {
+        return content.replace(/\$\{(\w+)}/g, (_match: string, varName: string) => {
+            const value: string | undefined = process.env[varName];
+            if (value === undefined) {
+                throw new Error(`Environment variable ${varName} is not set but required by seeding file`);
+            }
+            return value;
+        });
+    }
+
     public override async run(_passedParams: string[], _options?: Record<string, unknown>): Promise<void> {
         const directory: string = this.getDirectory(_passedParams);
         const subDirs: string[] = this.dbSeedService.getDirectories(directory);
@@ -122,7 +132,8 @@ export class DbSeedConsole extends CommandRunner {
 
     private async processEntityFile(entityFileName: string, directory: string, subDir: string): Promise<void> {
         this.logger.info(`Processing file ${directory}/${subDir}/${entityFileName}`);
-        const fileContentAsStr: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const rawFileContent: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const fileContentAsStr: string = this.resolveEnvVars(rawFileContent);
         const seedFile: SeedFile = JSON.parse(fileContentAsStr) as SeedFile;
         this.logger.info(`Processing ${seedFile.entityName} from ${directory}/${subDir}/${entityFileName}`);
         switch (seedFile.entityName) {

@@ -3,16 +3,17 @@
     "entities": [
         {
             "id": 1,
-            "username": "ssuperadmin",
-            "vorname": "Susi",
-            "familienname": "Superadmin"
+            "username": "${SEED_ADMIN_USERNAME}",
+            "password": "${SEED_ADMIN_PASSWORD}",
+            "vorname": "${SEED_ADMIN_VORNAME}",
+            "familienname": "${SEED_ADMIN_FAMILIENNAME}"
         },
         {
             "id": 2,
-            "username": "migration",
-            "vorname": "migration",
-            "familienname": "migration",
-            "istTechnisch": true
+            "username": "${SEED_USER_USERNAME}",
+            "password": "${SEED_USER_PASSWORD}",
+            "vorname": "${SEED_USER_VORNAME}",
+            "familienname": "${SEED_USER_FAMILIENNAME}"
         }
     ]
 }
