@@ -64,11 +64,13 @@ import { ImportVorgangStatusResponse } from './importvorgang-status.response.js'
 import { ImportResultResponse } from './import-result.response.js';
 import { ImportResultQueryParams } from './import-result-query.params.js';
 import { ImportDataRepository } from '../persistence/import-data.repository.js';
+import { DisabledEndpointGuard } from '../../../shared/guards/disabled-endpoint.guard.js';
 
 @UseFilters(SchulConnexValidationErrorFilter, new AuthenticationExceptionFilter(), new ImportExceptionFilter())
 @ApiTags('import')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
+@UseGuards(DisabledEndpointGuard)
 @Controller({ path: 'import' })
 export class ImportController {
     public constructor(

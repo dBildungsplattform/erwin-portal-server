@@ -20,6 +20,7 @@ import {
     Put,
     Query,
     UseFilters,
+    UseGuards,
 } from '@nestjs/common';
 import { RollenMapping } from '../domain/rollenmapping.js';
 import { RollenMappingRepo } from '../repo/rollenmapping.repo.js';
@@ -36,11 +37,13 @@ import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-respo
 import { RollenMappingExtractMappingRequestBody } from './rollenmapping-extract-mapping-request.body.js';
 import { RollenMappingService } from './rollenmapping.service.js';
 import { RolleID } from '../../../shared/types/index.js';
+import { DisabledEndpointGuard } from '../../../shared/guards/disabled-endpoint.guard.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenMapping')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
+@UseGuards(DisabledEndpointGuard)
 @Controller({ path: 'rollenMapping' })
 export class RollenMappingController {
     public constructor(
