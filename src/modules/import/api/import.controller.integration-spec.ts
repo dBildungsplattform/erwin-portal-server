@@ -41,6 +41,7 @@ import { PagedResponse } from '../../../shared/paging/paged.response.js';
 import { ImportVorgangResponse } from './importvorgang.response.js';
 import { ImportStatus } from '../domain/import.enums.js';
 import { StepUpGuard } from '../../authentication/api/steup-up.guard.js';
+import { DisabledEndpointGuard } from '../../../shared/guards/disabled-endpoint.guard.js';
 import { KeycloakAdministrationService } from '../../keycloak-administration/domain/keycloak-admin-client.service.js';
 import { ImportVorgangStatusResponse } from './importvorgang-status.response.js';
 import { PersonEntity } from '../../person/persistence/person.entity.js';
@@ -122,6 +123,9 @@ describe('Import API', () => {
 
         const stepUpGuard: StepUpGuard = module.get(StepUpGuard);
         stepUpGuard.canActivate = jest.fn().mockReturnValue(true);
+
+        const disabledEndpointGuard: DisabledEndpointGuard = module.get(DisabledEndpointGuard);
+        disabledEndpointGuard.canActivate = jest.fn().mockReturnValue(true);
 
         orm = module.get(MikroORM);
         em = module.get(EntityManager);
