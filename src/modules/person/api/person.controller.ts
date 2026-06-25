@@ -42,7 +42,6 @@ import { DuplicatePersonalnummerError } from '../../../shared/error/duplicate-pe
 import { DomainError, EntityNotFoundError, MissingPermissionsError } from '../../../shared/error/index.js';
 import { SchulConnexErrorMapper } from '../../../shared/error/schul-connex-error.mapper.js';
 import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
-import { PersonExternalSystemsSyncEvent } from '../../../shared/events/person-external-systems-sync.event.js';
 import { ApiOkResponsePaginated, Paged, PagedResponse, PagingHeadersObject } from '../../../shared/paging/index.js';
 import { ScopeOrder } from '../../../shared/persistence/index.js';
 import { PersonID } from '../../../shared/types/aggregate-ids.types.js';
@@ -542,37 +541,6 @@ export class PersonController {
             );
         }
         return new PersonLockResponse(`User has been successfully ${lockUserBodyParams.lock ? '' : 'un'}locked.`);
-    }
-
-    @Post(':personId/sync')
-    @UseGuards(StepUpGuard)
-    @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: 'User will be synced.' })
-    @ApiNotFoundResponse({ description: 'The person was not found.' })
-    @ApiForbiddenResponse({ description: 'Insufficient permissions to perform operation.' })
-    @ApiInternalServerErrorResponse({ description: 'An internal server error occurred.' })
-    @ApiBadGatewayResponse({ description: 'A downstream server returned an error.' })
-    public async syncPerson(
-        @Param('personId') personId: string,
-        @Permissions() permissions: PersonPermissions,
-    ): Promise<void> {
-        const personResult: Result<Person<true>> = await this.personRepository.getPersonIfAllowed(
-            personId,
-            permissions,
-            [RollenSystemRecht.PERSON_SYNCHRONISIEREN],
-        );
-        if (!personResult.ok) {
-            const error: NotFoundOrNoPermissionError = new NotFoundOrNoPermissionError(personId);
-            this.logger.error(
-                `Admin ${permissions.personFields.username} (AdminId: ${permissions.personFields.id} hat versucht Benutzer mit BenutzerId: ${personId} neu zu synchronisieren. Fehler: ${error.message}`,
-            );
-            throw error;
-        }
-
-        this.eventService.publish(new PersonExternalSystemsSyncEvent(personId));
-        this.logger.info(
-            `Admin ${permissions.personFields.username} (AdminId: ${permissions.personFields.id} hat für Benutzer ${personResult.value.referrer} (BenutzerId: ${personResult.value.id}) eine Synchronisation durchgeführt.`,
-        );
     }
 
     @Patch(':personId/metadata')
