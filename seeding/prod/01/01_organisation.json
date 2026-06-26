@@ -4,7 +4,7 @@
         {
             "id": 0,
             "kennung": null,
-            "name": "Land Schleswig-Holstein",
+            "name": "ErWIn Land",
             "kuerzel": "Root",
             "typ": "ROOT",
             "administriertVon": null,
@@ -13,7 +13,7 @@
         {
             "id": 1,
             "kennung": null,
-            "name": "Öffentliche Schulen Land Schleswig-Holstein",
+            "name": "Öffentliche Schulen ErWIn Land",
             "kuerzel": "Öffentl. Schulen",
             "typ": "LAND",
             "administriertVon": 0,
@@ -23,22 +23,12 @@
         {
             "id": 2,
             "kennung": null,
-            "name": "Ersatzschulen Land Schleswig-Holstein",
+            "name": "Ersatzschulen ErWIn Land",
             "kuerzel": "Ersatzschulen",
             "typ": "LAND",
             "administriertVon": 0,
             "zugehoerigZu": 0,
             "emailDomain": "ersatzschule-sh.de"
-        },
-        {
-            "id": 3,
-            "name": "SVS",
-            "typ": "LMS"
-        },
-        {
-            "id": 4,
-            "name": "Moodle",
-            "typ": "LMS"
         }
     ]
 }

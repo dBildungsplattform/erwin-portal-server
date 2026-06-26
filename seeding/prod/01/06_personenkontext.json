@@ -4,22 +4,22 @@
         {
             "personId": 1,
             "organisationId": 0,
-            "rolleId": 0
+            "rolleId": 4
         },
         {
             "personId": 2,
             "organisationId": 0,
-            "rolleId": 101
+            "rolleId": 4
         },
         {
             "personId": 7777777,
             "organisationId": 0,
-            "rolleId": 100
+            "rolleId": 4
         },
         {
             "personId": 7777778,
             "organisationId": 0,
-            "rolleId": 102
+            "rolleId": 4
         }
     ]
 }
