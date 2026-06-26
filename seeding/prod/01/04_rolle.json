@@ -2,274 +2,62 @@
     "entityName": "Rolle",
     "entities": [
         {
-            "id": 0,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Landesadministrator",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": [
-                "ROLLEN_VERWALTEN",
-                "PERSONEN_VERWALTEN",
-                "SCHULEN_VERWALTEN",
-                "KLASSEN_VERWALTEN",
-                "SCHULTRAEGER_VERWALTEN",
-                "PERSONEN_SOFORT_LOESCHEN",
-                "PERSON_SYNCHRONISIEREN",
-                "IMPORT_DURCHFUEHREN",
-                "PERSONEN_ANLEGEN",
-                "BULK_VERWALTEN",
-                "SERVICEPROVIDER_VERWALTEN"
-            ],
-            "serviceProviderIds": [5, 8, 10, 13, 14]
-        },
-        {
             "id": 1,
             "administeredBySchulstrukturknoten": 0,
-            "name": "itslearning-Schüler",
+            "name": "Schüler",
             "rollenart": "LERN",
             "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [3]
+            "serviceProviderIds": [2, 3, 4]
         },
         {
             "id": 2,
-            "administeredBySchulstrukturknoten": 1,
+            "administeredBySchulstrukturknoten": 0,
             "name": "Lehrkraft",
             "rollenart": "LEHR",
-            "merkmale": ["KOPERS_PFLICHT"],
+            "merkmale": [],
             "systemrechte": [],
-            "serviceProviderIds": [8, 10]
+            "serviceProviderIds": [2, 3, 4]
         },
         {
             "id": 3,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "LiV",
-            "rollenart": "LEHR",
-            "merkmale": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
+            "administeredBySchulstrukturknoten": 0,
+            "name": "Leiter",
+            "rollenart": "LEIT",
+            "merkmale": [],
+            "systemrechte": ["PERSONEN_LESEN"],
+            "serviceProviderIds": [2, 3, 4]
         },
         {
             "id": 4,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Schuladministrator öffentlich",
-            "rollenart": "LEIT",
+            "administeredBySchulstrukturknoten": 0,
+            "name": "Administrator",
+            "rollenart": "SYSADMIN",
             "merkmale": [],
-            "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
+            "systemrechte": ["PERSONEN_LESEN", "SERVICEPROVIDER_VERWALTEN", "ROLLEN_VERWALTEN"],
+            "serviceProviderIds": [1, 2, 3, 4]
         },
         {
             "id": 5,
             "administeredBySchulstrukturknoten": 0,
-            "name": "Webuntis-Schüler",
-            "rollenart": "LERN",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": []
-        },
-        {
-            "id": 6,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Student im Praxissemester",
-            "rollenart": "LEHR",
-            "merkmale": ["BEFRISTUNG_PFLICHT"],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
-        },
-        {
-            "id": 7,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Schulträgeradministrator",
-            "rollenart": "ORGADMIN",
-            "merkmale": [],
-            "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
-        },
-        {
-            "id": 8,
-            "administeredBySchulstrukturknoten": 2,
-            "name": "Schuladministrator Ersatzschule",
-            "rollenart": "LEIT",
-            "merkmale": [],
-            "systemrechte": ["PERSONEN_VERWALTEN", "KLASSEN_VERWALTEN"],
-            "serviceProviderIds": [5, 8, 10]
-        },
-        {
-            "id": 10,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Vertretungslehrkraft",
-            "rollenart": "LEHR",
-            "merkmale": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
-        },
-        {
-            "id": 11,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Ev./Kat. Religionslehrkraft",
-            "rollenart": "LEHR",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
-        },
-        {
-            "id": 12,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Pilotprojekt-Schulverwaltungskraft",
-            "rollenart": "LEHR",
-            "merkmale": ["KOPERS_PFLICHT"],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
-        },
-        {
-            "id": 13,
-            "administeredBySchulstrukturknoten": 2,
-            "name": "Ersatzschullehrkraft",
-            "rollenart": "LEHR",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [8, 10]
-        },
-        {
-            "id": 14,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "IQSH Mitarbeiter",
-            "rollenart": "LEHR",
-            "merkmale": ["KOPERS_PFLICHT"],
-            "systemrechte": [],
-            "serviceProviderIds": [3, 8, 10]
-        },
-        {
-            "id": 15,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "itslearning-Lehrkraft",
-            "rollenart": "LEHR",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [3]
-        },
-        {
-            "id": 16,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "itslearning-Administrator",
-            "rollenart": "LEIT",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [3]
-        },
-        {
-            "id": 17,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "itslearning-Schulbegleitung",
-            "rollenart": "LERN",
-            "merkmale": [],
-            "systemrechte": [],
-            "serviceProviderIds": [3]
-        },
-        {
-            "id": 100,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Technical User CRON",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": ["CRON_DURCHFUEHREN", "PERSONEN_VERWALTEN", "PERSONEN_SOFORT_LOESCHEN"],
-            "serviceProviderIds": [],
-            "istTechnisch": true
-        },
-        {
-            "id": 101,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Migration",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": [
-                "ROLLEN_VERWALTEN",
-                "PERSONEN_VERWALTEN",
-                "SCHULEN_VERWALTEN",
-                "KLASSEN_VERWALTEN",
-                "SCHULTRAEGER_VERWALTEN",
-                "MIGRATION_DURCHFUEHREN",
-                "PERSON_SYNCHRONISIEREN",
-                "SERVICEPROVIDER_VERWALTEN"
-            ],
-            "serviceProviderIds": [],
-            "istTechnisch": true
-        },
-        {
-            "id": 102,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Technical User NextCloud",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [],
-            "istTechnisch": true
-        },
-        {
-            "id": 103,
-            "administeredBySchulstrukturknoten": 0,
-            "name": "Portal Admin",
+            "name": "Portaladministrator",
             "rollenart": "PORTALADMIN",
             "merkmale": [],
             "systemrechte": [
-                "PERSONEN_ANLEGEN",
                 "PERSONEN_LESEN",
+                "PERSONEN_ANLEGEN",
                 "PERSONEN_VERWALTEN",
                 "PERSONEN_SOFORT_LOESCHEN",
-                "ROLLEN_VERWALTEN",
+                "SERVICEPROVIDER_VERWALTEN",
                 "LMS_VERWALTEN",
-                "SERVICEPROVIDER_VERWALTEN"
+
+                "ROLLEN_VERWALTEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN"
             ],
-            "serviceProviderIds": [13, 14],
-            "istTechnisch": false
-        },
-        {
-           "id": 104,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Systemadministrator",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": [
-                "PERSONEN_LESEN",
-                "SERVICEPROVIDER_VERWALTEN",
-                "ROLLEN_VERWALTEN"
-            ],
-            "serviceProviderIds": [13],
-            "istTechnisch": false
-        },
-        {
-           "id": 105,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Systemadministrator",
-            "rollenart": "SYSADMIN",
-            "merkmale": [],
-            "systemrechte": [
-                "PERSONEN_LESEN",
-                "SERVICEPROVIDER_VERWALTEN",
-                "ROLLEN_VERWALTEN"
-            ],
-            "serviceProviderIds": [14],
-            "istTechnisch": false
-        },
-        {
-           "id": 106,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "SVS Leiter",
-            "rollenart": "LEIT",
-            "merkmale": [],
-            "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [13],
-            "istTechnisch": false
-        },
-        {
-           "id": 107,
-            "administeredBySchulstrukturknoten": 1,
-            "name": "Moodle Leiter",
-            "rollenart": "LEIT",
-            "merkmale": [],
-            "systemrechte": ["PERSONEN_LESEN"],
-            "serviceProviderIds": [14],
-            "istTechnisch": false
+            "serviceProviderIds": [1, 2, 3, 4]
         }
     ]
 }
