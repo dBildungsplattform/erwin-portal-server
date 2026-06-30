@@ -200,7 +200,7 @@ jobs:
       - create_branch_identifier
       - wait_for_helm_chart_to_get_published
       - build_image_on_push
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/deploy.yml@1
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/deploy.yml@EW-1463
     with:
       erwin_portal_server_branch: ${{ needs.branch_meta.outputs.ticket }}
       erwin_portal_client_branch: ${{ needs.branch_meta.outputs.ticket }}
