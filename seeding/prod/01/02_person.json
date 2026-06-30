@@ -2,14 +2,14 @@
     "entityName": "Person",
     "entities": [
         {
-            "id": 1,
+            "id": 900,
             "username": "${SEED_ADMIN_USERNAME}",
             "password": "${SEED_ADMIN_PASSWORD}",
             "vorname": "${SEED_ADMIN_VORNAME}",
             "familienname": "${SEED_ADMIN_FAMILIENNAME}"
         },
         {
-            "id": 2,
+            "id": 901,
             "username": "${SEED_USER_USERNAME}",
             "password": "${SEED_USER_PASSWORD}",
             "vorname": "${SEED_USER_VORNAME}",
