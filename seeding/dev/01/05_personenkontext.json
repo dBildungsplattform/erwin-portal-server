@@ -168,6 +168,7 @@
             "personId": 13,
             "organisationId": 102,
             "rolleId": 1
+<<<<<<< EW-1463
         },
         {
             "personId": 90,
@@ -178,6 +179,8 @@
             "personId": 91,
             "organisationId": 0,
             "rolleId": 1
+=======
+>>>>>>> main
         }
     ]
 }
