@@ -106,46 +106,4 @@
     secretKeyRef:
         name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
         key: import-passphrase-secret
-{{- if .Values.auth.seed_admin_username }}
-- name: SEED_ADMIN_USERNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-admin-username
-- name: SEED_ADMIN_PASSWORD
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-admin-password
-- name: SEED_ADMIN_VORNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-admin-vorname
-- name: SEED_ADMIN_FAMILIENNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-admin-familienname
-- name: SEED_USER_USERNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-user-username
-- name: SEED_USER_PASSWORD
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-user-password
-- name: SEED_USER_VORNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-user-vorname
-- name: SEED_USER_FAMILIENNAME
-  valueFrom:
-    secretKeyRef:
-        name: {{ default .Values.auth.existingSecret .Values.auth.secretName }}
-        key: seed-user-familienname
-{{- end }}
 {{- end}}
