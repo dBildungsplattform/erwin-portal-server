@@ -103,32 +103,44 @@ export class DbSeedConsole extends CommandRunner {
         const contentHash: string = this.generateHashForEntityFile(fileContentAsStr);
         const dbSeedE: Option<DbSeed<true>> = await this.dbSeedRepo.findById(contentHash);
         if (dbSeedE) {
-            if (dbSeedE.status === DbSeedStatus.FAILED) {
-                this.logger.warning(
-                    `Skipping file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}`,
-                );
-            } else if (dbSeedE.status === DbSeedStatus.DONE) {
+            if (dbSeedE.status === DbSeedStatus.DONE) {
                 this.logger.info(
                     `Skipping file ${entityFileName} because it was successfully executed on ${dbSeedE.executedAt.toLocaleString()}`,
                 );
+                return;
+            } else if (dbSeedE.status === DbSeedStatus.FAILED) {
+                this.logger.warning(
+                    `Retrying file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}`,
+                );
+                try {
+                    await this.processEntityFile(entityFileName, directory, subDir);
+                    dbSeedE.setDone();
+                    await this.dbSeedRepo.update(dbSeedE);
+                } catch (err) {
+                    dbSeedE.setFailed();
+                    this.dbSeedRepo.forkEntityManager();
+                    await this.dbSeedRepo.update(dbSeedE);
+                    throw err;
+                }
+                return;
             }
-        } else {
-            const dbSeed: DbSeed<false> = DbSeed.createNew(
-                contentHash,
-                DbSeedStatus.STARTED,
-                subDir + '/' + entityFileName,
-            );
-            const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
-            try {
-                await this.processEntityFile(entityFileName, directory, subDir);
-                persistedDbSeed.setDone();
-                await this.dbSeedRepo.update(persistedDbSeed);
-            } catch (err) {
-                persistedDbSeed.setFailed();
-                this.dbSeedRepo.forkEntityManager();
-                await this.dbSeedRepo.update(persistedDbSeed);
-                throw err;
-            }
+        }
+
+        const dbSeed: DbSeed<false> = DbSeed.createNew(
+            contentHash,
+            DbSeedStatus.STARTED,
+            subDir + '/' + entityFileName,
+        );
+        const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
+        try {
+            await this.processEntityFile(entityFileName, directory, subDir);
+            persistedDbSeed.setDone();
+            await this.dbSeedRepo.update(persistedDbSeed);
+        } catch (err) {
+            persistedDbSeed.setFailed();
+            this.dbSeedRepo.forkEntityManager();
+            await this.dbSeedRepo.update(persistedDbSeed);
+            throw err;
         }
     }
 
