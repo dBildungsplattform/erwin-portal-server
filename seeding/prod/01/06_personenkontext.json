@@ -10,19 +10,6 @@
             "personId": 901,
             "organisationId": 0,
             "rolleId": 4
-<<<<<<< EW-1463
-=======
-        },
-        {
-            "personId": 7777777,
-            "organisationId": 0,
-            "rolleId": 4
-        },
-        {
-            "personId": 7777778,
-            "organisationId": 0,
-            "rolleId": 4
->>>>>>> main
         }
     ]
 }
