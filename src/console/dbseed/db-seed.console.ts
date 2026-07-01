@@ -40,6 +40,17 @@ export class DbSeedConsole extends CommandRunner {
         super();
     }
 
+    private resolveEnvVariables(content: string): string {
+        return content.replace(/\$\{([^}]+)}/g, (_match: string, varName: string): string => {
+            const value: string | undefined = process.env[varName];
+            if (value === undefined) {
+                this.logger.warning(`Environment variable ${varName} is not set`);
+                return '';
+            }
+            return value;
+        });
+    }
+
     private generateHashForEntityFile(entityFileContent: string): string {
         const hash: Hash = createHash('sha256').setEncoding('hex');
         hash.write(entityFileContent);
@@ -87,42 +98,56 @@ export class DbSeedConsole extends CommandRunner {
     }
 
     private async readAndProcessEntityFile(directory: string, subDir: string, entityFileName: string): Promise<void> {
-        const fileContentAsStr: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const rawFileContent: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const fileContentAsStr: string = this.resolveEnvVariables(rawFileContent);
         const contentHash: string = this.generateHashForEntityFile(fileContentAsStr);
         const dbSeedE: Option<DbSeed<true>> = await this.dbSeedRepo.findById(contentHash);
         if (dbSeedE) {
-            if (dbSeedE.status === DbSeedStatus.FAILED) {
-                this.logger.warning(
-                    `Skipping file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}`,
-                );
-            } else if (dbSeedE.status === DbSeedStatus.DONE) {
+            if (dbSeedE.status === DbSeedStatus.DONE) {
                 this.logger.info(
                     `Skipping file ${entityFileName} because it was successfully executed on ${dbSeedE.executedAt.toLocaleString()}`,
                 );
+                return;
+            } else if (dbSeedE.status === DbSeedStatus.FAILED) {
+                this.logger.warning(
+                    `Retrying file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}`,
+                );
+                try {
+                    await this.processEntityFile(entityFileName, directory, subDir);
+                    dbSeedE.setDone();
+                    await this.dbSeedRepo.update(dbSeedE);
+                } catch (err) {
+                    dbSeedE.setFailed();
+                    this.dbSeedRepo.forkEntityManager();
+                    await this.dbSeedRepo.update(dbSeedE);
+                    throw err;
+                }
+                return;
             }
-        } else {
-            const dbSeed: DbSeed<false> = DbSeed.createNew(
-                contentHash,
-                DbSeedStatus.STARTED,
-                subDir + '/' + entityFileName,
-            );
-            const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
-            try {
-                await this.processEntityFile(entityFileName, directory, subDir);
-                persistedDbSeed.setDone();
-                await this.dbSeedRepo.update(persistedDbSeed);
-            } catch (err) {
-                persistedDbSeed.setFailed();
-                this.dbSeedRepo.forkEntityManager();
-                await this.dbSeedRepo.update(persistedDbSeed);
-                throw err;
-            }
+        }
+
+        const dbSeed: DbSeed<false> = DbSeed.createNew(
+            contentHash,
+            DbSeedStatus.STARTED,
+            subDir + '/' + entityFileName,
+        );
+        const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
+        try {
+            await this.processEntityFile(entityFileName, directory, subDir);
+            persistedDbSeed.setDone();
+            await this.dbSeedRepo.update(persistedDbSeed);
+        } catch (err) {
+            persistedDbSeed.setFailed();
+            this.dbSeedRepo.forkEntityManager();
+            await this.dbSeedRepo.update(persistedDbSeed);
+            throw err;
         }
     }
 
     private async processEntityFile(entityFileName: string, directory: string, subDir: string): Promise<void> {
         this.logger.info(`Processing file ${directory}/${subDir}/${entityFileName}`);
-        const fileContentAsStr: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const rawFileContent: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const fileContentAsStr: string = this.resolveEnvVariables(rawFileContent);
         const seedFile: SeedFile = JSON.parse(fileContentAsStr) as SeedFile;
         this.logger.info(`Processing ${seedFile.entityName} from ${directory}/${subDir}/${entityFileName}`);
         switch (seedFile.entityName) {

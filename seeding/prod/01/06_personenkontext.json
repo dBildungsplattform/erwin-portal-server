@@ -2,22 +2,12 @@
     "entityName": "Personenkontext",
     "entities": [
         {
-            "personId": 1,
+            "personId": 900,
             "organisationId": 0,
             "rolleId": 4
         },
         {
-            "personId": 2,
-            "organisationId": 0,
-            "rolleId": 4
-        },
-        {
-            "personId": 7777777,
-            "organisationId": 0,
-            "rolleId": 4
-        },
-        {
-            "personId": 7777778,
+            "personId": 901,
             "organisationId": 0,
             "rolleId": 4
         }
