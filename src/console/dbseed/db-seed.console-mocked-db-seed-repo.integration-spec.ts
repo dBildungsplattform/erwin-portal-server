@@ -97,15 +97,113 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
         expect(orm).toBeDefined();
     });
 
+    describe('resolveEnvVariables', () => {
+        it('should replace env variable placeholders with values', () => {
+            process.env['TEST_SEED_VAR'] = 'resolved-value';
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            const result: string = (
+                sut as unknown as { resolveEnvVariables: (c: string) => string }
+            ).resolveEnvVariables('Hello ${TEST_SEED_VAR}!');
+            expect(result).toBe('Hello resolved-value!');
+            delete process.env['TEST_SEED_VAR'];
+        });
+
+        it('should return empty string and log warning for undefined env variables', () => {
+            delete process.env['UNDEFINED_SEED_VAR'];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            const result: string = (
+                sut as unknown as { resolveEnvVariables: (c: string) => string }
+            ).resolveEnvVariables('Hello ${UNDEFINED_SEED_VAR}!');
+            expect(result).toBe('Hello !');
+        });
+    });
+
     describe('run', () => {
-        describe('skips files if previous seeding already happened and failures occurred', () => {
-            it('should NOT fail', async () => {
+        describe('skips files if previous seeding was successful', () => {
+            it('should skip without processing', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.DONE });
+                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
+
+                await expect(sut.run(params)).resolves.not.toThrow();
+            });
+        });
+
+        describe('retries files if previous seeding failed', () => {
+            it('should retry and succeed', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
                 dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
 
+                jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
+                jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPerson').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedRolle').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedServiceProvider').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPersonenkontext').mockResolvedValue([]);
+                jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
+
                 await expect(sut.run(params)).resolves.not.toThrow();
+                expect(dbSeedMock.setDone).toHaveBeenCalled();
+                expect(dbSeedRepoMock.update).toHaveBeenCalled();
+            });
+        });
+
+        describe('retries files if previous seeding failed and retry also fails', () => {
+            it('should throw and mark as failed', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
+                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
+
+                jest.spyOn(dbSeedService, 'readDataProvider').mockImplementation(() => {
+                    throw new Error('Retry failed');
+                });
+
+                await expect(sut.run(params)).rejects.toThrow('Retry failed');
+                expect(dbSeedMock.setFailed).toHaveBeenCalled();
+            });
+        });
+
+        describe('creates new seed entry when no previous hash exists', () => {
+            it('should process files and mark as done', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
+                dbSeedRepoMock.findById.mockResolvedValue(null);
+                dbSeedRepoMock.create.mockResolvedValue(persistedDbSeed);
+
+                jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
+                jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPerson').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedRolle').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedServiceProvider').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPersonenkontext').mockResolvedValue([]);
+                jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
+
+                await expect(sut.run(params)).resolves.not.toThrow();
+                expect(dbSeedRepoMock.create).toHaveBeenCalled();
+                expect(persistedDbSeed.setDone).toHaveBeenCalled();
+                expect(dbSeedRepoMock.update).toHaveBeenCalled();
+            });
+        });
+
+        describe('creates new seed entry and processing fails', () => {
+            it('should throw and mark as failed', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
+                dbSeedRepoMock.findById.mockResolvedValue(null);
+                dbSeedRepoMock.create.mockResolvedValue(persistedDbSeed);
+
+                jest.spyOn(dbSeedService, 'readDataProvider').mockImplementation(() => {
+                    throw new Error('Processing failed');
+                });
+
+                await expect(sut.run(params)).rejects.toThrow('Processing failed');
+                expect(persistedDbSeed.setFailed).toHaveBeenCalled();
             });
         });
     });
