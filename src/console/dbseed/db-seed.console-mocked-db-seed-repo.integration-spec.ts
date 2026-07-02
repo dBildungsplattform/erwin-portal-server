@@ -98,22 +98,20 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
     });
 
     describe('resolveEnvVariables', () => {
+        // Access private method for testing
+        const callResolveEnvVariables = (instance: DbSeedConsole, content: string): string =>
+            (instance as unknown as { resolveEnvVariables: (c: string) => string }).resolveEnvVariables(content);
+
         it('should replace env variable placeholders with values', () => {
             process.env['TEST_SEED_VAR'] = 'resolved-value';
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            const result: string = (
-                sut as unknown as { resolveEnvVariables: (c: string) => string }
-            ).resolveEnvVariables('Hello ${TEST_SEED_VAR}!');
+            const result: string = callResolveEnvVariables(sut, 'Hello ${TEST_SEED_VAR}!');
             expect(result).toBe('Hello resolved-value!');
             delete process.env['TEST_SEED_VAR'];
         });
 
         it('should return empty string and log warning for undefined env variables', () => {
             delete process.env['UNDEFINED_SEED_VAR'];
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            const result: string = (
-                sut as unknown as { resolveEnvVariables: (c: string) => string }
-            ).resolveEnvVariables('Hello ${UNDEFINED_SEED_VAR}!');
+            const result: string = callResolveEnvVariables(sut, 'Hello ${UNDEFINED_SEED_VAR}!');
             expect(result).toBe('Hello !');
         });
     });
