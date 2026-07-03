@@ -168,6 +168,16 @@
             "personId": 13,
             "organisationId": 102,
             "rolleId": 1
+        },
+        {
+            "personId": 90,
+            "organisationId": 0,
+            "rolleId": 4
+        },
+        {
+            "personId": 91,
+            "organisationId": 0,
+            "rolleId": 1
         }
     ]
 }
