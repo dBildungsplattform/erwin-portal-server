@@ -40,6 +40,17 @@ export class DbSeedConsole extends CommandRunner {
         super();
     }
 
+    private resolveEnvVariables(content: string): string {
+        return content.replace(/\$\{([^}]+)}/g, (_match: string, varName: string): string => {
+            const value: string | undefined = process.env[varName];
+            if (value === undefined) {
+                this.logger.warning(`Environment variable ${varName} is not set`);
+                return '';
+            }
+            return value;
+        });
+    }
+
     private generateHashForEntityFile(entityFileContent: string): string {
         const hash: Hash = createHash('sha256').setEncoding('hex');
         hash.write(entityFileContent);
@@ -122,9 +133,11 @@ export class DbSeedConsole extends CommandRunner {
 
     private async processEntityFile(entityFileName: string, directory: string, subDir: string): Promise<void> {
         this.logger.info(`Processing file ${directory}/${subDir}/${entityFileName}`);
-        const fileContentAsStr: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
-        const seedFile: SeedFile = JSON.parse(fileContentAsStr) as SeedFile;
-        this.logger.info(`Processing ${seedFile.entityName} from ${directory}/${subDir}/${entityFileName}`);
+        const rawFileContent: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
+        const fileContentAsStr: string = this.resolveEnvVariables(rawFileContent);
+        const seedFile: EntityFile<unknown> = JSON.parse(fileContentAsStr) as EntityFile<unknown>;
+        const entityCount: number = seedFile.entities?.length ?? 0;
+        this.logger.info(`Seeding ${entityCount} ${seedFile.entityName}(s) from ${subDir}/${entityFileName}`);
         switch (seedFile.entityName) {
             case 'DataProvider':
                 this.handleDataProvider(this.dbSeedService.readDataProvider(fileContentAsStr), seedFile.entityName);
@@ -150,6 +163,9 @@ export class DbSeedConsole extends CommandRunner {
             default:
                 throw new Error(`Unsupported EntityName / EntityType: ${seedFile.entityName}`);
         }
+        this.logger.info(
+            `Successfully seeded ${entityCount} ${seedFile.entityName}(s) from ${subDir}/${entityFileName}`,
+        );
     }
 
     private handleDataProvider(entities: Entity[], entityName: string): void {
