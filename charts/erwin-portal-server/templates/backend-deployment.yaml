@@ -72,6 +72,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ template "common.names.name" . }}
+            {{- if .Values.encrypted_data.enabled }}
+            - secretRef:
+                name: {{ required "encrypted_data.existingSecret is required when encrypted_data.enabled=true" .Values.encrypted_data.existingSecret | quote }}
+            {{- end }}
           env: {{- include "erwin-portal-server-backend-envs" . | indent  12}}
           volumeMounts:
             {{- toYaml .Values.backend.volumeMounts | nindent 12 }}
