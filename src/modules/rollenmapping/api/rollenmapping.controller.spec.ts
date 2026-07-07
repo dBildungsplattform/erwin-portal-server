@@ -424,14 +424,12 @@ describe('RollenMapping API', () => {
     });
     describe('getMappingForRolleAndServiceProvider', () => {
         describe('when called', () => {
-            const userId: string = faker.string.uuid();
+            const keycloakUserId: string = faker.string.uuid();
             const clientName: string = faker.company.name();
             const rolleId: string = faker.string.uuid();
-            const clientId: string = faker.string.uuid();
             const rollenMappingExtractMappingRequestBody: RollenMappingExtractMappingRequestBody = {
-                userId,
+                keycloakUserId,
                 clientName,
-                clientId,
             };
 
             it('should return RollenMappingRolleIdResponse if rolleId and rollenMapping exist', async () => {
@@ -451,7 +449,7 @@ describe('RollenMapping API', () => {
                         rollenMappingExtractMappingRequestBody,
                     );
                 expect(result).toBeInstanceOf(Object);
-                expect(result.userId).toBe(userId);
+                expect(result.userId).toBe(keycloakUserId);
                 expect(result.mapToLmsRolle).toBe('Teacher');
             });
 

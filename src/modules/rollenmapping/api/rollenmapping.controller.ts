@@ -1,15 +1,5 @@
 import {
-    ApiBadRequestResponse,
-    ApiBearerAuth,
-    ApiForbiddenResponse,
-    ApiInternalServerErrorResponse,
-    ApiNotFoundResponse,
-    ApiOAuth2,
-    ApiOkResponse,
-    ApiTags,
-    ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import {
+    Body,
     Controller,
     Delete,
     ForbiddenException,
@@ -22,31 +12,44 @@ import {
     UseFilters,
     UseGuards,
 } from '@nestjs/common';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiForbiddenResponse,
+    ApiInternalServerErrorResponse,
+    ApiNotFoundResponse,
+    ApiOAuth2,
+    ApiOkResponse,
+    ApiTags,
+    ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { ClassLogger } from '../../../core/logging/class-logger.js';
+import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
+import { RolleID } from '../../../shared/types/index.js';
+import { AccessApiKeyGuard } from '../../authentication/api/access.apikey.guard.js';
+import { Permissions } from '../../authentication/api/permissions.decorator.js';
+import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
+import { Person } from '../../person/domain/person.js';
+import { PersonRepository } from '../../person/persistence/person.repository.js';
+import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
+import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
+import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
+import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
 import { RollenMapping } from '../domain/rollenmapping.js';
 import { RollenMappingRepo } from '../repo/rollenmapping.repo.js';
-import { Permissions } from '../../authentication/api/permissions.decorator.js';
-import { ClassLogger } from '../../../core/logging/class-logger.js';
-import { RollenSystemRecht } from '../../rolle/domain/rolle.enums.js';
-import { PersonPermissions } from '../../authentication/domain/person-permissions.js';
-import { RollenMappingFactory } from '../domain/rollenmapping.factory.js';
-import { SchulConnexValidationErrorFilter } from '../../../shared/error/schulconnex-validation-error.filter.js';
 import { RollenMappingCreateBodyParams } from './rollenmapping-create-body.params.js';
-import { ServiceProviderRepo } from '../../service-provider/repo/service-provider.repo.js';
-import { ServiceProvider } from '../../service-provider/domain/service-provider.js';
-import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-response.js';
 import { RollenMappingExtractMappingRequestBody } from './rollenmapping-extract-mapping-request.body.js';
+import { RollenMappingRolleUserIdResponse } from './rollenmapping-rolle-id-response.js';
 import { RollenMappingService } from './rollenmapping.service.js';
-import { RolleID } from '../../../shared/types/index.js';
-import { DisabledEndpointGuard } from '../../../shared/guards/disabled-endpoint.guard.js';
 
 @UseFilters(new SchulConnexValidationErrorFilter())
 @ApiTags('rollenMapping')
 @ApiBearerAuth()
 @ApiOAuth2(['openid'])
-@UseGuards(DisabledEndpointGuard)
 @Controller({ path: 'rollenMapping' })
 export class RollenMappingController {
     public constructor(
+        private readonly personRepository: PersonRepository,
         private readonly rollenMappingRepo: RollenMappingRepo,
         private readonly rollenMappingFactory: RollenMappingFactory,
         private readonly serviceProviderRepo: ServiceProviderRepo,
@@ -289,13 +292,19 @@ export class RollenMappingController {
     @ApiForbiddenResponse({ description: 'Insufficient rights to extract mapping' })
     @ApiNotFoundResponse({ description: 'No mapping found for the given user/service provider' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error while extracting mapping' })
+    @UseGuards(AccessApiKeyGuard)
     public async getMappingForRolleAndServiceProvider(
-        @Query('RollenMappingExtractMappingRequestBody')
-        rollenMappingExtractMappingRequestBody: RollenMappingExtractMappingRequestBody,
+        @Body() body: RollenMappingExtractMappingRequestBody,
     ): Promise<RollenMappingRolleUserIdResponse> {
+        const person: Option<Person<true>> = await this.personRepository.findByKeycloakUserId(body.keycloakUserId);
+
+        if (!person) {
+            throw new NotFoundException("Person with given id doesn't exist");
+        }
+
         const rolleId: RolleID | null = await this.rollenMappingService.getRoleOnServiceProviderByClientName(
-            rollenMappingExtractMappingRequestBody.clientName,
-            rollenMappingExtractMappingRequestBody.userId,
+            body.clientName,
+            person.id,
         );
         if (!rolleId) {
             throw new NotFoundException("User doesn't have access to the requested service provider");
@@ -308,9 +317,6 @@ export class RollenMappingController {
             throw new NotFoundException(`No rollenMapping object found with rolleId ${rolleId}`);
         }
 
-        return new RollenMappingRolleUserIdResponse(
-            rollenMappingExtractMappingRequestBody.userId,
-            rollenMapping.mapToLmsRolle,
-        );
+        return new RollenMappingRolleUserIdResponse(person.id, rollenMapping.mapToLmsRolle);
     }
 }
