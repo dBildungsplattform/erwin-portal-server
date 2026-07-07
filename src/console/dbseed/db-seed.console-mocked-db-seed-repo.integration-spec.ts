@@ -128,40 +128,14 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
             });
         });
 
-        describe('retries files if previous seeding failed', () => {
-            it('should retry and succeed', async () => {
+        describe('skips files if previous seeding failed', () => {
+            it('should skip without processing', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
                 dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
-
-                jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
-                jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
-                jest.spyOn(dbSeedService, 'seedPerson').mockResolvedValue();
-                jest.spyOn(dbSeedService, 'seedRolle').mockResolvedValue();
-                jest.spyOn(dbSeedService, 'seedServiceProvider').mockResolvedValue();
-                jest.spyOn(dbSeedService, 'seedPersonenkontext').mockResolvedValue([]);
-                jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
 
                 await expect(sut.run(params)).resolves.not.toThrow();
-                expect(dbSeedMock.setDone).toHaveBeenCalled();
-                expect(dbSeedRepoMock.update).toHaveBeenCalled();
-            });
-        });
-
-        describe('retries files if previous seeding failed and retry also fails', () => {
-            it('should throw and mark as failed', async () => {
-                const params: string[] = ['seeding-integration-test/all'];
-
-                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
-                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
-
-                jest.spyOn(dbSeedService, 'readDataProvider').mockImplementation(() => {
-                    throw new Error('Retry failed');
-                });
-
-                await expect(sut.run(params)).rejects.toThrow('Retry failed');
-                expect(dbSeedMock.setFailed).toHaveBeenCalled();
             });
         });
 
