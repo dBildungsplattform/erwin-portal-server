@@ -136,7 +136,7 @@ export class DbSeedConsole extends CommandRunner {
         const rawFileContent: string = fs.readFileSync(`./seeding/${directory}/${subDir}/${entityFileName}`, 'utf-8');
         const fileContentAsStr: string = this.resolveEnvVariables(rawFileContent);
         const seedFile: EntityFile<unknown> = JSON.parse(fileContentAsStr) as EntityFile<unknown>;
-        const entityCount: number = seedFile.entities?.length ?? 0;
+        const entityCount: number = seedFile.entities.length;
         this.logger.info(`Seeding ${entityCount} ${seedFile.entityName}(s) from ${subDir}/${entityFileName}`);
         switch (seedFile.entityName) {
             case 'DataProvider':
