@@ -69,6 +69,7 @@
                 "PERSONEN_LESEN",
                 "PERSONEN_ANLEGEN",
                 "PERSONEN_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
                 "SERVICEPROVIDER_VERWALTEN",
 
                 "ROLLEN_VERWALTEN",
