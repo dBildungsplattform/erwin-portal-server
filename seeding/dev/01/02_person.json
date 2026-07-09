@@ -166,7 +166,7 @@
             "familienname": "${SEED_USER_FAMILIENNAME}"
         },
         {
-            "id": 902,
+            "id": 92,
             "username": "${SEED_PORTALADMIN_USERNAME}",
             "password": "${SEED_PORTALADMIN_PASSWORD}",
             "vorname": "${SEED_PORTALADMIN_VORNAME}",
