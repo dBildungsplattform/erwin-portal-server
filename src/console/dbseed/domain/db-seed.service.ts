@@ -131,19 +131,38 @@ export class DbSeedService {
         const entities: OrganisationFile[] = plainToInstance(OrganisationFile, organisationFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const organisation of entities) {
+            const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
+                organisation.id,
+                ReferencedEntityType.ORGANISATION,
+            );
+            if (existingRef) {
+                this.logger.info(
+                    `Skipping Organisation with seeding ID ${organisation.id} because it was already seeded`,
+                );
+                continue;
+            }
             await this.constructAndPersistOrganisation(organisation);
         }
-        /* eslint-disable no-await-in-loop */
         this.logger.info(`Insert ${entities.length} entities of type Organisation`);
     }
 
     public async seedRolle(fileContentAsStr: string): Promise<void> {
         const rolleFile: EntityFile<RolleFile> = JSON.parse(fileContentAsStr) as EntityFile<RolleFile>;
         const files: RolleFile[] = plainToInstance(RolleFile, rolleFile.entities);
+        /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            if (file.id != null) {
+                const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
+                    file.id,
+                    ReferencedEntityType.ROLLE,
+                );
+                if (existingRef) {
+                    this.logger.info(`Skipping Rolle with seeding ID ${file.id} because it was already seeded`);
+                    continue;
+                }
+            }
             const serviceProviderUUIDs: string[] = [];
             const serviceProviderData: ServiceProvider<true>[] = [];
-            /* eslint-disable no-await-in-loop */
             for (const spId of file.serviceProviderIds) {
                 const sp: ServiceProvider<true> = await this.getReferencedServiceProvider(spId);
                 serviceProviderUUIDs.push(sp.id);
@@ -192,7 +211,20 @@ export class DbSeedService {
             fileContentAsStr,
         ) as EntityFile<ServiceProviderFile>;
         const files: ServiceProviderFile[] = plainToInstance(ServiceProviderFile, serviceProviderFile.entities);
+        /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            if (file.id != null) {
+                const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
+                    file.id,
+                    ReferencedEntityType.SERVICE_PROVIDER,
+                );
+                if (existingRef) {
+                    this.logger.info(
+                        `Skipping ServiceProvider with seeding ID ${file.id} because it was already seeded`,
+                    );
+                    continue;
+                }
+            }
             const referencedOrga: Organisation<true> = await this.getReferencedOrganisation(
                 file.providedOnSchulstrukturknoten,
             );
@@ -236,6 +268,16 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            if (file.id != null) {
+                const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
+                    file.id,
+                    ReferencedEntityType.PERSON,
+                );
+                if (existingRef) {
+                    this.logger.info(`Skipping Person with seeding ID ${file.id} because it was already seeded`);
+                    continue;
+                }
+            }
             const creationParams: PersonCreationParams = {
                 familienname: file.familienname,
                 vorname: file.vorname,
@@ -309,6 +351,16 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            if (file.id != null) {
+                const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
+                    file.id,
+                    ReferencedEntityType.PERSON,
+                );
+                if (existingRef) {
+                    this.logger.info(`Skipping TechnicalUser with seeding ID ${file.id} because it was already seeded`);
+                    continue;
+                }
+            }
             /* eslint-disable no-await-in-loop */
             const creationParams: PersonCreationParams = {
                 familienname: file.familienname,

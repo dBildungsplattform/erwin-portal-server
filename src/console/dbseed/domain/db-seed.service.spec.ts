@@ -184,6 +184,9 @@ describe('DbSeedService', () => {
                 );
                 const persistedOrganisation: Organisation<true> = DoFactory.createOrganisationAggregate(true);
 
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); // getReferencedOrganisation for administriertVon
+                organisationRepositoryMock.findById.mockResolvedValueOnce(createMock<Organisation<true>>());
                 organisationRepositoryMock.saveSeedData.mockResolvedValueOnce(persistedOrganisation);
                 await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow(
                     EntityNotFoundError,
@@ -199,6 +202,7 @@ describe('DbSeedService', () => {
                 );
                 const parent: Organisation<true> = createMock<Organisation<true>>();
                 organisationRepositoryMock.saveSeedData.mockResolvedValueOnce(parent);
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
                 //USE MockResolved instead of MockRecolvedOnce because it's called for administriert and zugehoerigZu
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); //mock UUID of referenced parent
                 organisationRepositoryMock.findById.mockResolvedValue(parent);
@@ -217,6 +221,7 @@ describe('DbSeedService', () => {
                 );
                 const parent: Organisation<true> = createMock<Organisation<true>>();
                 organisationRepositoryMock.saveSeedData.mockResolvedValueOnce(parent);
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
                 //USE MockResolved instead of MockRecolvedOnce because it's called for administriert and zugehoerigZu
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); //mock UUID of referenced parent
                 organisationRepositoryMock.findById.mockResolvedValue(parent); // mock get-SSK
@@ -275,6 +280,7 @@ describe('DbSeedService', () => {
                 const persistedOrganisation: Organisation<true> = DoFactory.createOrganisationAggregate(true);
                 const parent: Organisation<true> = createMock<Organisation<true>>();
                 organisationRepositoryMock.save.mockResolvedValueOnce(parent);
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
                 //USE MockResolved instead of MockRecolvedOnce because it's called for administriert and zugehoerigZu
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); //mock UUID of referenced parent
                 organisationRepositoryMock.findById.mockResolvedValue(parent);
@@ -351,19 +357,19 @@ describe('DbSeedService', () => {
                     `./seeding/seeding-integration-test/rolle/05_rolle-with-non-existing-ssk.json`,
                     'utf-8',
                 );
-                const persistedRolle: Rolle<true> = DoFactory.createRolle(true);
                 const serviceProviderMocked: ServiceProvider<true> = createMock<ServiceProvider<true>>();
 
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); //mock UUID of referenced serviceProvider
                 serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProviderMocked);
 
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); //mock UUID of referenced parent
                 organisationRepositoryMock.findById.mockRejectedValueOnce(new EntityNotFoundError());
 
-                rolleRepoMock.save.mockResolvedValueOnce(persistedRolle);
                 await expect(dbSeedService.seedRolle(fileContentAsStr)).rejects.toThrow(EntityNotFoundError);
             });
         });
+
 
         describe('with non-existing serviceProvider for in serviceProviderIds', () => {
             it('should throw EntityNotFoundError', async () => {
@@ -598,6 +604,71 @@ describe('DbSeedService', () => {
         });
     });
 
+    describe('seedOrganisation skips existing', () => {
+        it('should skip organisation if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/01_organisation.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow();
+            expect(organisationRepositoryMock.saveSeedData).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedRolle skips existing', () => {
+        it('should skip rolle if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/rolle/04_rolle-with-existing-ssk.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
+            expect(rolleRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedServiceProvider skips existing', () => {
+        it('should skip service provider if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/03_service-provider.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedServiceProvider(fileContentAsStr)).resolves.not.toThrow();
+            expect(serviceProviderRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedPerson skips existing', () => {
+        it('should skip person if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/existingPerson/02_person.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedTechnicalUser skips existing', () => {
+        it('should skip technical user if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
     describe('getReferencedPerson', () => {
         describe('when person cannot be found via PersonRepository', () => {
             it('should throw EntityNotFoundError', async () => {
@@ -718,6 +789,7 @@ describe('DbSeedService', () => {
                     'utf-8',
                 );
 
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // existence check
                 dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); //mock UUID for SP was found via seeding-ref-table
                 serviceProviderRepoMock.findById.mockResolvedValue(undefined);
                 await expect(dbSeedService.seedRolle(fileContentAsStr)).rejects.toThrow(EntityNotFoundError);
