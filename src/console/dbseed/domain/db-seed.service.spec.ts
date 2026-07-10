@@ -370,7 +370,6 @@ describe('DbSeedService', () => {
             });
         });
 
-
         describe('with non-existing serviceProvider for in serviceProviderIds', () => {
             it('should throw EntityNotFoundError', async () => {
                 const fileContentAsStr: string = fs.readFileSync(
