@@ -129,10 +129,22 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
         });
 
         describe('skips files if previous seeding failed', () => {
-            it('should skip without processing', async () => {
+            it('should skip without processing and log unknown reason when failureReason is not set', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
+                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
+
+                await expect(sut.run(params)).resolves.not.toThrow();
+            });
+
+            it('should skip without processing and log stored failureReason', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({
+                    status: DbSeedStatus.FAILED,
+                    failureReason: 'Error: previous failure details',
+                });
                 dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
 
                 await expect(sut.run(params)).resolves.not.toThrow();
@@ -163,7 +175,7 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
         });
 
         describe('creates new seed entry and processing fails', () => {
-            it('should throw and mark as failed', async () => {
+            it('should throw and mark as failed with Error stack trace', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
@@ -175,7 +187,24 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
                 });
 
                 await expect(sut.run(params)).rejects.toThrow('Processing failed');
-                expect(persistedDbSeed.setFailed).toHaveBeenCalled();
+                expect(persistedDbSeed.setFailed).toHaveBeenCalledWith(expect.stringContaining('Processing failed'));
+            });
+
+            it('should throw and mark as failed with stringified reason for non-Error throws', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
+                dbSeedRepoMock.findById.mockResolvedValue(null);
+                dbSeedRepoMock.create.mockResolvedValue(persistedDbSeed);
+
+                const errorWithoutStack: Error = new Error('non-error failure');
+                delete errorWithoutStack.stack;
+                jest.spyOn(dbSeedService, 'readDataProvider').mockImplementation((): never => {
+                    throw errorWithoutStack;
+                });
+
+                await expect(sut.run(params)).rejects.toThrow('non-error failure');
+                expect(persistedDbSeed.setFailed).toHaveBeenCalledWith('non-error failure');
             });
         });
     });

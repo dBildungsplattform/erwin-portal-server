@@ -19,4 +19,7 @@ export class DbSeedEntity extends BaseEntity {
 
     @Property({ nullable: true })
     public path?: string;
+
+    @Property({ nullable: true, type: 'text' })
+    public failureReason?: string;
 }

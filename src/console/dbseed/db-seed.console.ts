@@ -104,7 +104,7 @@ export class DbSeedConsole extends CommandRunner {
         if (dbSeedE) {
             if (dbSeedE.status === DbSeedStatus.FAILED) {
                 this.logger.warning(
-                    `Skipping file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}`,
+                    `Skipping file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}. Reason: ${dbSeedE.failureReason ?? 'unknown'}`,
                 );
             } else if (dbSeedE.status === DbSeedStatus.DONE) {
                 this.logger.info(
@@ -123,7 +123,9 @@ export class DbSeedConsole extends CommandRunner {
                 persistedDbSeed.setDone();
                 await this.dbSeedRepo.update(persistedDbSeed);
             } catch (err) {
-                persistedDbSeed.setFailed();
+                const reason: string = err instanceof Error ? (err.stack ?? err.message) : String(err);
+                this.logger.error(`Seeding file ${entityFileName} failed: ${reason}`);
+                persistedDbSeed.setFailed(reason);
                 this.dbSeedRepo.forkEntityManager();
                 await this.dbSeedRepo.update(persistedDbSeed);
                 throw err;
