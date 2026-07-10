@@ -286,4 +286,48 @@ describe('dbiam Personenkontext Repo', () => {
             });
         });
     });
+
+    describe('findByPersonIdOrgIdRolleId', () => {
+        describe('when personenkontext exists', () => {
+            it('should return the personenkontext', async () => {
+                const person: Person<true> = await createPerson();
+                const rolle: Rolle<true> | DomainError = await rolleRepo.save(DoFactory.createRolle(false));
+                const organisation: Organisation<true> = await organisationRepository.save(
+                    DoFactory.createOrganisation(false),
+                );
+                if (rolle instanceof DomainError) throw Error();
+
+                await sut.save(
+                    createPersonenkontext(false, {
+                        personId: person.id,
+                        rolleId: rolle.id,
+                        organisationId: organisation.id,
+                    }),
+                );
+
+                const result: Option<Personenkontext<true>> = await sut.findByPersonIdOrgIdRolleId(
+                    person.id,
+                    organisation.id,
+                    rolle.id,
+                );
+
+                expect(result).toBeDefined();
+                expect(result!.personId).toBe(person.id);
+                expect(result!.organisationId).toBe(organisation.id);
+                expect(result!.rolleId).toBe(rolle.id);
+            });
+        });
+
+        describe('when no matching personenkontext exists', () => {
+            it('should return null', async () => {
+                const result: Option<Personenkontext<true>> = await sut.findByPersonIdOrgIdRolleId(
+                    faker.string.uuid(),
+                    faker.string.uuid(),
+                    faker.string.uuid(),
+                );
+
+                expect(result).toBeNull();
+            });
+        });
+    });
 });

@@ -26,6 +26,7 @@ import { DbSeedReferenceRepo } from '../repo/db-seed-reference.repo.js';
 import { ServiceProvider } from '../../../modules/service-provider/domain/service-provider.js';
 import { GleicheRolleAnKlasseWieSchuleError } from '../../../modules/personenkontext/specification/error/gleiche-rolle-an-klasse-wie-schule.error.js';
 import { PersonenkontextFactory } from '../../../modules/personenkontext/domain/personenkontext.factory.js';
+import { Personenkontext } from '../../../modules/personenkontext/domain/personenkontext.js';
 import { OrganisationRepository } from '../../../modules/organisation/persistence/organisation.repository.js';
 import { KeycloakGroupRoleService } from '../../../modules/keycloak-administration/domain/keycloak-group-role.service.js';
 import { Organisation } from '../../../modules/organisation/domain/organisation.js';
@@ -45,6 +46,7 @@ describe('DbSeedService', () => {
     let dbSeedReferenceRepoMock: DeepMocked<DbSeedReferenceRepo>;
     let kcUserService: DeepMocked<KeycloakUserService>;
     let personFactory: DeepMocked<PersonFactory>;
+    let personenkontextRepoInternalMock: DeepMocked<DBiamPersonenkontextRepoInternal>;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
@@ -110,6 +112,7 @@ describe('DbSeedService', () => {
         dbSeedReferenceRepoMock = module.get(DbSeedReferenceRepo);
         kcUserService = module.get(KeycloakUserService);
         personFactory = module.get(PersonFactory);
+        personenkontextRepoInternalMock = module.get(DBiamPersonenkontextRepoInternal);
     });
 
     afterAll(async () => {
@@ -572,6 +575,26 @@ describe('DbSeedService', () => {
                     EntityNotFoundError,
                 );
             });
+        });
+    });
+
+    describe('seedPersonenkontext skips existing', () => {
+        it('should skip personenkontext if it already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/05_personenkontext.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(createMock<Person<true>>());
+            organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+            rolleRepoMock.findById.mockResolvedValue(createMock<Rolle<true>>({ merkmale: [] }));
+            personenkontextServiceMock.checkSpecifications.mockResolvedValueOnce(null);
+            personenkontextRepoInternalMock.findByPersonIdOrgIdRolleId.mockResolvedValueOnce(
+                createMock<Personenkontext<true>>(),
+            );
+
+            await expect(dbSeedService.seedPersonenkontext(fileContentAsStr)).resolves.not.toThrow();
+            expect(personenkontextRepoInternalMock.create).not.toHaveBeenCalled();
         });
     });
 
