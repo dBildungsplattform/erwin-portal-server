@@ -81,13 +81,13 @@ describe('DbSeedConsole', () => {
                 new Date('2024-01-01'),
                 DbSeedStatus.FAILED,
                 `${subDir}/${entityFileName}`,
-                'previous error',
+                undefined,
             );
             dbSeedRepoMock.findById.mockResolvedValueOnce(failedSeed);
 
             await console.run([directory]);
 
-            expect(loggerMock.warning).toHaveBeenCalledWith(expect.stringContaining('previous execution failed'));
+            expect(loggerMock.warning).toHaveBeenCalledWith(expect.stringContaining('Reason: unknown'));
             expect(dbSeedRepoMock.create).not.toHaveBeenCalled();
         });
 
@@ -133,13 +133,31 @@ describe('DbSeedConsole', () => {
                 `${subDir}/${entityFileName}`,
             );
             dbSeedRepoMock.create.mockResolvedValueOnce(createdSeed);
+            const processError: string = 'seed processing failed';
+            dbSeedServiceMock.seedOrganisation.mockRejectedValueOnce(processError);
+
+            await expect(console.run([directory])).rejects.toBe(processError);
+
+            expect(dbSeedRepoMock.update).toHaveBeenCalled();
+            expect(dbSeedRepoMock.forkEntityManager).toHaveBeenCalled();
+        });
+
+        it('should use error stack when processing throws an Error', async () => {
+            dbSeedRepoMock.findById.mockResolvedValueOnce(null);
+            const createdSeed: DbSeed<true> = DbSeed.construct<true>(
+                'somehash',
+                new Date(),
+                DbSeedStatus.STARTED,
+                `${subDir}/${entityFileName}`,
+            );
+            dbSeedRepoMock.create.mockResolvedValueOnce(createdSeed);
             const processError: Error = new Error('seed processing failed');
+            processError.stack = undefined;
             dbSeedServiceMock.seedOrganisation.mockRejectedValueOnce(processError);
 
             await expect(console.run([directory])).rejects.toThrow(processError);
 
-            expect(dbSeedRepoMock.update).toHaveBeenCalled();
-            expect(dbSeedRepoMock.forkEntityManager).toHaveBeenCalled();
+            expect(loggerMock.error).toHaveBeenCalledWith(expect.stringContaining('seed processing failed'));
         });
     });
 });
