@@ -397,6 +397,19 @@ export class DbSeedService {
                 personenKontext.id = this.getValidUuidOrUndefined(file.overrideId);
             }
 
+            const existingKontext: Option<Personenkontext<true>> =
+                await this.dBiamPersonenkontextRepoInternal.findByPersonIdOrgIdRolleId(
+                    referencedPerson.id,
+                    referencedOrga.id,
+                    referencedRolle.id,
+                );
+            if (existingKontext) {
+                this.logger.info(
+                    `Skipping personenkontext for person ${referencedPerson.id}, org ${referencedOrga.id}, rolle ${referencedRolle.id} because it already exists`,
+                );
+                continue;
+            }
+
             persistedPersonenkontexte.push(await this.dBiamPersonenkontextRepoInternal.create(personenKontext));
             //at the moment no saving of Personenkontext
         }

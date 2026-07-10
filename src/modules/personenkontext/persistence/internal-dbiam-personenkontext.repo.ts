@@ -100,4 +100,18 @@ export class DBiamPersonenkontextRepoInternal {
         const deletedPersons: number = await this.em.nativeDelete(PersonenkontextEntity, { id });
         return deletedPersons > 0;
     }
+
+    public async findByPersonIdOrgIdRolleId(
+        personId: PersonID,
+        organisationId: OrganisationID,
+        rolleId: RolleID,
+    ): Promise<Option<Personenkontext<true>>> {
+        const entity: PersonenkontextEntity | null = await this.em.findOne(PersonenkontextEntity, {
+            personId,
+            organisationId,
+            rolleId,
+        });
+        if (!entity) return null;
+        return mapEntityToAggregate(entity, this.personenkontextFactory);
+    }
 }
