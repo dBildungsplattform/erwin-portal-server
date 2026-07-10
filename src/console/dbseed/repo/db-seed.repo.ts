@@ -49,4 +49,8 @@ export class DbSeedRepo {
     public forkEntityManager(): void {
         this.em = this.em.fork();
     }
+
+    public async deleteById(hash: string): Promise<void> {
+        await this.em.nativeDelete(DbSeedEntity, { hash });
+    }
 }

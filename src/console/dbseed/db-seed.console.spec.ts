@@ -75,7 +75,7 @@ describe('DbSeedConsole', () => {
             ormMock.em.flush = jest.fn().mockResolvedValue(undefined);
         });
 
-        it('should skip file with warning when previous execution failed', async () => {
+        it('should retry file when previous execution failed', async () => {
             const failedSeed: DbSeed<true> = DbSeed.construct<true>(
                 'somehash',
                 new Date('2024-01-01'),
@@ -84,11 +84,21 @@ describe('DbSeedConsole', () => {
                 undefined,
             );
             dbSeedRepoMock.findById.mockResolvedValueOnce(failedSeed);
+            const createdSeed: DbSeed<true> = DbSeed.construct<true>(
+                'somehash',
+                new Date(),
+                DbSeedStatus.STARTED,
+                `${subDir}/${entityFileName}`,
+            );
+            dbSeedRepoMock.create.mockResolvedValueOnce(createdSeed);
+            dbSeedServiceMock.seedOrganisation.mockResolvedValueOnce(undefined);
 
             await console.run([directory]);
 
             expect(loggerMock.warning).toHaveBeenCalledWith(expect.stringContaining('Reason: unknown'));
-            expect(dbSeedRepoMock.create).not.toHaveBeenCalled();
+            expect(dbSeedRepoMock.deleteById).toHaveBeenCalled();
+            expect(dbSeedRepoMock.create).toHaveBeenCalled();
+            expect(dbSeedServiceMock.seedOrganisation).toHaveBeenCalledWith(fileContent);
         });
 
         it('should skip file with info when previous execution succeeded', async () => {

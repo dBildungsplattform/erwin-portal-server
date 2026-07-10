@@ -104,32 +104,33 @@ export class DbSeedConsole extends CommandRunner {
         if (dbSeedE) {
             if (dbSeedE.status === DbSeedStatus.FAILED) {
                 this.logger.warning(
-                    `Skipping file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}. Reason: ${dbSeedE.failureReason ?? 'unknown'}`,
+                    `Retrying file ${entityFileName} because previous execution failed on ${dbSeedE.executedAt.toLocaleString()}. Reason: ${dbSeedE.failureReason ?? 'unknown'}`,
                 );
+                await this.dbSeedRepo.deleteById(contentHash);
             } else if (dbSeedE.status === DbSeedStatus.DONE) {
                 this.logger.info(
                     `Skipping file ${entityFileName} because it was successfully executed on ${dbSeedE.executedAt.toLocaleString()}`,
                 );
+                return;
             }
-        } else {
-            const dbSeed: DbSeed<false> = DbSeed.createNew(
-                contentHash,
-                DbSeedStatus.STARTED,
-                subDir + '/' + entityFileName,
-            );
-            const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
-            try {
-                await this.processEntityFile(entityFileName, directory, subDir);
-                persistedDbSeed.setDone();
-                await this.dbSeedRepo.update(persistedDbSeed);
-            } catch (err) {
-                const reason: string = err instanceof Error ? (err.stack ?? err.message) : String(err);
-                this.logger.error(`Seeding file ${entityFileName} failed: ${reason}`);
-                persistedDbSeed.setFailed(reason);
-                this.dbSeedRepo.forkEntityManager();
-                await this.dbSeedRepo.update(persistedDbSeed);
-                throw err;
-            }
+        }
+        const dbSeed: DbSeed<false> = DbSeed.createNew(
+            contentHash,
+            DbSeedStatus.STARTED,
+            subDir + '/' + entityFileName,
+        );
+        const persistedDbSeed: DbSeed<true> = await this.dbSeedRepo.create(dbSeed);
+        try {
+            await this.processEntityFile(entityFileName, directory, subDir);
+            persistedDbSeed.setDone();
+            await this.dbSeedRepo.update(persistedDbSeed);
+        } catch (err) {
+            const reason: string = err instanceof Error ? (err.stack ?? err.message) : String(err);
+            this.logger.error(`Seeding file ${entityFileName} failed: ${reason}`);
+            persistedDbSeed.setFailed(reason);
+            this.dbSeedRepo.forkEntityManager();
+            await this.dbSeedRepo.update(persistedDbSeed);
+            throw err;
         }
     }
 
