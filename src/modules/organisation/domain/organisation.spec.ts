@@ -321,6 +321,8 @@ describe('Organisation', () => {
             let traeger: Organisation<true>;
             beforeEach(() => {
                 jest.restoreAllMocks();
+                organisationRepositoryMock.findRootDirectChildren.mockResolvedValue([oeffentlich, ersatz]);
+                organisationRepositoryMock.findById.mockResolvedValue(root);
                 // Setup a unique Schultraeger
                 traeger = DoFactory.createOrganisationAggregate(true, {
                     zugehoerigZu: oeffentlich.id,
