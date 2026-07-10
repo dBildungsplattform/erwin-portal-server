@@ -71,6 +71,7 @@
                 "PERSONEN_VERWALTEN",
                 "PERSONEN_SOFORT_LOESCHEN",
                 "SERVICEPROVIDER_VERWALTEN",
+                "LMS_VERWALTEN",
 
                 "ROLLEN_VERWALTEN",
                 "SCHULPORTAL_VERWALTEN"
