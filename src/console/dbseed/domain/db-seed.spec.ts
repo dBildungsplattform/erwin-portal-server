@@ -10,13 +10,7 @@ describe('DbSeed', () => {
             const path: string = '01/01_data-provider.json';
             const failureReason: string = 'some error';
 
-            const result: DbSeed<boolean> = DbSeed.construct(
-                hash,
-                executedAt,
-                DbSeedStatus.DONE,
-                path,
-                failureReason,
-            );
+            const result: DbSeed<boolean> = DbSeed.construct(hash, executedAt, DbSeedStatus.DONE, path, failureReason);
 
             expect(result).toBeInstanceOf(DbSeed);
             expect(result.hash).toBe(hash);
