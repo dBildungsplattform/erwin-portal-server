@@ -645,7 +645,7 @@ describe('DbSeedService', () => {
     describe('seedPerson skips existing', () => {
         it('should skip person if reference already exists', async () => {
             const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/existingPerson/02_person.json`,
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
                 'utf-8',
             );
             dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());

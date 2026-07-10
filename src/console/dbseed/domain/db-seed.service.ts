@@ -151,7 +151,7 @@ export class DbSeedService {
         const files: RolleFile[] = plainToInstance(RolleFile, rolleFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
-            if (file.id != null) {
+            if (typeof file.id === 'number') {
                 const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
                     file.id,
                     ReferencedEntityType.ROLLE,
@@ -213,7 +213,7 @@ export class DbSeedService {
         const files: ServiceProviderFile[] = plainToInstance(ServiceProviderFile, serviceProviderFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
-            if (file.id != null) {
+            if (typeof file.id === 'number') {
                 const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
                     file.id,
                     ReferencedEntityType.SERVICE_PROVIDER,
@@ -268,7 +268,7 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
-            if (file.id != null) {
+            if (typeof file.id === 'number') {
                 const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
                     file.id,
                     ReferencedEntityType.PERSON,
@@ -351,7 +351,7 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
-            if (file.id != null) {
+            if (typeof file.id === 'number') {
                 const existingRef: Option<string> = await this.dbSeedReferenceRepo.findUUID(
                     file.id,
                     ReferencedEntityType.PERSON,
