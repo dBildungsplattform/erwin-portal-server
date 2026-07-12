@@ -326,22 +326,7 @@ export class DbSeedService {
                 );
             }
 
-            const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
-                person,
-                undefined,
-                this.getValidUuidOrUndefined(file.overrideId),
-            );
-            if (persistedPerson instanceof Person && file.id != null) {
-                const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
-                    ReferencedEntityType.PERSON,
-                    file.id,
-                    persistedPerson.id,
-                );
-                await this.dbSeedReferenceRepo.create(dbSeedReference);
-            } else {
-                this.logger.error('Person without ID thus not referenceable:');
-                this.logger.error(JSON.stringify(person));
-            }
+            await this.persistPersonAndCreateReference(person, file.id, file.overrideId);
         }
         this.logger.info(`Insert ${files.length} entities of type Person`);
     }
@@ -380,22 +365,7 @@ export class DbSeedService {
 
             person.keycloakUserId = file.keycloakUserId;
 
-            const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
-                person,
-                undefined,
-                this.getValidUuidOrUndefined(file.overrideId),
-            );
-            if (persistedPerson instanceof Person && file.id != null) {
-                const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
-                    ReferencedEntityType.PERSON,
-                    file.id,
-                    persistedPerson.id,
-                );
-                await this.dbSeedReferenceRepo.create(dbSeedReference);
-            } else {
-                this.logger.error('Person without ID thus not referenceable:');
-                this.logger.error(JSON.stringify(person));
-            }
+            await this.persistPersonAndCreateReference(person, file.id, file.overrideId);
         }
         this.logger.info(`Insert ${files.length} entities of type Person`);
     }
@@ -542,6 +512,29 @@ export class DbSeedService {
         return fs.readdirSync(path).filter(function (file: string) {
             return fs.statSync(path + '/' + file).isDirectory();
         });
+    }
+
+    private async persistPersonAndCreateReference(
+        person: Person<false>,
+        fileId: number | undefined,
+        overrideId: string | undefined,
+    ): Promise<void> {
+        const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
+            person,
+            undefined,
+            this.getValidUuidOrUndefined(overrideId),
+        );
+        if (persistedPerson instanceof Person && fileId != null) {
+            const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
+                ReferencedEntityType.PERSON,
+                fileId,
+                persistedPerson.id,
+            );
+            await this.dbSeedReferenceRepo.create(dbSeedReference);
+        } else {
+            this.logger.error('Person without ID thus not referenceable:');
+            this.logger.error(JSON.stringify(person));
+        }
     }
 
     public isValidUuid(id: unknown): id is string {
