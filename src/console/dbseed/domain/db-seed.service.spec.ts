@@ -301,11 +301,9 @@ describe('DbSeedService', () => {
                     'utf-8',
                 );
                 const persistedRolle: Rolle<true> = DoFactory.createRolle(true);
-                const serviceProviderMocked: ServiceProvider<true> = createMock<ServiceProvider<true>>();
 
-                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); //mock UUID of referenced serviceProvider
-                serviceProviderRepoMock.findById.mockResolvedValueOnce(serviceProviderMocked);
-                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); //mock UUID of referenced parent
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); //mock: rolle not yet seeded
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); //mock UUID of referenced organisation
                 organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>()); // mock get-SSK
 
                 rolleRepoMock.create.mockResolvedValueOnce(persistedRolle);
