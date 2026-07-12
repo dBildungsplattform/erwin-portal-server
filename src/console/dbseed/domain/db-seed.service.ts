@@ -408,17 +408,7 @@ export class DbSeedService {
                 befristung,
             );
 
-            //Check specifications
-            const specificationCheckError: Option<DomainError> =
-                await this.dbiamPersonenkontextService.checkSpecifications(personenKontext);
-            if (specificationCheckError) {
-                throw specificationCheckError;
-            }
-
-            if (file.overrideId) {
-                personenKontext.id = this.getValidUuidOrUndefined(file.overrideId);
-            }
-
+            // Check if exact (person, org, rolle) already exists → skip
             const existingKontext: Option<Personenkontext<true>> =
                 await this.dBiamPersonenkontextRepoInternal.findByPersonIdOrgIdRolleId(
                     referencedPerson.id,
@@ -430,6 +420,32 @@ export class DbSeedService {
                     `Skipping personenkontext for person ${referencedPerson.id}, org ${referencedOrga.id}, rolle ${referencedRolle.id} because it already exists`,
                 );
                 continue;
+            }
+
+            //Check specifications
+            let specificationCheckError: Option<DomainError> =
+                await this.dbiamPersonenkontextService.checkSpecifications(personenKontext);
+            if (specificationCheckError) {
+                // Seeding data likely changed — delete stale kontexte for this person and retry
+                this.logger.warning(
+                    `Specification failed for person ${referencedPerson.id}: ${specificationCheckError.message}. Deleting stale kontexte and retrying.`,
+                );
+                const staleKontexte: Personenkontext<true>[] =
+                    await this.dBiamPersonenkontextRepoInternal.findByPersonId(referencedPerson.id);
+                for (const stale of staleKontexte) {
+                    await this.dBiamPersonenkontextRepoInternal.delete(stale);
+                }
+                specificationCheckError = await this.dbiamPersonenkontextService.checkSpecifications(personenKontext);
+                if (specificationCheckError) {
+                    this.logger.warning(
+                        `Skipping personenkontext for person ${referencedPerson.id}, org ${referencedOrga.id}, rolle ${referencedRolle.id} due to specification error: ${specificationCheckError.message}`,
+                    );
+                    continue;
+                }
+            }
+
+            if (file.overrideId) {
+                personenKontext.id = this.getValidUuidOrUndefined(file.overrideId);
             }
 
             persistedPersonenkontexte.push(await this.dBiamPersonenkontextRepoInternal.create(personenKontext));

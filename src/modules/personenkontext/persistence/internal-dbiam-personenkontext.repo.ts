@@ -114,4 +114,11 @@ export class DBiamPersonenkontextRepoInternal {
         if (!entity) return null;
         return mapEntityToAggregate(entity, this.personenkontextFactory);
     }
+
+    public async findByPersonId(personId: PersonID): Promise<Personenkontext<true>[]> {
+        const entities: PersonenkontextEntity[] = await this.em.find(PersonenkontextEntity, { personId });
+        return entities.map((entity: PersonenkontextEntity) =>
+            mapEntityToAggregate(entity, this.personenkontextFactory),
+        );
+    }
 }
