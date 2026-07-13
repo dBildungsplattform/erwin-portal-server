@@ -330,4 +330,38 @@ describe('dbiam Personenkontext Repo', () => {
             });
         });
     });
+
+    describe('findByPersonId', () => {
+        describe('when personenkontexte exist for person', () => {
+            it('should return all personenkontexte', async () => {
+                const person: Person<true> = await createPerson();
+                const rolle: Rolle<true> | DomainError = await rolleRepo.save(DoFactory.createRolle(false));
+                const organisation: Organisation<true> = await organisationRepository.save(
+                    DoFactory.createOrganisation(false),
+                );
+                if (rolle instanceof DomainError) throw Error();
+
+                await sut.save(
+                    createPersonenkontext(false, {
+                        personId: person.id,
+                        rolleId: rolle.id,
+                        organisationId: organisation.id,
+                    }),
+                );
+
+                const result: Personenkontext<true>[] = await sut.findByPersonId(person.id);
+
+                expect(result).toHaveLength(1);
+                expect(result[0]!.personId).toBe(person.id);
+            });
+        });
+
+        describe('when no personenkontexte exist for person', () => {
+            it('should return empty array', async () => {
+                const result: Personenkontext<true>[] = await sut.findByPersonId(faker.string.uuid());
+
+                expect(result).toHaveLength(0);
+            });
+        });
+    });
 });
