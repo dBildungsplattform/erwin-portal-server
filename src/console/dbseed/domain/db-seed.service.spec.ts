@@ -840,6 +840,277 @@ describe('DbSeedService', () => {
         });
     });
 
+    describe('seedOrganisation updates existing', () => {
+        it('should update organisation when reference exists and org is found', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/01_organisation.json`,
+                'utf-8',
+            );
+            const existingOrg: Organisation<true> = createMock<Organisation<true>>({
+                name: 'OldName',
+                kennung: 'OldKennung',
+            });
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            organisationRepositoryMock.findById.mockResolvedValue(existingOrg);
+
+            await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow();
+            expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingOrg);
+            expect(organisationRepositoryMock.saveSeedData).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when organisation not found for update', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/01_organisation.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            organisationRepositoryMock.findById.mockResolvedValue(undefined);
+
+            await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow();
+            expect(organisationRepositoryMock.save).not.toHaveBeenCalled();
+            expect(organisationRepositoryMock.saveSeedData).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedRolle updates existing', () => {
+        it('should update rolle when reference exists and rolle is found', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/04_rolle.json`,
+                'utf-8',
+            );
+            const existingRolle: Rolle<true> = createMock<Rolle<true>>({ name: 'OldRolleName' });
+            const updatedRolle: Rolle<true> = createMock<Rolle<true>>();
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            rolleRepoMock.findById.mockResolvedValue(existingRolle);
+            serviceProviderRepoMock.findById.mockResolvedValue(createMock<ServiceProvider<true>>());
+            organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+            rolleRepoMock.save.mockResolvedValue(updatedRolle);
+
+            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
+            expect(rolleRepoMock.save).toHaveBeenCalled();
+            expect(rolleRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when rolle save returns DomainError', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/04_rolle.json`,
+                'utf-8',
+            );
+            const existingRolle: Rolle<true> = createMock<Rolle<true>>({ name: 'OldRolleName' });
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            rolleRepoMock.findById.mockResolvedValue(existingRolle);
+            serviceProviderRepoMock.findById.mockResolvedValue(createMock<ServiceProvider<true>>());
+            organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+            rolleRepoMock.save.mockResolvedValue(new NameForRolleWithTrailingSpaceError());
+
+            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
+            expect(rolleRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when rolle not found for update', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/04_rolle.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            rolleRepoMock.findById.mockResolvedValue(undefined);
+
+            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
+            expect(rolleRepoMock.save).not.toHaveBeenCalled();
+            expect(rolleRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedServiceProvider updates existing', () => {
+        it('should update service provider when reference exists and SP is found', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/03_service-provider.json`,
+                'utf-8',
+            );
+            const existingSP: ServiceProvider<true> = createMock<ServiceProvider<true>>({
+                name: 'OldSPName',
+                url: 'https://old.example.com',
+            });
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            serviceProviderRepoMock.findById.mockResolvedValue(existingSP);
+            organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+
+            await expect(dbSeedService.seedServiceProvider(fileContentAsStr)).resolves.not.toThrow();
+            expect(serviceProviderRepoMock.save).toHaveBeenCalled();
+            expect(serviceProviderRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when service provider not found for update', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/03_service-provider.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            serviceProviderRepoMock.findById.mockResolvedValue(undefined);
+
+            await expect(dbSeedService.seedServiceProvider(fileContentAsStr)).resolves.not.toThrow();
+            expect(serviceProviderRepoMock.save).not.toHaveBeenCalled();
+            expect(serviceProviderRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedPerson updates existing', () => {
+        it('should update person when reference exists and person is found', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn();
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+            personRepoMock.save.mockResolvedValue(existingPerson);
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(existingPerson.update).toHaveBeenCalled();
+            expect(personRepoMock.save).toHaveBeenCalledWith(existingPerson);
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when person update returns DomainError', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn().mockReturnValue(new NameForOrganisationWithTrailingSpaceError());
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.save).not.toHaveBeenCalled();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when person save returns DomainError', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn();
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+            personRepoMock.save.mockResolvedValue(new NameForOrganisationWithTrailingSpaceError());
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when person not found for update', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(undefined);
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.save).not.toHaveBeenCalled();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('seedTechnicalUser updates existing', () => {
+        it('should update technical user when reference exists and person is found', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn();
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+            personRepoMock.save.mockResolvedValue(existingPerson);
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(existingPerson.update).toHaveBeenCalled();
+            expect(personRepoMock.save).toHaveBeenCalledWith(existingPerson);
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when technical user update returns DomainError', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn().mockReturnValue(new NameForOrganisationWithTrailingSpaceError());
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.save).not.toHaveBeenCalled();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when technical user save returns DomainError', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            const existingPerson: Person<true> = createMock<Person<true>>({
+                vorname: 'OldVorname',
+                familienname: 'OldFamilienname',
+                revision: '1',
+            });
+            existingPerson.update = jest.fn();
+
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(existingPerson);
+            personRepoMock.save.mockResolvedValue(new NameForOrganisationWithTrailingSpaceError());
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should log warning when technical user not found for update', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+            personRepoMock.findById.mockResolvedValue(undefined);
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.save).not.toHaveBeenCalled();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+    });
+
     describe('getEntityFileNames', () => {
         describe('getEntityFileNames in directory sql/seeding-integration-test', () => {
             it('should return all files in directory', () => {

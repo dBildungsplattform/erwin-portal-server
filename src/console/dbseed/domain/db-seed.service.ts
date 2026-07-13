@@ -123,6 +123,39 @@ export class DbSeedService {
         return savedOrga;
     }
 
+    private async updateExistingOrganisation(existingUUID: string, data: OrganisationFile): Promise<void> {
+        const existingOrg: Option<Organisation<true>> = await this.organisationRepository.findById(existingUUID);
+        if (!existingOrg) {
+            this.logger.warning(`Organisation with UUID ${existingUUID} not found for update`);
+            return;
+        }
+
+        if (data.administriertVon != null) {
+            const ref: Organisation<true> = await this.getReferencedOrganisation(data.administriertVon);
+            existingOrg.administriertVon = ref.id;
+        }
+        if (data.zugehoerigZu != null) {
+            const ref: Organisation<true> = await this.getReferencedOrganisation(data.zugehoerigZu);
+            existingOrg.zugehoerigZu = ref.id;
+        }
+
+        this.logger.info(
+            `Updating Organisation (seeding ID ${data.id}): name "${existingOrg.name}" -> "${data.name}", kennung "${existingOrg.kennung}" -> "${data.kennung}"`,
+        );
+
+        existingOrg.kennung = data.kennung;
+        existingOrg.name = data.name;
+        existingOrg.namensergaenzung = data.namensergaenzung;
+        existingOrg.kuerzel = data.kuerzel;
+        existingOrg.typ = data.typ;
+        existingOrg.traegerschaft = data.traegerschaft;
+        existingOrg.emailDomain = data.emailDomain;
+        existingOrg.emailAdress = data.emailAdress;
+
+        await this.organisationRepository.save(existingOrg);
+        this.logger.info(`Updated Organisation with seeding ID ${data.id}`);
+    }
+
     public async seedOrganisation(fileContentAsStr: string): Promise<void> {
         const organisationFile: EntityFile<OrganisationFile> = JSON.parse(
             fileContentAsStr,
@@ -136,9 +169,7 @@ export class DbSeedService {
                 ReferencedEntityType.ORGANISATION,
             );
             if (existingRef) {
-                this.logger.info(
-                    `Skipping Organisation with seeding ID ${organisation.id} because it was already seeded`,
-                );
+                await this.updateExistingOrganisation(existingRef, organisation);
                 continue;
             }
             await this.constructAndPersistOrganisation(organisation);
@@ -157,7 +188,39 @@ export class DbSeedService {
                     ReferencedEntityType.ROLLE,
                 );
                 if (existingRef) {
-                    this.logger.info(`Skipping Rolle with seeding ID ${file.id} because it was already seeded`);
+                    const existingRolle: Option<Rolle<true>> = await this.rolleRepo.findById(existingRef, true);
+                    if (existingRolle) {
+                        this.logger.info(
+                            `Updating Rolle (seeding ID ${file.id}): name "${existingRolle.name}" -> "${file.name}"`,
+                        );
+                        const spUUIDs: string[] = [];
+                        for (const spId of file.serviceProviderIds) {
+                            const sp: ServiceProvider<true> = await this.getReferencedServiceProvider(spId);
+                            spUUIDs.push(sp.id);
+                        }
+                        const refOrga: Organisation<true> = await this.getReferencedOrganisation(
+                            file.administeredBySchulstrukturknoten,
+                        );
+                        existingRolle.name = file.name;
+                        existingRolle.administeredBySchulstrukturknoten = refOrga.id;
+                        existingRolle.rollenart = file.rollenart;
+                        existingRolle.merkmale = file.merkmale;
+                        existingRolle.systemrechte = file.systemrechte;
+                        existingRolle.serviceProviderIds = spUUIDs;
+                        existingRolle.istTechnisch = file.istTechnisch ?? false;
+                        const saveResult: Rolle<true> | DomainError = await this.rolleRepo.save(existingRolle);
+                        if (saveResult instanceof DomainError) {
+                            this.logger.warning(
+                                `Could not update Rolle with seeding ID ${file.id}: ${saveResult.message}`,
+                            );
+                        } else {
+                            this.logger.info(`Updated Rolle with seeding ID ${file.id}`);
+                        }
+                    } else {
+                        this.logger.warning(
+                            `Rolle with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                        );
+                    }
                     continue;
                 }
             }
@@ -219,9 +282,34 @@ export class DbSeedService {
                     ReferencedEntityType.SERVICE_PROVIDER,
                 );
                 if (existingRef) {
-                    this.logger.info(
-                        `Skipping ServiceProvider with seeding ID ${file.id} because it was already seeded`,
-                    );
+                    const existingSP: Option<ServiceProvider<true>> =
+                        await this.serviceProviderRepo.findById(existingRef);
+                    if (existingSP) {
+                        this.logger.info(
+                            `Updating ServiceProvider (seeding ID ${file.id}): name "${existingSP.name}" -> "${file.name}", url "${existingSP.url}" -> "${file.url}"`,
+                        );
+                        const refOrga: Organisation<true> = await this.getReferencedOrganisation(
+                            file.providedOnSchulstrukturknoten,
+                        );
+                        existingSP.name = file.name;
+                        existingSP.target = file.target;
+                        existingSP.url = file.url;
+                        existingSP.kategorie = file.kategorie;
+                        existingSP.providedOnSchulstrukturknoten = refOrga.id;
+                        existingSP.logo = file.logoBase64 ? Buffer.from(file.logoBase64, 'base64') : undefined;
+                        existingSP.logoMimeType = file.logoMimeType;
+                        existingSP.keycloakGroup = file.keycloakGroup;
+                        existingSP.keycloakRole = file.keycloakRole;
+                        existingSP.externalSystem = file.externalSystem ?? ServiceProviderSystem.NONE;
+                        existingSP.requires2fa = file.requires2fa;
+                        existingSP.vidisAngebotId = file.vidisAngebotId;
+                        await this.serviceProviderRepo.save(existingSP);
+                        this.logger.info(`Updated ServiceProvider with seeding ID ${file.id}`);
+                    } else {
+                        this.logger.warning(
+                            `ServiceProvider with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                        );
+                    }
                     continue;
                 }
             }
@@ -274,7 +362,53 @@ export class DbSeedService {
                     ReferencedEntityType.PERSON,
                 );
                 if (existingRef) {
-                    this.logger.info(`Skipping Person with seeding ID ${file.id} because it was already seeded`);
+                    const existingPerson: Option<Person<true>> = await this.personRepository.findById(existingRef);
+                    if (existingPerson) {
+                        this.logger.info(
+                            `Updating Person (seeding ID ${file.id}): vorname "${existingPerson.vorname}" -> "${file.vorname}", familienname "${existingPerson.familienname}" -> "${file.familienname}"`,
+                        );
+                        const updateResult: void | DomainError = existingPerson.update(
+                            existingPerson.revision,
+                            file.familienname,
+                            file.vorname,
+                            file.referrer,
+                            file.stammorganisation,
+                            file.initialenFamilienname,
+                            file.initialenVorname,
+                            file.rufname,
+                            file.nameTitel,
+                            file.nameAnrede,
+                            file.namePraefix,
+                            file.nameSuffix,
+                            file.nameSortierindex,
+                            file.geburtsdatum,
+                            file.geburtsort,
+                            file.geschlecht,
+                            file.lokalisierung,
+                            file.vertrauensstufe,
+                            file.auskunftssperre,
+                            file.personalnummer,
+                        );
+                        if (updateResult instanceof DomainError) {
+                            this.logger.warning(
+                                `Could not update Person with seeding ID ${file.id}: ${updateResult.message}`,
+                            );
+                        } else {
+                            const saveResult: Person<true> | DomainError =
+                                await this.personRepository.save(existingPerson);
+                            if (saveResult instanceof DomainError) {
+                                this.logger.warning(
+                                    `Could not save Person with seeding ID ${file.id}: ${saveResult.message}`,
+                                );
+                            } else {
+                                this.logger.info(`Updated Person with seeding ID ${file.id}`);
+                            }
+                        }
+                    } else {
+                        this.logger.warning(
+                            `Person with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                        );
+                    }
                     continue;
                 }
             }
@@ -342,7 +476,36 @@ export class DbSeedService {
                     ReferencedEntityType.PERSON,
                 );
                 if (existingRef) {
-                    this.logger.info(`Skipping TechnicalUser with seeding ID ${file.id} because it was already seeded`);
+                    const existingPerson: Option<Person<true>> = await this.personRepository.findById(existingRef);
+                    if (existingPerson) {
+                        this.logger.info(
+                            `Updating TechnicalUser (seeding ID ${file.id}): vorname "${existingPerson.vorname}" -> "${file.vorname}", familienname "${existingPerson.familienname}" -> "${file.familienname}"`,
+                        );
+                        const updateResult: void | DomainError = existingPerson.update(
+                            existingPerson.revision,
+                            file.familienname,
+                            file.vorname,
+                        );
+                        if (updateResult instanceof DomainError) {
+                            this.logger.warning(
+                                `Could not update TechnicalUser with seeding ID ${file.id}: ${updateResult.message}`,
+                            );
+                        } else {
+                            const saveResult: Person<true> | DomainError =
+                                await this.personRepository.save(existingPerson);
+                            if (saveResult instanceof DomainError) {
+                                this.logger.warning(
+                                    `Could not save TechnicalUser with seeding ID ${file.id}: ${saveResult.message}`,
+                                );
+                            } else {
+                                this.logger.info(`Updated TechnicalUser with seeding ID ${file.id}`);
+                            }
+                        }
+                    } else {
+                        this.logger.warning(
+                            `TechnicalUser with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                        );
+                    }
                     continue;
                 }
             }
