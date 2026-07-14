@@ -466,8 +466,8 @@ describe('DbSeedService', () => {
             });
         });
 
-        describe('person with overrideId', () => {
-            it('should use the overrideId as person id', async () => {
+        describe('when person has overrideId in seeding file', () => {
+            it('should create person successfully without throwing', async () => {
                 const fileContentAsStr: string = fs.readFileSync(
                     `./seeding/seeding-integration-test/existingPerson/02_person_with_overrideId.json`,
                     'utf-8',
@@ -482,8 +482,8 @@ describe('DbSeedService', () => {
             });
         });
 
-        describe('when person creation fails with DomainError', () => {
-            it('should throw DomainError', async () => {
+        describe('when personFactory.createNew returns DomainError', () => {
+            it('should throw the DomainError', async () => {
                 const fileContentAsStr: string = fs.readFileSync(
                     `./seeding/seeding-integration-test/existingPerson/02_person.json`,
                     'utf-8',
