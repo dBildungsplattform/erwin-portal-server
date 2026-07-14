@@ -154,7 +154,10 @@ export class DbSeedConsole extends CommandRunner {
         this.logger.info(`Seeding ${entityCount} ${seedFile.entityName}(s) from ${subDir}/${entityFileName}`);
         switch (seedFile.entityName) {
             case 'DataProvider':
-                this.handleDataProvider(this.dbSeedService.readDataProvider(fileContentAsStr), seedFile.entityName);
+                await this.handleDataProvider(
+                    this.dbSeedService.readDataProvider(fileContentAsStr),
+                    seedFile.entityName,
+                );
                 break;
             case 'Organisation':
                 await this.dbSeedService.seedOrganisation(fileContentAsStr);
@@ -182,10 +185,13 @@ export class DbSeedConsole extends CommandRunner {
         );
     }
 
-    private handleDataProvider(entities: Entity[], entityName: string): void {
+    private async handleDataProvider(entities: Entity[], entityName: string): Promise<void> {
         for (const entity of entities) {
             const mappedEntity: DataProviderEntity = this.mapper.map(entity, DataProviderFile, DataProviderEntity);
-            this.orm.em.upsert(DataProviderEntity, mappedEntity);
+            const existing: DataProviderEntity | null = await this.orm.em.findOne(DataProviderEntity, mappedEntity.id);
+            if (!existing) {
+                this.orm.em.persist(mappedEntity);
+            }
         }
         this.logger.info(`Insert ${entities.length} entities of type ${entityName}`);
     }
