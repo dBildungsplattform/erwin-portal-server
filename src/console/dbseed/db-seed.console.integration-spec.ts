@@ -21,12 +21,14 @@ import { DbSeedModule } from './db-seed.module.js';
 import { PersonenKontextModule } from '../../modules/personenkontext/personenkontext.module.js';
 import { OxUserBlacklistRepo } from '../../modules/person/persistence/ox-user-blacklist.repo.js';
 import { EntityAggregateMapper } from '../../modules/person/mapper/entity-aggregate.mapper.js';
+import { DbSeedRepo } from './repo/db-seed.repo.js';
 
 describe('DbSeedConsoleIntegration', () => {
     let module: TestingModule;
     let sut: DbSeedConsole;
     let orm: MikroORM;
     let dbSeedService: DbSeedService;
+    let dbSeedRepo: DbSeedRepo;
 
     beforeAll(async () => {
         module = await Test.createTestingModule({
@@ -51,6 +53,7 @@ describe('DbSeedConsoleIntegration', () => {
         sut = module.get(DbSeedConsole);
         orm = module.get(MikroORM);
         dbSeedService = module.get(DbSeedService);
+        dbSeedRepo = module.get(DbSeedRepo);
 
         await DatabaseTestModule.setupDatabase(module.get(MikroORM));
     }, 10000000);
@@ -124,6 +127,14 @@ describe('DbSeedConsoleIntegration', () => {
                 await expect(sut.run(params)).rejects.toThrow(
                     new Error(`Unsupported EntityName / EntityType: NonExistingEntityType`),
                 );
+            });
+        });
+    });
+
+    describe('DbSeedRepo', () => {
+        describe('deleteById', () => {
+            it('should not throw when deleting by hash', async () => {
+                await expect(dbSeedRepo.deleteById('nonexistent-hash')).resolves.not.toThrow();
             });
         });
     });

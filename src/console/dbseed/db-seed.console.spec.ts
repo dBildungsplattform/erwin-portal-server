@@ -162,5 +162,56 @@ describe('DbSeedConsole', () => {
 
             expect(loggerMock.error).toHaveBeenCalledWith(expect.stringContaining('seed processing failed'));
         });
+
+        it('should mark existing seed as failed and rethrow when re-processing throws', async () => {
+            const existingSeed: DbSeed<true> = DbSeed.construct<true>(
+                'somehash',
+                new Date('2024-01-01'),
+                DbSeedStatus.DONE,
+                `${subDir}/${entityFileName}`,
+            );
+            dbSeedRepoMock.findById.mockResolvedValueOnce(existingSeed);
+            const processError: Error = new Error('re-processing failed');
+            dbSeedServiceMock.seedOrganisation.mockRejectedValueOnce(processError);
+
+            await expect(console.run([directory])).rejects.toThrow(processError);
+
+            expect(dbSeedRepoMock.forkEntityManager).toHaveBeenCalled();
+            expect(dbSeedRepoMock.update).toHaveBeenCalled();
+            expect(loggerMock.error).toHaveBeenCalledWith(expect.stringContaining('re-processing failed'));
+        });
+
+        it('should use String(err) when existing seed re-processing throws a non-Error', async () => {
+            const existingSeed: DbSeed<true> = DbSeed.construct<true>(
+                'somehash',
+                new Date('2024-01-01'),
+                DbSeedStatus.DONE,
+                `${subDir}/${entityFileName}`,
+            );
+            dbSeedRepoMock.findById.mockResolvedValueOnce(existingSeed);
+            const processError: string = 'non-error string thrown';
+            dbSeedServiceMock.seedOrganisation.mockRejectedValueOnce(processError);
+
+            await expect(console.run([directory])).rejects.toBe(processError);
+
+            expect(loggerMock.error).toHaveBeenCalledWith(expect.stringContaining('non-error string thrown'));
+        });
+
+        it('should use err.message when existing seed throws Error without stack', async () => {
+            const existingSeed: DbSeed<true> = DbSeed.construct<true>(
+                'somehash',
+                new Date('2024-01-01'),
+                DbSeedStatus.DONE,
+                `${subDir}/${entityFileName}`,
+            );
+            dbSeedRepoMock.findById.mockResolvedValueOnce(existingSeed);
+            const processError: Error = new Error('no stack error');
+            processError.stack = undefined;
+            dbSeedServiceMock.seedOrganisation.mockRejectedValueOnce(processError);
+
+            await expect(console.run([directory])).rejects.toThrow(processError);
+
+            expect(loggerMock.error).toHaveBeenCalledWith(expect.stringContaining('no stack error'));
+        });
     });
 });
