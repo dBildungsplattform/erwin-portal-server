@@ -84,24 +84,16 @@ describe('DbSeedConsole', () => {
                 undefined,
             );
             dbSeedRepoMock.findById.mockResolvedValueOnce(failedSeed);
-            const createdSeed: DbSeed<true> = DbSeed.construct<true>(
-                'somehash',
-                new Date(),
-                DbSeedStatus.STARTED,
-                `${subDir}/${entityFileName}`,
-            );
-            dbSeedRepoMock.create.mockResolvedValueOnce(createdSeed);
             dbSeedServiceMock.seedOrganisation.mockResolvedValueOnce(undefined);
 
             await console.run([directory]);
 
             expect(loggerMock.warning).toHaveBeenCalledWith(expect.stringContaining('Reason: unknown'));
-            expect(dbSeedRepoMock.deleteById).toHaveBeenCalled();
-            expect(dbSeedRepoMock.create).toHaveBeenCalled();
+            expect(dbSeedRepoMock.update).toHaveBeenCalled();
             expect(dbSeedServiceMock.seedOrganisation).toHaveBeenCalledWith(fileContent);
         });
 
-        it('should skip file with info when previous execution succeeded', async () => {
+        it('should re-process file when previous execution succeeded', async () => {
             const doneSeed: DbSeed<true> = DbSeed.construct<true>(
                 'somehash',
                 new Date('2024-01-01'),
@@ -109,11 +101,12 @@ describe('DbSeedConsole', () => {
                 `${subDir}/${entityFileName}`,
             );
             dbSeedRepoMock.findById.mockResolvedValueOnce(doneSeed);
+            dbSeedServiceMock.seedOrganisation.mockResolvedValueOnce(undefined);
 
             await console.run([directory]);
 
-            expect(loggerMock.info).toHaveBeenCalledWith(expect.stringContaining('successfully executed'));
-            expect(dbSeedRepoMock.create).not.toHaveBeenCalled();
+            expect(loggerMock.info).toHaveBeenCalledWith(expect.stringContaining('Re-processing'));
+            expect(dbSeedRepoMock.update).toHaveBeenCalled();
         });
 
         it('should create new seed and process file when no previous record exists', async () => {

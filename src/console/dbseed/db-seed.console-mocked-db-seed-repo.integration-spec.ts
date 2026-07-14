@@ -117,26 +117,12 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
     });
 
     describe('run', () => {
-        describe('skips files if previous seeding was successful', () => {
-            it('should skip without processing', async () => {
+        describe('re-processes files if previous seeding was successful', () => {
+            it('should re-process without error', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.DONE });
                 dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
-
-                await expect(sut.run(params)).resolves.not.toThrow();
-            });
-        });
-
-        describe('retries files if previous seeding failed', () => {
-            it('should delete failed record, retry processing and log unknown reason when failureReason is not set', async () => {
-                const params: string[] = ['seeding-integration-test/all'];
-
-                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
-                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
-
-                const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
-                dbSeedRepoMock.create.mockResolvedValue(persistedDbSeed);
 
                 jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
                 jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
@@ -147,11 +133,29 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
                 jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
 
                 await expect(sut.run(params)).resolves.not.toThrow();
-                expect(dbSeedRepoMock.deleteById).toHaveBeenCalled();
-                expect(dbSeedRepoMock.create).toHaveBeenCalled();
+            });
+        });
+
+        describe('retries files if previous seeding failed', () => {
+            it('should re-process and update record when failureReason is not set', async () => {
+                const params: string[] = ['seeding-integration-test/all'];
+
+                const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.FAILED });
+                dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
+
+                jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
+                jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPerson').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedRolle').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedServiceProvider').mockResolvedValue();
+                jest.spyOn(dbSeedService, 'seedPersonenkontext').mockResolvedValue([]);
+                jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
+
+                await expect(sut.run(params)).resolves.not.toThrow();
+                expect(dbSeedRepoMock.update).toHaveBeenCalled();
             });
 
-            it('should delete failed record, retry processing and log stored failureReason', async () => {
+            it('should re-process and update record when failureReason is set', async () => {
                 const params: string[] = ['seeding-integration-test/all'];
 
                 const dbSeedMock: DbSeed<true> = createMock<DbSeed<true>>({
@@ -160,9 +164,6 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
                 });
                 dbSeedRepoMock.findById.mockResolvedValue(dbSeedMock);
 
-                const persistedDbSeed: DbSeed<true> = createMock<DbSeed<true>>({ status: DbSeedStatus.STARTED });
-                dbSeedRepoMock.create.mockResolvedValue(persistedDbSeed);
-
                 jest.spyOn(dbSeedService, 'readDataProvider').mockReturnValue([]);
                 jest.spyOn(dbSeedService, 'seedOrganisation').mockResolvedValue();
                 jest.spyOn(dbSeedService, 'seedPerson').mockResolvedValue();
@@ -172,8 +173,7 @@ describe('DbSeedConsoleMockedDbSeedRepo', () => {
                 jest.spyOn(dbSeedService, 'seedTechnicalUser').mockResolvedValue();
 
                 await expect(sut.run(params)).resolves.not.toThrow();
-                expect(dbSeedRepoMock.deleteById).toHaveBeenCalled();
-                expect(dbSeedRepoMock.create).toHaveBeenCalled();
+                expect(dbSeedRepoMock.update).toHaveBeenCalled();
             });
         });
 

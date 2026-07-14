@@ -185,7 +185,7 @@ export class DbSeedConsole extends CommandRunner {
     private handleDataProvider(entities: Entity[], entityName: string): void {
         for (const entity of entities) {
             const mappedEntity: DataProviderEntity = this.mapper.map(entity, DataProviderFile, DataProviderEntity);
-            this.orm.em.persist(mappedEntity);
+            this.orm.em.upsert(DataProviderEntity, mappedEntity);
         }
         this.logger.info(`Insert ${entities.length} entities of type ${entityName}`);
     }
