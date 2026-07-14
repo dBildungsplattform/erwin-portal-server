@@ -628,7 +628,62 @@ describe('DbSeedService', () => {
         });
     });
 
-    describe('seedPersonenkontext skips existing', () => {
+    describe('seed methods skip already-seeded entities', () => {
+        it('should skip organisation if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/01_organisation.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow();
+            expect(organisationRepositoryMock.saveSeedData).not.toHaveBeenCalled();
+        });
+
+        it('should skip rolle if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/rolle/04_rolle-with-existing-ssk.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
+            expect(rolleRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should skip service provider if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/03_service-provider.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedServiceProvider(fileContentAsStr)).resolves.not.toThrow();
+            expect(serviceProviderRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should skip person if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
+        it('should skip technical user if reference already exists', async () => {
+            const fileContentAsStr: string = fs.readFileSync(
+                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
+                'utf-8',
+            );
+            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+
+            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
+            expect(personRepoMock.create).not.toHaveBeenCalled();
+        });
+
         it('should skip personenkontext if it already exists', async () => {
             const fileContentAsStr: string = fs.readFileSync(
                 `./seeding/seeding-integration-test/personenkontext/05_personenkontext.json`,
@@ -645,71 +700,6 @@ describe('DbSeedService', () => {
             await expect(dbSeedService.seedPersonenkontext(fileContentAsStr)).resolves.not.toThrow();
             expect(personenkontextServiceMock.checkSpecifications).not.toHaveBeenCalled();
             expect(personenkontextRepoInternalMock.create).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('seedOrganisation skips existing', () => {
-        it('should skip organisation if reference already exists', async () => {
-            const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/all/01/01_organisation.json`,
-                'utf-8',
-            );
-            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
-
-            await expect(dbSeedService.seedOrganisation(fileContentAsStr)).resolves.not.toThrow();
-            expect(organisationRepositoryMock.saveSeedData).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('seedRolle skips existing', () => {
-        it('should skip rolle if reference already exists', async () => {
-            const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/rolle/04_rolle-with-existing-ssk.json`,
-                'utf-8',
-            );
-            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
-
-            await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow();
-            expect(rolleRepoMock.create).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('seedServiceProvider skips existing', () => {
-        it('should skip service provider if reference already exists', async () => {
-            const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/all/01/03_service-provider.json`,
-                'utf-8',
-            );
-            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
-
-            await expect(dbSeedService.seedServiceProvider(fileContentAsStr)).resolves.not.toThrow();
-            expect(serviceProviderRepoMock.create).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('seedPerson skips existing', () => {
-        it('should skip person if reference already exists', async () => {
-            const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/personenkontext/02_person.json`,
-                'utf-8',
-            );
-            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
-
-            await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
-            expect(personRepoMock.create).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('seedTechnicalUser skips existing', () => {
-        it('should skip technical user if reference already exists', async () => {
-            const fileContentAsStr: string = fs.readFileSync(
-                `./seeding/seeding-integration-test/all/01/06_technical-user.json`,
-                'utf-8',
-            );
-            dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
-
-            await expect(dbSeedService.seedTechnicalUser(fileContentAsStr)).resolves.not.toThrow();
-            expect(personRepoMock.create).not.toHaveBeenCalled();
         });
     });
 
