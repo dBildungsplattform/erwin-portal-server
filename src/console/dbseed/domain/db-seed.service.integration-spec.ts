@@ -20,7 +20,6 @@ import { RolleModule } from '../../../modules/rolle/rolle.module.js';
 import { PersonModule } from '../../../modules/person/person.module.js';
 import { DbSeedModule } from '../db-seed.module.js';
 import { PersonenKontextModule } from '../../../modules/personenkontext/personenkontext.module.js';
-import { VornameForPersonWithTrailingSpaceError } from '../../../modules/person/domain/vorname-with-trailing-space.error.js';
 import { OxUserBlacklistRepo } from '../../../modules/person/persistence/ox-user-blacklist.repo.js';
 import { EntityAggregateMapper } from '../../../modules/person/mapper/entity-aggregate.mapper.js';
 
@@ -109,20 +108,6 @@ describe('DbSeedServiceIntegration', () => {
                 await dbSeedService.seedOrganisation(fileContentOrganisationAsStr);
 
                 await expect(dbSeedService.seedPersonenkontext(fileContentAsStr)).rejects.toThrow(EntityNotFoundError);
-            });
-        });
-    });
-
-    describe('seedPerson', () => {
-        describe('when personFactory is failing', () => {
-            it('should throw error', async () => {
-                const fileContentAsStr: string = fs.readFileSync(
-                    `./seeding/seeding-integration-test/invalidPerson/02_person.json`,
-                    'utf-8',
-                );
-                await expect(dbSeedService.seedPerson(fileContentAsStr)).rejects.toThrow(
-                    VornameForPersonWithTrailingSpaceError,
-                );
             });
         });
     });

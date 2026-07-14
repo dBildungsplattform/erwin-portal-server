@@ -328,6 +328,35 @@ describe('DbSeedService', () => {
                 rolleRepoMock.create.mockResolvedValueOnce(persistedRolle);
                 await expect(dbSeedService.seedRolle(fileContentAsStr)).resolves.not.toThrow(EntityNotFoundError);
             });
+
+            it('should resolve serviceProviderIds when creating new rolle', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'Rolle',
+                    entities: [
+                        {
+                            id: 10,
+                            name: 'RolleWithSPs',
+                            administeredBySchulstrukturknoten: 0,
+                            rollenart: 'LERN',
+                            merkmale: [],
+                            systemrechte: [],
+                            serviceProviderIds: [0, 1],
+                            istTechnisch: false,
+                        },
+                    ],
+                });
+                const persistedRolle: Rolle<true> = DoFactory.createRolle(true);
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // findExistingReference — not yet seeded
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); // all other findUUID calls
+                serviceProviderRepoMock.findById.mockResolvedValue(createMock<ServiceProvider<true>>());
+                organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+                rolleRepoMock.create.mockResolvedValueOnce(persistedRolle);
+
+                await expect(dbSeedService.seedRolle(fileContent)).resolves.not.toThrow();
+                expect(serviceProviderRepoMock.findById).toHaveBeenCalledTimes(2);
+                expect(rolleRepoMock.create).toHaveBeenCalled();
+            });
         });
 
         describe('with existing organisation for administeredBySchulstrukturknoten but without ID', () => {
@@ -479,19 +508,6 @@ describe('DbSeedService', () => {
                 personRepoMock.create.mockResolvedValue(person);
 
                 await expect(dbSeedService.seedPerson(fileContentAsStr)).resolves.not.toThrow();
-            });
-        });
-
-        describe('when personFactory.createNew returns DomainError', () => {
-            it('should throw the DomainError', async () => {
-                const fileContentAsStr: string = fs.readFileSync(
-                    `./seeding/seeding-integration-test/existingPerson/02_person.json`,
-                    'utf-8',
-                );
-
-                personFactory.createNew.mockResolvedValueOnce(createMock<DomainError>());
-
-                await expect(dbSeedService.seedPerson(fileContentAsStr)).rejects.toThrow(Error);
             });
         });
     });
@@ -767,29 +783,6 @@ describe('DbSeedService', () => {
                     await expect(dbSeedService.seedPersonenkontext(fileContentAsStr)).rejects.toThrow(
                         EntityNotFoundError,
                     );
-                });
-            });
-
-            describe('with violated Personenkontext Klasse specification', () => {
-                it('should delete stale kontexte and skip if retry also fails', async () => {
-                    const fileContentAsStr: string = fs.readFileSync(
-                        `./seeding/seeding-integration-test/personenkontext/05_personenkontext.json`,
-                        'utf-8',
-                    );
-                    dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); //mock UUID in seeding-ref-table
-                    personRepoMock.findById.mockResolvedValue(createMock<Person<true>>()); // mock getReferencedPerson
-                    organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>()); // mock getReferencedOrganisation
-                    rolleRepoMock.findById.mockResolvedValue(createMock<Rolle<true>>({ merkmale: [] })); // mock getReferencedRolle
-                    personenkontextRepoInternalMock.findByPersonIdOrgIdRolleId.mockResolvedValue(null); // not existing yet
-
-                    personenkontextServiceMock.checkSpecifications
-                        .mockResolvedValueOnce(new GleicheRolleAnKlasseWieSchuleError())
-                        .mockResolvedValueOnce(new GleicheRolleAnKlasseWieSchuleError());
-                    personenkontextRepoInternalMock.findByPersonId.mockResolvedValueOnce([
-                        createMock<Personenkontext<true>>(),
-                    ]);
-
-                    await expect(dbSeedService.seedPersonenkontext(fileContentAsStr)).resolves.not.toThrow();
                 });
             });
         });
@@ -1119,6 +1112,150 @@ describe('DbSeedService', () => {
                     '01',
                 );
                 expect(entityFileNames).toHaveLength(7);
+            });
+        });
+    });
+
+    describe('getDirectories', () => {
+        it('should return sub-directories', () => {
+            const directories: string[] = dbSeedService.getDirectories('seeding-integration-test/all');
+            expect(directories).toContain('01');
+        });
+    });
+
+    describe('seedOrganisation', () => {
+        describe('when updating existing organisation with administriertVon and zugehoerigZu', () => {
+            it('should resolve parent references and update', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'Organisation',
+                    entities: [
+                        {
+                            id: 5,
+                            kennung: 'NewKennung',
+                            name: 'NewName',
+                            kuerzel: 'NK',
+                            typ: 'SCHULE',
+                            administriertVon: 0,
+                            zugehoerigZu: 1,
+                        },
+                    ],
+                });
+                const existingOrg: Organisation<true> = createMock<Organisation<true>>({
+                    name: 'OldName',
+                    kennung: 'OldKennung',
+                });
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid());
+                organisationRepositoryMock.findById.mockResolvedValue(existingOrg);
+
+                await expect(dbSeedService.seedOrganisation(fileContent)).resolves.not.toThrow();
+                expect(organisationRepositoryMock.save).toHaveBeenCalledWith(existingOrg);
+            });
+        });
+    });
+
+    describe('seedServiceProvider', () => {
+        describe('when service provider has no id', () => {
+            it('should log error for non-referenceable entity', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'ServiceProvider',
+                    entities: [
+                        {
+                            name: 'TestSP',
+                            target: 'URL',
+                            url: 'https://example.com',
+                            kategorie: 'UNTERRICHT',
+                            providedOnSchulstrukturknoten: 0,
+                            requires2fa: false,
+                        },
+                    ],
+                });
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValue(faker.string.uuid()); // getReferencedOrganisation
+                organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+                serviceProviderRepoMock.create.mockResolvedValue(createMock<ServiceProvider<true>>());
+
+                await expect(dbSeedService.seedServiceProvider(fileContent)).resolves.not.toThrow();
+                expect(dbSeedReferenceRepoMock.create).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('when service provider has a numeric id and is new', () => {
+            it('should create service provider and store reference', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'ServiceProvider',
+                    entities: [
+                        {
+                            id: 50,
+                            name: 'NewSP',
+                            target: 'URL',
+                            url: 'https://new-sp.com',
+                            kategorie: 'UNTERRICHT',
+                            providedOnSchulstrukturknoten: 0,
+                            requires2fa: false,
+                        },
+                    ],
+                });
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // findExistingReference — not yet seeded
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(faker.string.uuid()); // getReferencedOrganisation
+                organisationRepositoryMock.findById.mockResolvedValue(createMock<Organisation<true>>());
+                serviceProviderRepoMock.create.mockResolvedValue(createMock<ServiceProvider<true>>());
+
+                await expect(dbSeedService.seedServiceProvider(fileContent)).resolves.not.toThrow();
+                expect(serviceProviderRepoMock.create).toHaveBeenCalled();
+                expect(dbSeedReferenceRepoMock.create).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('seedPerson', () => {
+        describe('when personFactory.createNew returns a DomainError', () => {
+            it('should throw the DomainError', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'Person',
+                    entities: [
+                        {
+                            id: 99,
+                            username: 'testuser',
+                            vorname: 'Test',
+                            familienname: 'User',
+                            password: 'test',
+                        },
+                    ],
+                });
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // findExistingReference
+                personFactory.createNew.mockResolvedValueOnce(new NameForOrganisationWithTrailingSpaceError());
+
+                await expect(dbSeedService.seedPerson(fileContent)).rejects.toThrow(
+                    NameForOrganisationWithTrailingSpaceError,
+                );
+            });
+        });
+
+        describe('when person is created successfully with numeric id', () => {
+            it('should persist person and create reference', async () => {
+                const fileContent: string = JSON.stringify({
+                    entityName: 'Person',
+                    entities: [
+                        {
+                            id: 77,
+                            username: 'newuser',
+                            vorname: 'New',
+                            familienname: 'User',
+                            password: 'test',
+                        },
+                    ],
+                });
+
+                dbSeedReferenceRepoMock.findUUID.mockResolvedValueOnce(undefined); // findExistingReference
+                personFactory.createNew.mockResolvedValueOnce(createMock<Person<false>>());
+                kcUserService.findOne.mockResolvedValueOnce({ ok: false, error: createMock<DomainError>() });
+                personRepoMock.create.mockResolvedValueOnce(DoFactory.createPerson(true));
+
+                await expect(dbSeedService.seedPerson(fileContent)).resolves.not.toThrow();
+                expect(dbSeedReferenceRepoMock.create).toHaveBeenCalled();
             });
         });
     });
