@@ -341,7 +341,6 @@ describe('DbSeedService', () => {
                             merkmale: [],
                             systemrechte: [],
                             serviceProviderIds: [0, 1],
-                            istTechnisch: false,
                         },
                     ],
                 });
