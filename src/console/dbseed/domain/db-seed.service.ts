@@ -186,7 +186,7 @@ export class DbSeedService {
 
             await this.constructAndPersistOrganisation(organisation);
         }
-        this.logger.info(`Insert ${entities.length} entities of type Organisation`);
+        this.logger.info(`Processed ${entities.length} entities of type Organisation`);
     }
 
     public async seedRolle(fileContentAsStr: string): Promise<void> {
