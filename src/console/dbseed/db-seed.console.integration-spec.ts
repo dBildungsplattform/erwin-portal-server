@@ -112,5 +112,19 @@ describe('DbSeedConsoleIntegration', () => {
                 );
             });
         });
+
+        describe('retries previously failed seeding files', () => {
+            it('should retry a previously failed file on next run', async () => {
+                const params: string[] = ['seeding-integration-test/nonExistingEntity'];
+
+                // First run fails and marks the seed as FAILED
+                await expect(sut.run(params)).rejects.toThrow();
+
+                // Second run retries the failed file (deletes old record, creates new one)
+                await expect(sut.run(params)).rejects.toThrow(
+                    new Error(`Unsupported EntityName / EntityType: NonExistingEntityType`),
+                );
+            });
+        });
     });
 });

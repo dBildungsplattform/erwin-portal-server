@@ -1,0 +1,13 @@
+{
+    "entityName": "Person",
+    "entities": [
+        {
+            "id": 0,
+            "overrideId": "1850aef4-a771-40fd-8e84-3de483007bfa",
+            "username": "testusername",
+            "vorname": "Max",
+            "familienname": "Mustermann",
+            "password": "test"
+        }
+    ]
+}

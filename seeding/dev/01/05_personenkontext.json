@@ -176,8 +176,13 @@
         },
         {
             "personId": 91,
+            "organisationId": 12,
+            "rolleId": 2
+        },
+        {
+            "personId": 92,
             "organisationId": 0,
-            "rolleId": 1
+            "rolleId": 6
         }
     ]
 }

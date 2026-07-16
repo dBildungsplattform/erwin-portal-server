@@ -9,11 +9,12 @@ function mapAggregateToData(dbSeed: DbSeed<boolean>): RequiredEntityData<DbSeedE
         hash: dbSeed.hash,
         status: dbSeed.status,
         path: dbSeed.path,
+        failureReason: dbSeed.failureReason,
     };
 }
 
 function mapEntityToAggregate(entity: DbSeedEntity): DbSeed<boolean> {
-    return DbSeed.construct(entity.hash, entity.executedAt, entity.status, entity.path);
+    return DbSeed.construct(entity.hash, entity.executedAt, entity.status, entity.path, entity.failureReason);
 }
 
 @Injectable()
@@ -47,5 +48,9 @@ export class DbSeedRepo {
 
     public forkEntityManager(): void {
         this.em = this.em.fork();
+    }
+
+    public async deleteById(hash: string): Promise<void> {
+        await this.em.nativeDelete(DbSeedEntity, { hash });
     }
 }

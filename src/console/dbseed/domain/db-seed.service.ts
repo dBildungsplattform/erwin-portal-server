@@ -60,6 +60,17 @@ export class DbSeedService {
 
     private dataProviderMap: Map<string, DataProviderFile> = new Map<string, DataProviderFile>();
 
+    private async findExistingReference(
+        id: number | undefined,
+        referenceType: ReferencedEntityType,
+    ): Promise<Option<string>> {
+        if (id === undefined || typeof id !== 'number') {
+            return undefined;
+        }
+
+        return this.dbSeedReferenceRepo.findUUID(id, referenceType);
+    }
+
     public readDataProvider(fileContentAsStr: string): DataProviderFile[] {
         const entities: DataProviderFile[] = this.readEntityFromJSONFile<DataProviderFile>(
             fileContentAsStr,
@@ -123,6 +134,39 @@ export class DbSeedService {
         return savedOrga;
     }
 
+    private async updateExistingOrganisation(existingUUID: string, data: OrganisationFile): Promise<void> {
+        const existingOrg: Option<Organisation<true>> = await this.organisationRepository.findById(existingUUID);
+        if (!existingOrg) {
+            this.logger.warning(`Organisation with UUID ${existingUUID} not found for update`);
+            return;
+        }
+
+        if (data.administriertVon != null) {
+            const ref: Organisation<true> = await this.getReferencedOrganisation(data.administriertVon);
+            existingOrg.administriertVon = ref.id;
+        }
+        if (data.zugehoerigZu != null) {
+            const ref: Organisation<true> = await this.getReferencedOrganisation(data.zugehoerigZu);
+            existingOrg.zugehoerigZu = ref.id;
+        }
+
+        this.logger.info(
+            `Updating Organisation (seeding ID ${data.id}): name "${existingOrg.name}" -> "${data.name}", kennung "${existingOrg.kennung}" -> "${data.kennung}"`,
+        );
+
+        existingOrg.kennung = data.kennung;
+        existingOrg.name = data.name;
+        existingOrg.namensergaenzung = data.namensergaenzung;
+        existingOrg.kuerzel = data.kuerzel;
+        existingOrg.typ = data.typ;
+        existingOrg.traegerschaft = data.traegerschaft;
+        existingOrg.emailDomain = data.emailDomain;
+        existingOrg.emailAdress = data.emailAdress;
+
+        await this.organisationRepository.save(existingOrg);
+        this.logger.info(`Updated Organisation with seeding ID ${data.id}`);
+    }
+
     public async seedOrganisation(fileContentAsStr: string): Promise<void> {
         const organisationFile: EntityFile<OrganisationFile> = JSON.parse(
             fileContentAsStr,
@@ -131,19 +175,62 @@ export class DbSeedService {
         const entities: OrganisationFile[] = plainToInstance(OrganisationFile, organisationFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const organisation of entities) {
+            const existingRef: Option<string> = await this.findExistingReference(
+                organisation.id,
+                ReferencedEntityType.ORGANISATION,
+            );
+            if (existingRef) {
+                await this.updateExistingOrganisation(existingRef, organisation);
+                continue;
+            }
+
             await this.constructAndPersistOrganisation(organisation);
         }
-        /* eslint-disable no-await-in-loop */
-        this.logger.info(`Insert ${entities.length} entities of type Organisation`);
+        this.logger.info(`Processed ${entities.length} entities of type Organisation`);
     }
 
     public async seedRolle(fileContentAsStr: string): Promise<void> {
         const rolleFile: EntityFile<RolleFile> = JSON.parse(fileContentAsStr) as EntityFile<RolleFile>;
         const files: RolleFile[] = plainToInstance(RolleFile, rolleFile.entities);
+        /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            const existingRef: Option<string> = await this.findExistingReference(file.id, ReferencedEntityType.ROLLE);
+
+            if (existingRef) {
+                const existingRolle: Option<Rolle<true>> = await this.rolleRepo.findById(existingRef, true);
+                if (existingRolle) {
+                    this.logger.info(
+                        `Updating Rolle (seeding ID ${file.id}): name "${existingRolle.name}" -> "${file.name}"`,
+                    );
+                    const spUUIDs: string[] = [];
+                    for (const spId of file.serviceProviderIds) {
+                        const sp: ServiceProvider<true> = await this.getReferencedServiceProvider(spId);
+                        spUUIDs.push(sp.id);
+                    }
+                    const refOrga: Organisation<true> = await this.getReferencedOrganisation(
+                        file.administeredBySchulstrukturknoten,
+                    );
+                    existingRolle.name = file.name;
+                    existingRolle.administeredBySchulstrukturknoten = refOrga.id;
+                    existingRolle.rollenart = file.rollenart;
+                    existingRolle.merkmale = file.merkmale;
+                    existingRolle.systemrechte = file.systemrechte;
+                    existingRolle.serviceProviderIds = spUUIDs;
+                    existingRolle.istTechnisch = file.istTechnisch ?? false;
+                    const saveResult: Rolle<true> | DomainError = await this.rolleRepo.save(existingRolle);
+                    if (saveResult instanceof DomainError) {
+                        this.logger.warning(`Could not update Rolle with seeding ID ${file.id}: ${saveResult.message}`);
+                    } else {
+                        this.logger.info(`Updated Rolle with seeding ID ${file.id}`);
+                    }
+                } else {
+                    this.logger.warning(`Rolle with UUID ${existingRef} not found for update (seeding ID ${file.id})`);
+                }
+                continue;
+            }
+
             const serviceProviderUUIDs: string[] = [];
             const serviceProviderData: ServiceProvider<true>[] = [];
-            /* eslint-disable no-await-in-loop */
             for (const spId of file.serviceProviderIds) {
                 const sp: ServiceProvider<true> = await this.getReferencedServiceProvider(spId);
                 serviceProviderUUIDs.push(sp.id);
@@ -192,7 +279,44 @@ export class DbSeedService {
             fileContentAsStr,
         ) as EntityFile<ServiceProviderFile>;
         const files: ServiceProviderFile[] = plainToInstance(ServiceProviderFile, serviceProviderFile.entities);
+        /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            const existingRef: Option<string> = await this.findExistingReference(
+                file.id,
+                ReferencedEntityType.SERVICE_PROVIDER,
+            );
+
+            if (existingRef) {
+                const existingSP: Option<ServiceProvider<true>> = await this.serviceProviderRepo.findById(existingRef);
+                if (existingSP) {
+                    this.logger.info(
+                        `Updating ServiceProvider (seeding ID ${file.id}): name "${existingSP.name}" -> "${file.name}", url "${existingSP.url}" -> "${file.url}"`,
+                    );
+                    const refOrga: Organisation<true> = await this.getReferencedOrganisation(
+                        file.providedOnSchulstrukturknoten,
+                    );
+                    existingSP.name = file.name;
+                    existingSP.target = file.target;
+                    existingSP.url = file.url;
+                    existingSP.kategorie = file.kategorie;
+                    existingSP.providedOnSchulstrukturknoten = refOrga.id;
+                    existingSP.logo = file.logoBase64 ? Buffer.from(file.logoBase64, 'base64') : undefined;
+                    existingSP.logoMimeType = file.logoMimeType;
+                    existingSP.keycloakGroup = file.keycloakGroup;
+                    existingSP.keycloakRole = file.keycloakRole;
+                    existingSP.externalSystem = file.externalSystem ?? ServiceProviderSystem.NONE;
+                    existingSP.requires2fa = file.requires2fa;
+                    existingSP.vidisAngebotId = file.vidisAngebotId;
+                    await this.serviceProviderRepo.save(existingSP);
+                    this.logger.info(`Updated ServiceProvider with seeding ID ${file.id}`);
+                } else {
+                    this.logger.warning(
+                        `ServiceProvider with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                    );
+                }
+                continue;
+            }
+
             const referencedOrga: Organisation<true> = await this.getReferencedOrganisation(
                 file.providedOnSchulstrukturknoten,
             );
@@ -236,6 +360,56 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            const existingRef: Option<string> = await this.findExistingReference(file.id, ReferencedEntityType.PERSON);
+
+            if (existingRef) {
+                const existingPerson: Option<Person<true>> = await this.personRepository.findById(existingRef);
+                if (existingPerson) {
+                    this.logger.info(
+                        `Updating Person (seeding ID ${file.id}): vorname "${existingPerson.vorname}" -> "${file.vorname}", familienname "${existingPerson.familienname}" -> "${file.familienname}"`,
+                    );
+                    const updateResult: void | DomainError = existingPerson.update(
+                        existingPerson.revision,
+                        file.familienname,
+                        file.vorname,
+                        file.referrer,
+                        file.stammorganisation,
+                        file.initialenFamilienname,
+                        file.initialenVorname,
+                        file.rufname,
+                        file.nameTitel,
+                        file.nameAnrede,
+                        file.namePraefix,
+                        file.nameSuffix,
+                        file.nameSortierindex,
+                        file.geburtsdatum,
+                        file.geburtsort,
+                        file.geschlecht,
+                        file.lokalisierung,
+                        file.vertrauensstufe,
+                        file.auskunftssperre,
+                        file.personalnummer,
+                    );
+                    if (updateResult instanceof DomainError) {
+                        this.logger.warning(
+                            `Could not update Person with seeding ID ${file.id}: ${updateResult.message}`,
+                        );
+                    } else {
+                        const saveResult: Person<true> | DomainError = await this.personRepository.save(existingPerson);
+                        if (saveResult instanceof DomainError) {
+                            this.logger.warning(
+                                `Could not save Person with seeding ID ${file.id}: ${saveResult.message}`,
+                            );
+                        } else {
+                            this.logger.info(`Updated Person with seeding ID ${file.id}`);
+                        }
+                    }
+                } else {
+                    this.logger.warning(`Person with UUID ${existingRef} not found for update (seeding ID ${file.id})`);
+                }
+                continue;
+            }
+
             const creationParams: PersonCreationParams = {
                 familienname: file.familienname,
                 vorname: file.vorname,
@@ -284,22 +458,7 @@ export class DbSeedService {
                 );
             }
 
-            const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
-                person,
-                undefined,
-                this.getValidUuidOrUndefined(file.overrideId),
-            );
-            if (persistedPerson instanceof Person && file.id != null) {
-                const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
-                    ReferencedEntityType.PERSON,
-                    file.id,
-                    persistedPerson.id,
-                );
-                await this.dbSeedReferenceRepo.create(dbSeedReference);
-            } else {
-                this.logger.error('Person without ID thus not referenceable:');
-                this.logger.error(JSON.stringify(person));
-            }
+            await this.persistPersonAndCreateReference(person, file.id, file.overrideId);
         }
         this.logger.info(`Insert ${files.length} entities of type Person`);
     }
@@ -309,6 +468,41 @@ export class DbSeedService {
         const files: PersonFile[] = plainToInstance(PersonFile, personFile.entities);
         /* eslint-disable no-await-in-loop */
         for (const file of files) {
+            const existingRef: Option<string> = await this.findExistingReference(file.id, ReferencedEntityType.PERSON);
+
+            if (existingRef) {
+                const existingPerson: Option<Person<true>> = await this.personRepository.findById(existingRef);
+                if (existingPerson) {
+                    this.logger.info(
+                        `Updating TechnicalUser (seeding ID ${file.id}): vorname "${existingPerson.vorname}" -> "${file.vorname}", familienname "${existingPerson.familienname}" -> "${file.familienname}"`,
+                    );
+                    const updateResult: void | DomainError = existingPerson.update(
+                        existingPerson.revision,
+                        file.familienname,
+                        file.vorname,
+                    );
+                    if (updateResult instanceof DomainError) {
+                        this.logger.warning(
+                            `Could not update TechnicalUser with seeding ID ${file.id}: ${updateResult.message}`,
+                        );
+                    } else {
+                        const saveResult: Person<true> | DomainError = await this.personRepository.save(existingPerson);
+                        if (saveResult instanceof DomainError) {
+                            this.logger.warning(
+                                `Could not save TechnicalUser with seeding ID ${file.id}: ${saveResult.message}`,
+                            );
+                        } else {
+                            this.logger.info(`Updated TechnicalUser with seeding ID ${file.id}`);
+                        }
+                    }
+                } else {
+                    this.logger.warning(
+                        `TechnicalUser with UUID ${existingRef} not found for update (seeding ID ${file.id})`,
+                    );
+                }
+                continue;
+            }
+
             /* eslint-disable no-await-in-loop */
             const creationParams: PersonCreationParams = {
                 familienname: file.familienname,
@@ -328,22 +522,7 @@ export class DbSeedService {
 
             person.keycloakUserId = file.keycloakUserId;
 
-            const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
-                person,
-                undefined,
-                this.getValidUuidOrUndefined(file.overrideId),
-            );
-            if (persistedPerson instanceof Person && file.id != null) {
-                const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
-                    ReferencedEntityType.PERSON,
-                    file.id,
-                    persistedPerson.id,
-                );
-                await this.dbSeedReferenceRepo.create(dbSeedReference);
-            } else {
-                this.logger.error('Person without ID thus not referenceable:');
-                this.logger.error(JSON.stringify(person));
-            }
+            await this.persistPersonAndCreateReference(person, file.id, file.overrideId);
         }
         this.logger.info(`Insert ${files.length} entities of type Person`);
     }
@@ -386,11 +565,42 @@ export class DbSeedService {
                 befristung,
             );
 
+            // Check if exact (person, org, rolle) already exists → skip
+            const existingKontext: Option<Personenkontext<true>> =
+                await this.dBiamPersonenkontextRepoInternal.findByPersonIdOrgIdRolleId(
+                    referencedPerson.id,
+                    referencedOrga.id,
+                    referencedRolle.id,
+                );
+            if (existingKontext) {
+                this.logger.info(
+                    `Skipping personenkontext for person ${referencedPerson.id}, org ${referencedOrga.id}, rolle ${referencedRolle.id} because it already exists`,
+                );
+                continue;
+            }
+
             //Check specifications
-            const specificationCheckError: Option<DomainError> =
+            let specificationCheckError: Option<DomainError> =
                 await this.dbiamPersonenkontextService.checkSpecifications(personenKontext);
             if (specificationCheckError) {
-                throw specificationCheckError;
+                // Specification failed — this person likely has existing kontexte from a previous seeding
+                // with different rolle/org assignments that now conflict. Delete ALL kontexte for this
+                // person and retry the spec check with a clean slate.
+                this.logger.warning(
+                    `Specification failed for person ${referencedPerson.id}: ${specificationCheckError.message}. Deleting existing kontexte for this person and retrying.`,
+                );
+                const existingKontexte: Personenkontext<true>[] =
+                    await this.dBiamPersonenkontextRepoInternal.findByPersonId(referencedPerson.id);
+                for (const existing of existingKontexte) {
+                    await this.dBiamPersonenkontextRepoInternal.delete(existing);
+                }
+                specificationCheckError = await this.dbiamPersonenkontextService.checkSpecifications(personenKontext);
+                if (specificationCheckError) {
+                    this.logger.warning(
+                        `Skipping personenkontext for person ${referencedPerson.id}, org ${referencedOrga.id}, rolle ${referencedRolle.id} due to specification error: ${specificationCheckError.message}`,
+                    );
+                    continue;
+                }
             }
 
             if (file.overrideId) {
@@ -477,6 +687,29 @@ export class DbSeedService {
         return fs.readdirSync(path).filter(function (file: string) {
             return fs.statSync(path + '/' + file).isDirectory();
         });
+    }
+
+    private async persistPersonAndCreateReference(
+        person: Person<false>,
+        fileId: number | undefined,
+        overrideId: string | undefined,
+    ): Promise<void> {
+        const persistedPerson: Person<true> | DomainError = await this.personRepository.create(
+            person,
+            undefined,
+            this.getValidUuidOrUndefined(overrideId),
+        );
+        if (persistedPerson instanceof Person && fileId != null) {
+            const dbSeedReference: DbSeedReference = DbSeedReference.createNew(
+                ReferencedEntityType.PERSON,
+                fileId,
+                persistedPerson.id,
+            );
+            await this.dbSeedReferenceRepo.create(dbSeedReference);
+        } else {
+            this.logger.error('Person without ID thus not referenceable:');
+            this.logger.error(JSON.stringify(person));
+        }
     }
 
     public isValidUuid(id: unknown): id is string {

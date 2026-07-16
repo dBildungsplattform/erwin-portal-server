@@ -58,6 +58,23 @@
                 "SCHULPORTAL_VERWALTEN"
             ],
             "serviceProviderIds": [1, 2, 3, 4]
+        },
+        {
+            "id": 6,
+            "administeredBySchulstrukturknoten": 0,
+            "name": "Portaladministratorseeding",
+            "rollenart": "PORTALADMINSEEDING",
+            "merkmale": [],
+            "systemrechte": [
+                "PERSONEN_LESEN",
+                "PERSONEN_ANLEGEN",
+                "PERSONEN_VERWALTEN",
+                "SERVICEPROVIDER_VERWALTEN",
+
+                "ROLLEN_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN"
+            ],
+            "serviceProviderIds": [1, 2, 3, 4]
         }
     ]
 }

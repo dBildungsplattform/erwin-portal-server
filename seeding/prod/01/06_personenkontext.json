@@ -8,8 +8,13 @@
         },
         {
             "personId": 901,
+            "organisationId": 3,
+            "rolleId": 2
+        },
+        {
+            "personId": 902,
             "organisationId": 0,
-            "rolleId": 1
+            "rolleId": 6
         }
     ]
 }

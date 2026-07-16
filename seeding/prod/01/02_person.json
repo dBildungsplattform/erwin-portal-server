@@ -14,6 +14,13 @@
             "password": "${SEED_USER_PASSWORD}",
             "vorname": "${SEED_USER_VORNAME}",
             "familienname": "${SEED_USER_FAMILIENNAME}"
+        },
+        {
+            "id": 902,
+            "username": "${SEED_PORTALADMIN_USERNAME}",
+            "password": "${SEED_PORTALADMIN_PASSWORD}",
+            "vorname": "${SEED_PORTALADMIN_VORNAME}",
+            "familienname": "${SEED_PORTALADMIN_FAMILIENNAME}"
         }
     ]
 }
