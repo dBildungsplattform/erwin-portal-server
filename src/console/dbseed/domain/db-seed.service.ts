@@ -64,7 +64,7 @@ export class DbSeedService {
         id: number | undefined,
         referenceType: ReferencedEntityType,
     ): Promise<Option<string>> {
-        if (id === undefined) {
+        if (id === undefined || typeof id !== 'number') {
             return undefined;
         }
 
