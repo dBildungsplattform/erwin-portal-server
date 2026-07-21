@@ -101,7 +101,7 @@ backend:
   maxUnavailable: '50%'
   maxSurge: '50%'
   image:
-    repository: ghcr.io/dbildungsplattform/erwin-portal-server
+    repository: ghcr.io/hpi-schul-cloud/erwin-portal-server
     tag: ''
     pullPolicy: Always
   containerPorts:

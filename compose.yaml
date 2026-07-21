@@ -12,7 +12,7 @@ services:
       - POSTGRES_DB=erwin-portal-server
 
   keycloak:
-    image: ghcr.io/dbildungsplattform/erwin-portal-keycloak:latest
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-keycloak:latest
     container_name: keycloak
     hostname: keycloak
     environment:
@@ -45,7 +45,7 @@ services:
       - ./config/dev-realm-spsh.json:/opt/keycloak/data/import/realm.json
 
   keycloak-db-microservice:
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     profiles:
       - kc-service
     build:
@@ -75,7 +75,7 @@ services:
   backend:
     profiles:
       - backend
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     container_name: spsh-backend
     # build:
     #   context: .
@@ -108,7 +108,7 @@ services:
     profiles:
       - db-init
       - db-seed
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     build:
       context: .
     depends_on:
@@ -128,7 +128,7 @@ services:
   db-seed:
     profiles:
       - db-seed
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     build:
       context: .
     depends_on:
@@ -151,7 +151,7 @@ services:
   db-migrate:
     profiles:
       - db-migrate
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     build:
       context: .
     depends_on:
@@ -171,7 +171,7 @@ services:
   keycloak-client-update:
     profiles:
       - keycloak-client-update
-    image: ghcr.io/dbildungsplattform/erwin-portal-server
+    image: ghcr.io/hpi-schul-cloud/erwin-portal-server
     build:
       context: .
     depends_on:
